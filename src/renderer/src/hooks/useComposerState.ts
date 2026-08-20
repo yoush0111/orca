@@ -92,6 +92,7 @@ import {
   getLinearLinkedWorkItemBranchName,
   isLinearLinkedWorkItem
 } from '@/lib/linear-linked-work-item'
+import { getLinkedWorkItemBranchNameOverride } from '@/lib/linked-work-item-branch-name'
 import { getLinearIssueWorkspaceName } from '../../../shared/workspace-name'
 import {
   getFullComposerCreateDisabled,
@@ -1016,7 +1017,7 @@ export function useComposerState(options: UseComposerStateOptions): UseComposerS
   const [linkedWorkItem, setLinkedWorkItem] = useState<LinkedWorkItemSummary | null>(
     () => linkedWorkItemSeed
   )
-  const initialLinearBranchName = getLinearLinkedWorkItemBranchName(linkedWorkItemSeed)
+  const initialLinkedBranchName = getLinkedWorkItemBranchNameOverride(linkedWorkItemSeed)
   const [linkedTaskSourceContext, setLinkedTaskSourceContext] = useState<TaskSourceContext | null>(
     () => draftLinkedTaskSourceContext ?? initialLinkedTaskSourceContext
   )
@@ -1152,10 +1153,10 @@ export function useComposerState(options: UseComposerStateOptions): UseComposerS
     persistDraft ? newWorkspaceDraft?.compareBaseRef : undefined
   )
   const [branchNameOverride, setBranchNameOverride] = useState<string | undefined>(
-    initialLinearBranchName
+    initialLinkedBranchName
   )
   const [branchNameOverridePreservesNameEdits, setBranchNameOverridePreservesNameEdits] = useState(
-    Boolean(initialLinearBranchName)
+    Boolean(initialLinkedBranchName)
   )
   const [smartNameMode, setSmartNameMode] = useState<SmartNameMode>('smart')
   // Why: a pasted Jira URL is not a workspace name yet — block create until it resolves to an issue.
@@ -2717,9 +2718,10 @@ export function useComposerState(options: UseComposerStateOptions): UseComposerS
           hint = `was ${baseBranch}`
         }
       }
-      const preserveLinearLinkedWorkItem = isLinearLinkedWorkItem(linkedWorkItem)
-      const preservedLinearBranchName = preserveLinearLinkedWorkItem
-        ? getLinearLinkedWorkItemBranchName(linkedWorkItem)
+      // Why: Linear and Redmine sources are workspace-scoped, so their canonical
+      // branch survives choosing a different implementation repo.
+      const preservedLinearBranchName = shouldPreserveWorkspaceSourceOnRepoChange(linkedWorkItem)
+        ? getLinkedWorkItemBranchNameOverride(linkedWorkItem)
         : undefined
       setRepoId(value)
       if (!options.preserveStartFrom) {

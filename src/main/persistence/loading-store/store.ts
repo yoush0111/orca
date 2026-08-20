@@ -1044,8 +1044,15 @@ export class Store {
           : rawTaskProviderSettings.visibleTaskProviders.includes('jira')
             ? rawTaskProviderSettings.visibleTaskProviders
             : [...rawTaskProviderSettings.visibleTaskProviders, 'jira' as const]
+        const visibleTaskProvidersDefaultedForRedmine =
+          parsed.settings?.visibleTaskProvidersDefaultedForRedmine === true
+        const migratedVisibleTaskProvidersWithRedmine =
+          visibleTaskProvidersDefaultedForRedmine ||
+          migratedVisibleTaskProviders.includes('redmine')
+            ? migratedVisibleTaskProviders
+            : [...migratedVisibleTaskProviders, 'redmine' as const]
         const taskProviderSettings = normalizeTaskProviderSettings({
-          visibleTaskProviders: migratedVisibleTaskProviders,
+          visibleTaskProviders: migratedVisibleTaskProvidersWithRedmine,
           defaultTaskSource: rawTaskProviderSettings.defaultTaskSource
         })
         const primarySelectionDefaultedForLinux =
@@ -1064,7 +1071,7 @@ export class Store {
         if (migratePrimarySelectionPlatformDefault || stampPrimarySelectionTerminalDefaults) {
           this.loadNeedsSave = true
         }
-        if (!visibleTaskProvidersDefaultedForJira) {
+        if (!visibleTaskProvidersDefaultedForJira || !visibleTaskProvidersDefaultedForRedmine) {
           this.loadNeedsSave = true
         }
         const claudeAgentTeamsDefaultDisabledMigrated =
@@ -1265,6 +1272,7 @@ export class Store {
             defaultTaskSource: taskProviderSettings.defaultTaskSource,
             visibleTaskProviders: taskProviderSettings.visibleTaskProviders,
             visibleTaskProvidersDefaultedForJira: true,
+            visibleTaskProvidersDefaultedForRedmine: true,
             terminalShortcutPolicy: normalizeTerminalShortcutPolicy(
               parsed.settings?.terminalShortcutPolicy
             ),
