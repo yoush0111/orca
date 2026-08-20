@@ -2055,6 +2055,22 @@ const api = {
     }): Promise<JiraProjectStatusOrder> => ipcRenderer.invoke('jira:getProjectStatusOrder', args)
   },
 
+  redmine: {
+    connect: (args: { baseUrl: string; apiKey: string }): Promise<unknown> =>
+      ipcRenderer.invoke('redmine:connect', args),
+    disconnect: (): Promise<void> => ipcRenderer.invoke('redmine:disconnect'),
+    status: (): Promise<unknown> => ipcRenderer.invoke('redmine:status'),
+    testConnection: (): Promise<unknown> => ipcRenderer.invoke('redmine:testConnection'),
+    listIssues: (args?: {
+      mineOnly?: boolean
+      projectId?: number | null
+      statusId?: string
+      limit?: number
+    }): Promise<unknown[]> => ipcRenderer.invoke('redmine:listIssues', args),
+    listProjects: (): Promise<unknown[]> => ipcRenderer.invoke('redmine:listProjects'),
+    listStatuses: (): Promise<unknown[]> => ipcRenderer.invoke('redmine:listStatuses')
+  },
+
   starNag: {
     onShow: (
       callback: (payload?: { mode?: 'gh' | 'web'; surface?: 'card' | 'toast' }) => void
