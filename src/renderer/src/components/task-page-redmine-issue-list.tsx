@@ -1,14 +1,22 @@
+import { useCallback } from 'react'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { translate } from '@/i18n/i18n'
+import { openHttpLink } from '@/lib/http-link-routing'
 import { cn } from '@/lib/utils'
+import { useAppStore } from '@/store'
+import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
 import type { RedmineIssue } from '../../../shared/redmine-types'
 
 type TaskPageRedmineIssueListProps = {
   issues: readonly RedmineIssue[]
   onStartWorkspace: (issue: RedmineIssue) => void
+}
+
+function isMacShortcutPlatform(): boolean {
+  return typeof navigator !== 'undefined' && navigator.userAgent.includes('Mac')
 }
 
 // Shared between the header and every row so the columns stay aligned.
@@ -21,9 +29,11 @@ function clampDoneRatio(value: number): number {
 
 function RedmineIssueRow({
   issue,
+  onOpenExternal,
   onStartWorkspace
 }: {
   issue: RedmineIssue
+  onOpenExternal: (issue: RedmineIssue, event: React.MouseEvent) => void
   onStartWorkspace: (issue: RedmineIssue) => void
 }): React.JSX.Element {
   const doneRatio = clampDoneRatio(issue.doneRatio)
@@ -106,7 +116,7 @@ function RedmineIssueRow({
             <Button
               variant="ghost"
               size="icon-xs"
-              onClick={() => window.api.shell.openUrl(issue.url)}
+              onClick={(event) => onOpenExternal(issue, event)}
               aria-label={translate(
                 'auto.components.task.page.redmine.issue.list.openInRedmine',
                 'Open #{{value0}} in Redmine',
@@ -132,6 +142,19 @@ export function TaskPageRedmineIssueList({
   issues,
   onStartWorkspace
 }: TaskPageRedmineIssueListProps): React.JSX.Element {
+  const activeWorktreeId = useAppStore((s) => s.activeWorktreeId)
+  // Why: route through Link Routing so the issue can land in an Orca browser
+  // tab; Shift+Cmd/Ctrl stays the system-browser escape hatch.
+  const handleOpenExternal = useCallback(
+    (issue: RedmineIssue, event: React.MouseEvent): void => {
+      openHttpLink(
+        issue.url,
+        resolveRedmineIssueOpenOptions(event, isMacShortcutPlatform(), activeWorktreeId)
+      )
+    },
+    [activeWorktreeId]
+  )
+
   return (
     <div>
       <div
@@ -160,7 +183,12 @@ export function TaskPageRedmineIssueList({
       </div>
       <div className="divide-y divide-border/50">
         {issues.map((issue) => (
-          <RedmineIssueRow key={issue.id} issue={issue} onStartWorkspace={onStartWorkspace} />
+          <RedmineIssueRow
+            key={issue.id}
+            issue={issue}
+            onOpenExternal={handleOpenExternal}
+            onStartWorkspace={onStartWorkspace}
+          />
         ))}
       </div>
     </div>
