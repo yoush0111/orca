@@ -294,6 +294,7 @@ import type {
   JiraIssueUpdate,
   JiraSiteSelection
 } from '../../shared/jira-types'
+import type { RedmineConnectArgs, RedmineIssueQuery } from '../../shared/redmine-types'
 import type { LinearCustomViewModel, LinearProjectSummary } from '../../shared/linear/project-types'
 import type { LinearWorkspaceSelection } from '../../shared/linear/workspace-types'
 import type {
@@ -982,6 +983,15 @@ import {
   selectSite as selectJiraSite,
   testConnection as testJiraConnection
 } from '../jira/client'
+import {
+  connect as connectRedmine,
+  disconnect as disconnectRedmine,
+  getStatus as getRedmineStatus,
+  listIssues as listRedmineIssues,
+  listProjects as listRedmineProjects,
+  listStatuses as listRedmineStatuses,
+  testConnection as testRedmineConnection
+} from '../redmine/client'
 import {
   addIssueComment as addJiraIssueComment,
   createIssue as createJiraIssue,
@@ -38550,6 +38560,37 @@ export class OrcaRuntimeService {
   jiraDisconnect(siteId?: string): { ok: true } {
     disconnectJira(siteId)
     return { ok: true }
+  }
+
+  // ── Redmine integration ──
+
+  redmineConnect(args: RedmineConnectArgs): ReturnType<typeof connectRedmine> {
+    return connectRedmine(args)
+  }
+
+  redmineDisconnect(): { ok: true } {
+    disconnectRedmine()
+    return { ok: true }
+  }
+
+  redmineStatus(): ReturnType<typeof getRedmineStatus> {
+    return getRedmineStatus()
+  }
+
+  redmineTestConnection(): ReturnType<typeof testRedmineConnection> {
+    return testRedmineConnection()
+  }
+
+  redmineListIssues(query: RedmineIssueQuery): ReturnType<typeof listRedmineIssues> {
+    return listRedmineIssues(query)
+  }
+
+  redmineListProjects(): ReturnType<typeof listRedmineProjects> {
+    return listRedmineProjects()
+  }
+
+  redmineListStatuses(): ReturnType<typeof listRedmineStatuses> {
+    return listRedmineStatuses()
   }
 
   jiraSelectSite(siteId: JiraSiteSelection): ReturnType<typeof getJiraStatus> {

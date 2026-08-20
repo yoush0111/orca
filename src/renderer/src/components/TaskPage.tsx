@@ -198,6 +198,8 @@ import {
 } from '@/components/linear-project-view-surfaces'
 import JiraIssueWorkspace from '@/components/JiraIssueWorkspace'
 import { TaskPageJiraIssueList } from '@/components/task-page-jira-issue-list'
+import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
+import { RedmineConnectDialog } from '@/components/redmine-connect-dialog'
 import {
   getSingleJiraProjectScope,
   getTaskPageJiraStatusOrderScopeKey,
@@ -363,6 +365,9 @@ import type {
   JiraProject,
   JiraProjectStatusOrder
 } from '../../../shared/jira-types'
+import type { RedmineIssue } from '../../../shared/redmine-types'
+import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
+import { redmineWorkspaceSeedName } from '../../../shared/redmine-workspace-name'
 import type { LinearIssue } from '../../../shared/linear/issue-types'
 import type {
   LinearCustomViewModel,
@@ -3034,6 +3039,10 @@ export default function TaskPage(): React.JSX.Element {
   const searchJiraIssues = useAppStore((s) => s.searchJiraIssues)
   const listJiraIssues = useAppStore((s) => s.listJiraIssues)
   const checkJiraConnection = useAppStore((s) => s.checkJiraConnection)
+  const redmineStatus = useAppStore((s) => s.redmineStatus)
+  const redmineStatusChecked = useAppStore((s) => s.redmineStatusChecked)
+  const redmineStatusContextKey = useAppStore((s) => s.redmineStatusContextKey)
+  const checkRedmineConnection = useAppStore((s) => s.checkRedmineConnection)
   const providerRuntimeContextKey = getProviderRuntimeContextKey(settings)
   const providerRuntimeContextKeyRef = useRef(providerRuntimeContextKey)
   providerRuntimeContextKeyRef.current = providerRuntimeContextKey
@@ -3042,6 +3051,8 @@ export default function TaskPage(): React.JSX.Element {
   const preflightStatusCurrent = preflightStatusContextKey === expectedPreflightContextKey
   const linearStatusReady = linearStatusCurrent && linearStatusChecked
   const jiraStatusReady = jiraStatusCurrent && jiraStatusChecked
+  const redmineStatusReady =
+    redmineStatusContextKey === providerRuntimeContextKey && redmineStatusChecked
   const linearConnected = linearStatusCurrent && linearStatus.connected
   const jiraConnected = jiraStatusCurrent && jiraStatus.connected
   const submitShortcutLabel = getScreenSubmitShortcutLabel()
@@ -3428,6 +3439,20 @@ export default function TaskPage(): React.JSX.Element {
       selectedJiraSiteId
     ]
   )
+  const redmineTaskSourceContext = useMemo(
+    () =>
+      normalizeTaskSourceContext({
+        provider: 'redmine',
+        projectId: fallbackTaskSourceProjectId,
+        hostId: accountBackedTaskSourceHostId,
+        providerIdentity: {
+          provider: 'redmine',
+          baseUrl: redmineStatus.connection?.baseUrl ?? null
+        },
+        accountLabel: redmineStatus.connection?.baseUrl ?? null
+      }),
+    [accountBackedTaskSourceHostId, fallbackTaskSourceProjectId, redmineStatus.connection]
+  )
   const jiraTaskSourceScopeKey = jiraTaskSourceContext
     ? getTaskSourceCacheScope(jiraTaskSourceContext)
     : providerRuntimeContextKey
@@ -3505,6 +3530,13 @@ export default function TaskPage(): React.JSX.Element {
           sourceCount: 1,
           hostLabelById,
           hostAvailability: accountAvailability
+        }) ?? undefined,
+      redmine:
+        getTaskSourceAvailabilityNotice({
+          providerLabel: labelFor('redmine'),
+          sourceCount: 1,
+          hostLabelById,
+          hostAvailability: accountAvailability
         }) ?? undefined
     }
   }, [
@@ -3534,9 +3566,11 @@ export default function TaskPage(): React.JSX.Element {
       selectedRepoCount: selectedRepos.length,
       linearWorkspaceName:
         selectedLinearWorkspace?.organizationName ?? selectedLinearWorkspace?.id ?? null,
-      jiraSiteName: selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null
+      jiraSiteName: selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null,
+      redmineBaseUrl: redmineStatus.connection?.baseUrl ?? null
     })
   }, [
+    redmineStatus.connection,
     selectedJiraSite,
     selectedLinearWorkspace,
     selectedRepos.length,
@@ -5872,6 +5906,7 @@ export default function TaskPage(): React.JSX.Element {
 
   const [linearConnectOpen, setLinearConnectOpen] = useState(false)
   const [jiraConnectOpen, setJiraConnectOpen] = useState(false)
+  const [redmineConnectOpen, setRedmineConnectOpen] = useState(false)
   useContextualTour(
     'tasks',
     !dialogWorkItem &&
@@ -7937,8 +7972,13 @@ export default function TaskPage(): React.JSX.Element {
     if (!jiraStatusReady) {
       void checkJiraConnection()
     }
+    if (!redmineStatusReady) {
+      void checkRedmineConnection()
+    }
   }, [
     checkJiraConnection,
+    checkRedmineConnection,
+    redmineStatusReady,
     checkLinearConnection,
     expectedPreflightContextKey,
     jiraStatusContextKey,
@@ -8846,6 +8886,18 @@ export default function TaskPage(): React.JSX.Element {
       openComposerForJiraItem(issue)
     },
     [openComposerForJiraItem]
+  )
+
+  const handleUseRedmineItem = useCallback(
+    (issue: RedmineIssue): void => {
+      openModal('new-workspace-composer', {
+        linkedWorkItem: buildRedmineWorkspaceSource(issue),
+        taskSourceContext: redmineTaskSourceContext,
+        prefilledName: redmineWorkspaceSeedName(issue),
+        telemetrySource: 'sidebar'
+      })
+    },
+    [openModal, redmineTaskSourceContext]
   )
 
   const taskPageListChromeHidden = shouldHideTaskPageListChrome({
@@ -10974,6 +11026,13 @@ export default function TaskPage(): React.JSX.Element {
                 />
               </div>
             )
+          ) : taskSource === 'redmine' ? (
+            <TaskPageRedminePanel
+              onConnectRequest={() => setRedmineConnectOpen(true)}
+              onHideProvider={() => hideTaskSource('redmine', 'Redmine')}
+              onStartWorkspace={handleUseRedmineItem}
+              sourceContext={redmineTaskSourceContext}
+            />
           ) : taskSource === 'linear' && selectedLinearIssue ? (
             <LinearIssueWorkspace
               issue={selectedLinearIssue}
@@ -13569,6 +13628,7 @@ export default function TaskPage(): React.JSX.Element {
       />
 
       <JiraConnectDialog open={jiraConnectOpen} onOpenChange={setJiraConnectOpen} />
+      <RedmineConnectDialog open={redmineConnectOpen} onOpenChange={setRedmineConnectOpen} />
     </div>
   )
 }
