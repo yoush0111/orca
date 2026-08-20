@@ -30,5 +30,8 @@ export function shouldHideTaskPageListChrome({
       return hasJiraDetail
     case 'linear':
       return hasLinearIssueDetail || hasLinearProjectContext || hasLinearViewContext
+    // Why: the Redmine surface is list-only, so it has no detail view to hide chrome for.
+    case 'redmine':
+      return false
   }
 }

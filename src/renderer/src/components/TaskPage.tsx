@@ -88,6 +88,7 @@ import type { NewLinearProjectDialogProps } from '@/components/task-page/dialogs
 import type { NewLinearIssueDialogProps } from '@/components/task-page/dialogs/new-linear-issue-dialog'
 import type { NewJiraIssueDialogProps } from '@/components/task-page/dialogs/new-jira-issue-dialog'
 import type { TaskPageConnectDialogsProps } from '@/components/task-page/dialogs/task-page-connect-dialogs'
+import type { TaskPageRedminePanelProps } from '@/components/task-page-redmine-panel'
 import type { LinearViewsHostProps } from '@/components/task-page/linear/linear-views-host'
 import { useTaskPageStoreBindings } from '@/components/task-page/hooks/use-task-page-store-bindings'
 import { useTaskPageRepoSelection } from '@/components/task-page/source/use-task-page-repo-selection'
@@ -118,6 +119,9 @@ import { useTaskPageLinearIssueWindow } from '@/components/task-page/hooks/use-t
 import { useTaskPageLinearActions } from '@/components/task-page/hooks/use-task-page-linear-actions'
 import { useTaskPageJiraFetch } from '@/components/task-page/hooks/use-task-page-jira-fetch'
 import { useTaskPageJiraActions } from '@/components/task-page/hooks/use-task-page-jira-actions'
+import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
+import { redmineWorkspaceSeedName } from '../../../shared/redmine-workspace-name'
+import type { RedmineIssue } from '../../../shared/redmine-types'
 import { useTaskPageGitHubFilteredItems } from '@/components/task-page/hooks/use-task-page-github-filtered-items'
 import { useTaskPageGitHubPageLoader } from '@/components/task-page/hooks/use-task-page-github-page-loader'
 import { useTaskPageCreateLinearSubmits } from '@/components/task-page/hooks/use-task-page-create-linear-submits'
@@ -189,6 +193,9 @@ export default function TaskPage(): React.JSX.Element {
     searchJiraIssues,
     listJiraIssues,
     checkJiraConnection,
+    redmineStatus,
+    checkRedmineConnection,
+    redmineStatusReady,
     providerRuntimeContextKey,
     providerRuntimeContextKeyRef,
     preflightStatusCurrent,
@@ -270,6 +277,7 @@ export default function TaskPage(): React.JSX.Element {
   const {
     taskSourceHostAvailability,
     accountBackedTaskSourceHostId,
+    fallbackTaskSourceProjectId,
     linearTaskSourceContext,
     linearListInvalidationVersionForSource,
     jiraTaskSourceContext,
@@ -292,6 +300,20 @@ export default function TaskPage(): React.JSX.Element {
     selectedJiraSite,
     selectedJiraSiteId
   })
+  const redmineTaskSourceContext = useMemo(
+    () =>
+      normalizeTaskSourceContext({
+        provider: 'redmine',
+        projectId: fallbackTaskSourceProjectId,
+        hostId: accountBackedTaskSourceHostId,
+        providerIdentity: {
+          provider: 'redmine',
+          baseUrl: redmineStatus.connection?.baseUrl ?? null
+        },
+        accountLabel: redmineStatus.connection?.baseUrl ?? null
+      }),
+    [accountBackedTaskSourceHostId, fallbackTaskSourceProjectId, redmineStatus.connection]
+  )
   const {
     taskSourceAvailabilityNoticeByProvider,
     taskSourceContextSummary,
@@ -312,6 +334,7 @@ export default function TaskPage(): React.JSX.Element {
     taskSourceHostAvailability,
     selectedLinearWorkspace,
     selectedJiraSite,
+    redmineBaseUrl: redmineStatus.connection?.baseUrl ?? null,
     sourceOptions
   })
   const {
@@ -1279,6 +1302,7 @@ export default function TaskPage(): React.JSX.Element {
   })
 
   const [jiraConnectOpen, setJiraConnectOpen] = useState(false)
+  const [redmineConnectOpen, setRedmineConnectOpen] = useState(false)
   useContextualTour(
     'tasks',
     !dialogWorkItem &&
@@ -1926,8 +1950,13 @@ export default function TaskPage(): React.JSX.Element {
     if (!jiraStatusReady) {
       void checkJiraConnection()
     }
+    if (!redmineStatusReady) {
+      void checkRedmineConnection()
+    }
   }, [
     checkJiraConnection,
+    checkRedmineConnection,
+    redmineStatusReady,
     checkLinearConnection,
     expectedPreflightContextKey,
     jiraStatusContextKey,
@@ -2528,6 +2557,18 @@ export default function TaskPage(): React.JSX.Element {
     setLinearRefreshNonce
   })
 
+  const handleUseRedmineItem = useCallback(
+    (issue: RedmineIssue): void => {
+      openModal('new-workspace-composer', {
+        linkedWorkItem: buildRedmineWorkspaceSource(issue),
+        taskSourceContext: redmineTaskSourceContext,
+        prefilledName: redmineWorkspaceSeedName(issue),
+        telemetrySource: 'sidebar'
+      })
+    },
+    [openModal, redmineTaskSourceContext]
+  )
+
   const { handleUseJiraItem } = useTaskPageJiraActions({
     jiraSites,
     jiraTaskSourceContext,
@@ -3044,6 +3085,12 @@ export default function TaskPage(): React.JSX.Element {
     submitShortcutLabel,
     hasMissingJiraCreateField
   }
+  const redminePanel: TaskPageRedminePanelProps = {
+    onConnectRequest: () => setRedmineConnectOpen(true),
+    onHideProvider: () => hideTaskSource('redmine', 'Redmine'),
+    onStartWorkspace: handleUseRedmineItem,
+    sourceContext: redmineTaskSourceContext
+  }
   const connectDialogs: TaskPageConnectDialogsProps = {
     gitlabDialogItem,
     gitlabDialogRepo,
@@ -3055,7 +3102,9 @@ export default function TaskPage(): React.JSX.Element {
     selectedLinearWorkspace,
     handleLinearAccessConnected,
     jiraConnectOpen,
-    setJiraConnectOpen
+    setJiraConnectOpen,
+    redmineConnectOpen,
+    setRedmineConnectOpen
   }
 
   return (
@@ -3080,6 +3129,7 @@ export default function TaskPage(): React.JSX.Element {
       primaryRepo={primaryRepo}
       gitlabList={gitlabList}
       jiraList={jiraList}
+      redminePanel={redminePanel}
       linearViews={linearViews}
       newGithubIssue={newGithubIssue}
       newLinearProject={newLinearProject}

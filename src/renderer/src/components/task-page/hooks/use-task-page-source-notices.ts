@@ -37,6 +37,7 @@ export function useTaskPageSourceNotices({
   taskSourceHostAvailability,
   selectedLinearWorkspace,
   selectedJiraSite,
+  redmineBaseUrl,
   sourceOptions
 }: {
   taskSource: TaskProvider
@@ -56,6 +57,7 @@ export function useTaskPageSourceNotices({
   taskSourceHostAvailability: TaskSourceHostAvailability[]
   selectedLinearWorkspace: LinearWorkspace | null
   selectedJiraSite: JiraSite | null
+  redmineBaseUrl: string | null
   sourceOptions: SourceOption[]
 }) {
   const taskSourceAvailabilityNoticeByProvider = useMemo<
@@ -124,6 +126,13 @@ export function useTaskPageSourceNotices({
           sourceCount: 1,
           hostLabelById,
           hostAvailability: accountAvailability
+        }) ?? undefined,
+      redmine:
+        getTaskSourceAvailabilityNotice({
+          providerLabel: labelFor('redmine'),
+          sourceCount: 1,
+          hostLabelById,
+          hostAvailability: accountAvailability
         }) ?? undefined
     }
   }, [
@@ -153,9 +162,11 @@ export function useTaskPageSourceNotices({
       selectedRepoCount: selectedRepos.length,
       linearWorkspaceName:
         selectedLinearWorkspace?.organizationName ?? selectedLinearWorkspace?.id ?? null,
-      jiraSiteName: selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null
+      jiraSiteName: selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null,
+      redmineBaseUrl
     })
   }, [
+    redmineBaseUrl,
     selectedJiraSite,
     selectedLinearWorkspace,
     selectedRepos.length,

@@ -64,6 +64,10 @@ import {
   type TaskPageConnectDialogsProps
 } from '@/components/task-page/dialogs/task-page-connect-dialogs'
 import {
+  TaskPageRedminePanel,
+  type TaskPageRedminePanelProps
+} from '@/components/task-page-redmine-panel'
+import {
   LinearViewsHost,
   type LinearViewsHostProps
 } from '@/components/task-page/linear/linear-views-host'
@@ -92,6 +96,7 @@ export function TaskPageLayout({
   primaryRepo,
   gitlabList,
   jiraList,
+  redminePanel,
   linearViews,
   newGithubIssue,
   newLinearProject,
@@ -119,6 +124,7 @@ export function TaskPageLayout({
   primaryRepo: Repo | null
   gitlabList: GitlabWorkItemListProps
   jiraList: JiraIssueListHostProps
+  redminePanel: TaskPageRedminePanelProps
   linearViews: LinearViewsHostProps
   newGithubIssue: NewGithubIssueDialogProps
   newLinearProject: NewLinearProjectDialogProps
@@ -168,6 +174,8 @@ export function TaskPageLayout({
             <GitlabWorkItemList {...gitlabList} />
           ) : taskSource === 'jira' ? (
             <JiraIssueListHost {...jiraList} />
+          ) : taskSource === 'redmine' ? (
+            <TaskPageRedminePanel {...redminePanel} />
           ) : taskSource === 'linear' ? (
             <LinearViewsHost {...linearViews} />
           ) : null}

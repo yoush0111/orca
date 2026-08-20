@@ -8,12 +8,13 @@ import {
   resolveVisibleTaskProvider
 } from '../../../../shared/task-providers'
 import { JiraIcon } from '@/components/icons/JiraIcon'
+import { RedmineIcon } from '@/components/icons/RedmineIcon'
 import { LinearIcon } from '@/components/icons/LinearIcon'
 import { Button } from '@/components/ui/button'
 import { useAppStore } from '@/store'
 import { SearchableSetting } from './SearchableSetting'
 import { SettingsSubsectionHeader } from './SettingsFormControls'
-import { CodeHostSetupSteps, JiraSetupSteps } from './TaskSourceSimpleSetup'
+import { CodeHostSetupSteps, JiraSetupSteps, RedmineSetupSteps } from './TaskSourceSimpleSetup'
 import { TaskSourceLinearSetup } from './TaskSourceLinearSetup'
 import { TaskSourceProviderCard } from './TaskSourceProviderCard'
 import {
@@ -22,7 +23,8 @@ import {
 } from './task-source-setup-state'
 import {
   JIRA_INTEGRATION_SECTION_ID,
-  LINEAR_INTEGRATION_SECTION_ID
+  LINEAR_INTEGRATION_SECTION_ID,
+  REDMINE_INTEGRATION_SECTION_ID
 } from './task-provider-integration-section-ids'
 import { getTasksPaneSearchKeywords } from './tasks-search'
 import { useIntegrationProviderStatusRefresh } from './use-integration-provider-status-refresh'
@@ -89,6 +91,18 @@ const PROVIDER_META: Record<
       )
     },
     Icon: ({ className }) => <JiraIcon className={className} />
+  },
+  redmine: {
+    get label() {
+      return translate('auto.components.settings.TasksPane.redmineLabel', 'Redmine')
+    },
+    get description() {
+      return translate(
+        'auto.components.settings.TasksPane.redmineDescription',
+        'Connect a Redmine instance with its REST API key and show it in Tasks.'
+      )
+    },
+    Icon: ({ className }) => <RedmineIcon className={className} />
   }
 }
 
@@ -97,6 +111,7 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
   const openSettingsPage = useAppStore((s) => s.openSettingsPage)
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
   const checkJiraConnection = useAppStore((s) => s.checkJiraConnection)
+  const checkRedmineConnection = useAppStore((s) => s.checkRedmineConnection)
   const refreshPreflightStatus = useAppStore((s) => s.refreshPreflightStatus)
   const readinessByProvider = useTaskSourceProviderReadiness(visibleProviders)
   useIntegrationProviderStatusRefresh()
@@ -216,6 +231,16 @@ export function TasksPane({ settings, updateSettings }: TasksPaneProps): React.J
                     canHide={canHide}
                     onToggleVisible={() => toggleProvider('linear')}
                     onOpenIntegrations={() => openIntegrations(LINEAR_INTEGRATION_SECTION_ID)}
+                  />
+                ) : provider === 'redmine' ? (
+                  <RedmineSetupSteps
+                    connected={readiness.connected}
+                    checking={readiness.checking}
+                    visible={visible}
+                    canHide={canHide}
+                    onToggleVisible={() => toggleProvider('redmine')}
+                    onConnected={() => void checkRedmineConnection()}
+                    onOpenIntegrations={() => openIntegrations(REDMINE_INTEGRATION_SECTION_ID)}
                   />
                 ) : provider === 'jira' ? (
                   <JiraSetupSteps

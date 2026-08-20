@@ -3,6 +3,7 @@ import React from 'react'
 import GitLabItemDialog from '@/components/GitLabItemDialog'
 import { JiraConnectDialog } from '@/components/jira-connect-dialog'
 import { LinearApiKeyDialog } from '@/components/linear-api-key-dialog'
+import { RedmineConnectDialog } from '@/components/redmine-connect-dialog'
 import { translate } from '@/i18n/i18n'
 import type { GitLabWorkItem } from '../../../../../shared/gitlab-types'
 import type { LinearWorkspace } from '../../../../../shared/linear/workspace-types'
@@ -21,6 +22,8 @@ export type TaskPageConnectDialogsProps = {
   handleLinearAccessConnected: () => void
   jiraConnectOpen: boolean
   setJiraConnectOpen: (open: boolean) => void
+  redmineConnectOpen: boolean
+  setRedmineConnectOpen: (open: boolean) => void
 }
 
 export function TaskPageConnectDialogs({
@@ -34,7 +37,9 @@ export function TaskPageConnectDialogs({
   selectedLinearWorkspace,
   handleLinearAccessConnected,
   jiraConnectOpen,
-  setJiraConnectOpen
+  setJiraConnectOpen,
+  redmineConnectOpen,
+  setRedmineConnectOpen
 }: TaskPageConnectDialogsProps): React.JSX.Element {
   return (
     <>
@@ -67,6 +72,8 @@ export function TaskPageConnectDialogs({
       />
 
       <JiraConnectDialog open={jiraConnectOpen} onOpenChange={setJiraConnectOpen} />
+
+      <RedmineConnectDialog open={redmineConnectOpen} onOpenChange={setRedmineConnectOpen} />
     </>
   )
 }
