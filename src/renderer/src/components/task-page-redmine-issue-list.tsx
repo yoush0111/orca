@@ -160,10 +160,15 @@ export function TaskPageRedmineIssueList({
     (issue: RedmineIssue, event: React.MouseEvent): void => {
       openHttpLink(
         issue.url,
-        resolveRedmineIssueOpenOptions(event, isMacShortcutPlatform(), targetWorktreeId)
+        resolveRedmineIssueOpenOptions(
+          event,
+          isMacShortcutPlatform(),
+          targetWorktreeId,
+          openInFloatingWorkspace
+        )
       )
     },
-    [targetWorktreeId]
+    [targetWorktreeId, openInFloatingWorkspace]
   )
 
   return (

@@ -31,6 +31,30 @@ describe('resolveRedmineIssueOpenOptions', () => {
     ).toEqual({ worktreeId: 'wt-1', sourceOwner: { kind: 'local' }, modifierHeld: true })
   })
 
+  it('forces the in-app tab when the floating workspace is the target', () => {
+    expect(resolveRedmineIssueOpenOptions(plainClick, false, 'floating', true)).toEqual({
+      worktreeId: 'floating',
+      sourceOwner: { kind: 'local' },
+      forceInApp: true
+    })
+  })
+
+  it('keeps the escape hatch usable while forcing the in-app tab', () => {
+    expect(
+      resolveRedmineIssueOpenOptions(
+        { metaKey: false, ctrlKey: true, shiftKey: true },
+        false,
+        'floating',
+        true
+      )
+    ).toEqual({
+      worktreeId: 'floating',
+      sourceOwner: { kind: 'local' },
+      forceInApp: true,
+      modifierHeld: true
+    })
+  })
+
   it('does not treat the other platform modifier as the escape hatch', () => {
     expect(
       resolveRedmineIssueOpenOptions({ metaKey: true, ctrlKey: false, shiftKey: true }, false, null)
