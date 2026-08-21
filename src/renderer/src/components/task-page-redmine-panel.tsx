@@ -31,6 +31,8 @@ type TaskPageRedminePanelProps = {
   onConnectRequest: () => void
   onHideProvider: () => void
   onStartWorkspace: (issue: RedmineIssue) => void
+  /** Lifts the project list so the composer can resolve subproject repo mappings. */
+  onProjectsLoaded?: (projects: RedmineProject[]) => void
   sourceContext: TaskSourceContext | null
 }
 
@@ -38,6 +40,7 @@ export function TaskPageRedminePanel({
   onConnectRequest,
   onHideProvider,
   onStartWorkspace,
+  onProjectsLoaded,
   sourceContext
 }: TaskPageRedminePanelProps): React.JSX.Element {
   const settings = useAppStore((s) => s.settings)
@@ -65,6 +68,7 @@ export function TaskPageRedminePanel({
     if (!connected) {
       setProjects([])
       setStatuses([])
+      onProjectsLoaded?.([])
       return
     }
     let cancelled = false
@@ -73,6 +77,7 @@ export function TaskPageRedminePanel({
         if (!cancelled) {
           setProjects(nextProjects)
           setStatuses(nextStatuses)
+          onProjectsLoaded?.(nextProjects)
         }
       })
       .catch(() => {
@@ -81,7 +86,7 @@ export function TaskPageRedminePanel({
     return () => {
       cancelled = true
     }
-  }, [connected, readSettings])
+  }, [connected, onProjectsLoaded, readSettings])
 
   const loadIssues = useCallback(async (): Promise<void> => {
     if (!connected) {
