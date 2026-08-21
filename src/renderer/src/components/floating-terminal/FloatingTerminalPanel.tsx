@@ -4,7 +4,7 @@
  * main tab model while still keeping the DOM-mounted panes local. */
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { lazyWithRetry as lazy } from '@/lib/lazy-with-retry'
-import { FileText, Globe, Minus, TerminalSquare } from 'lucide-react'
+import { FileText, Globe, ListTodo, Minus, TerminalSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import EmulatorPane from '@/components/emulator-pane/EmulatorPane'
 import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
@@ -93,6 +93,7 @@ import { FloatingBrowserSlot } from './FloatingBrowserSlot'
 import { FloatingTerminalOrchestrationDialog } from './FloatingTerminalOrchestrationDialog'
 import { FloatingTerminalResizeHandles } from './FloatingTerminalResizeHandles'
 import { FloatingTerminalWindowControls } from './FloatingTerminalWindowControls'
+import { FloatingWorkspaceTasksView } from './FloatingWorkspaceTasksView'
 export { FloatingTerminalToggleButton } from './FloatingTerminalToggleButton'
 import {
   anchorFloatingTerminalPanelBounds,
@@ -111,6 +112,7 @@ import {
 } from './floating-terminal-panel-bounds'
 import {
   persistFloatingTerminalPanelMaximized,
+  persistFloatingTerminalPanelTasksView,
   readPersistedFloatingTerminalPanelViewState
 } from './floating-terminal-panel-view-state'
 import { useSettledPanelViewport } from './use-settled-panel-viewport'
@@ -297,6 +299,15 @@ export function FloatingTerminalPanel({
     () => readPersistedFloatingTerminalPanelViewState()?.maximized === true
   )
   const panelViewportSettled = useSettledPanelViewport()
+  const [tasksViewOpen, setTasksViewOpen] = useState(
+    () => readPersistedFloatingTerminalPanelViewState()?.tasksView === true
+  )
+  const setTasksViewOpenPersisted = useCallback((next: boolean): void => {
+    setTasksViewOpen(next)
+    persistFloatingTerminalPanelTasksView(next)
+  }, [])
+  // `undefined` means "not observed yet" — distinct from an empty panel's null.
+  const tasksViewActiveTabIdRef = useRef<string | null | undefined>(undefined)
   const [orchestrationDialogOpen, setOrchestrationDialogOpen] = useState(false)
   const [showOrchestrationSetup, setShowOrchestrationSetup] = useState(
     () => !hasOrchestrationSetupMarker() && !isOrchestrationSetupDismissed()
@@ -363,6 +374,18 @@ export function FloatingTerminalPanel({
       null,
     [activeGroup, groupTabs]
   )
+  // Why: the tasks view covers the body but not the tab strip, so anything that
+  // activates a tab — a Redmine link opening a browser tab, or a plain tab click —
+  // would otherwise land invisibly underneath it.
+  useEffect(() => {
+    const activeTabId = activeTab?.id ?? null
+    const previousActiveTabId = tasksViewActiveTabIdRef.current
+    tasksViewActiveTabIdRef.current = activeTabId
+    if (tasksViewOpen && previousActiveTabId !== undefined && previousActiveTabId !== activeTabId) {
+      setTasksViewOpenPersisted(false)
+    }
+  }, [activeTab, setTasksViewOpenPersisted, tasksViewOpen])
+
   const activeTerminalId = activeTab?.contentType === 'terminal' ? activeTab.entityId : null
   const activeBrowserId = activeTab?.contentType === 'browser' ? activeTab.entityId : null
   const activeEditorUnifiedId =
@@ -1875,6 +1898,25 @@ export function FloatingTerminalPanel({
               tabStripChrome="floating-panel"
             />
           </div>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="mr-1 shrink-0 self-center"
+            data-floating-workspace-tasks-toggle
+            aria-pressed={tasksViewOpen}
+            aria-label={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            title={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            onClick={() => setTasksViewOpenPersisted(!tasksViewOpen)}
+          >
+            <ListTodo className="size-3.5" />
+          </Button>
           <FloatingTerminalWindowControls
             maximized={maximized}
             onToggleMaximized={toggleMaximized}
@@ -1994,9 +2036,20 @@ export function FloatingTerminalPanel({
               closeShortcut={closeShortcut}
             />
           ) : null}
+          {/* Why an overlay rather than a swap: unmounting the panes would detach
+              the PTY and reflow the xterm buffer under whatever is running. */}
+          {tasksViewOpen ? (
+            <div
+              className="absolute inset-0 z-20 bg-background"
+              data-floating-workspace-tasks-view
+              data-floating-terminal-no-drag
+            >
+              <FloatingWorkspaceTasksView onClose={() => setTasksViewOpenPersisted(false)} />
+            </div>
+          ) : null}
         </div>
       </div>
-      {showOrchestrationSetup && activeTabType === 'terminal' ? (
+      {showOrchestrationSetup && activeTabType === 'terminal' && !tasksViewOpen ? (
         <div
           className="absolute right-4 bottom-4 z-10 w-[280px] rounded-md border border-border/60 bg-card/95 p-3 text-card-foreground shadow-xs"
           data-floating-terminal-no-drag

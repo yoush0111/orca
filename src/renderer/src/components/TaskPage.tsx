@@ -201,6 +201,7 @@ import {
 } from '@/components/linear-project-view-surfaces'
 import JiraIssueWorkspace from '@/components/JiraIssueWorkspace'
 import { TaskPageJiraIssueList } from '@/components/task-page-jira-issue-list'
+import { buildRedmineTaskSourceContext } from '@/components/redmine-task-source-context'
 import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
 import { RedmineConnectDialog } from '@/components/redmine-connect-dialog'
 import {
@@ -3459,15 +3460,10 @@ export default function TaskPage(): React.JSX.Element {
   )
   const redmineTaskSourceContext = useMemo(
     () =>
-      normalizeTaskSourceContext({
-        provider: 'redmine',
+      buildRedmineTaskSourceContext({
         projectId: fallbackTaskSourceProjectId,
         hostId: accountBackedTaskSourceHostId,
-        providerIdentity: {
-          provider: 'redmine',
-          baseUrl: redmineStatus.connection?.baseUrl ?? null
-        },
-        accountLabel: redmineStatus.connection?.baseUrl ?? null
+        baseUrl: redmineStatus.connection?.baseUrl ?? null
       }),
     [accountBackedTaskSourceHostId, fallbackTaskSourceProjectId, redmineStatus.connection]
   )
