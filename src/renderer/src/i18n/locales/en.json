@@ -16178,7 +16178,8 @@
                 "columnStatus": "Status",
                 "columnProject": "Project",
                 "columnAssignee": "Assignee",
-                "columnDone": "Done"
+                "columnDone": "Done",
+                "mappedRepo": "Repo: {{value0}}"
               }
             },
             "panel": {
