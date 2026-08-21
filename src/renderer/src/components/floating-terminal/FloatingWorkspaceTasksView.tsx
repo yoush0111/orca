@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { RedmineConnectDialog } from '@/components/redmine-connect-dialog'
 import {
@@ -6,6 +6,7 @@ import {
   buildRedmineTaskSourceContext
 } from '@/components/redmine-task-source-context'
 import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
+import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
 import { useAppStore } from '@/store'
 import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host'
 import { buildRedmineWorkspaceSource } from '../../../../shared/new-workspace/workspace-source'
@@ -20,7 +21,20 @@ export function FloatingWorkspaceTasksView({
   const openModal = useAppStore((s) => s.openModal)
   const settings = useAppStore((s) => s.settings)
   const redmineConnection = useAppStore((s) => s.redmineStatus.connection)
+  const redmineStatusChecked = useAppStore((s) => s.redmineStatusChecked)
+  const redmineStatusContextKey = useAppStore((s) => s.redmineStatusContextKey)
+  const checkRedmineConnection = useAppStore((s) => s.checkRedmineConnection)
   const [connectOpen, setConnectOpen] = useState(false)
+
+  // Why: the panel spins until the status is checked, and TaskPage owns the only
+  // other check — so opening this view first would spin forever.
+  const redmineStatusReady =
+    redmineStatusChecked && redmineStatusContextKey === getProviderRuntimeContextKey(settings)
+  useEffect(() => {
+    if (!redmineStatusReady) {
+      void checkRedmineConnection()
+    }
+  }, [checkRedmineConnection, redmineStatusReady])
 
   // Why the account-backed project id: the floating workspace has no repo
   // selection to derive one from, which is the fallback TaskPage lands on too.
