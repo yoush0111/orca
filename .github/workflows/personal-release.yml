@@ -24,7 +24,9 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run build:win
+      # electron-builder auto-publishes on a git tag by default (targets
+      # stablyai/orca); disabled since we publish to orca-releases ourselves below.
+      - run: pnpm run build:win -- --publish=never
 
       - name: Publish to public releases repo
         env:
