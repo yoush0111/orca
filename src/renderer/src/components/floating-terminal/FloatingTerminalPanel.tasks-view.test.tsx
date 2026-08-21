@@ -4,9 +4,11 @@ import { setupFloatingTerminalPanelTest } from './floating-terminal-panel-test-h
 import {
   findAllByTypeName,
   findByProp,
+  getMockedLocalStorage,
   renderPanel,
   runEffects
 } from './floating-terminal-panel-render-probe'
+import { FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY } from './floating-terminal-panel-view-state'
 
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react') // eslint-disable-line @typescript-eslint/consistent-type-imports -- vi.importActual requires inline import()
@@ -158,9 +160,9 @@ function findTasksToggle(tree: unknown): { props: Record<string, unknown> } {
 }
 
 describe('FloatingTerminalPanel tasks view', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     tasksViewRendered.mockClear()
-    setupFloatingTerminalPanelTest()
+    await setupFloatingTerminalPanelTest()
   })
 
   afterEach(() => {
@@ -209,5 +211,35 @@ describe('FloatingTerminalPanel tasks view', () => {
     runEffects()
 
     expect(findAllByTypeName(closed, 'FloatingWorkspaceTasksView')).toHaveLength(0)
+  })
+
+  it('restores a tasks view that was open when the app last shut down', async () => {
+    getMockedLocalStorage().getItem.mockImplementation((key: string) =>
+      key === FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY
+        ? JSON.stringify({ open: true, maximized: false, tasksView: true })
+        : null
+    )
+    setFloatingTabs([makeTab({ id: 'tab-1' })])
+
+    const tree = await renderPanel(true)
+    runEffects()
+
+    expect(findAllByTypeName(tree, 'FloatingWorkspaceTasksView')).toHaveLength(1)
+  })
+
+  it('persists the tasks view flag so a restart lands back on it', async () => {
+    setFloatingTabs([makeTab({ id: 'tab-1' })])
+
+    const tree = await renderPanel(true)
+    runEffects()
+    ;(findTasksToggle(tree).props.onClick as () => void)()
+
+    await renderPanel(true)
+    runEffects()
+
+    expect(getMockedLocalStorage().setItem).toHaveBeenCalledWith(
+      FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY,
+      expect.stringContaining('"tasksView":true')
+    )
   })
 })

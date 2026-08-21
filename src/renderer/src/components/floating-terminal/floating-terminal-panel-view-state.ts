@@ -4,6 +4,7 @@ export const FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY =
 export type FloatingTerminalPanelViewState = {
   open: boolean
   maximized: boolean
+  tasksView: boolean
 }
 
 function getWindowStorage(): Storage | null {
@@ -35,7 +36,8 @@ export function readPersistedFloatingTerminalPanelViewState(): FloatingTerminalP
     // existed must still restore the half it does carry.
     return {
       open: record.open === true,
-      maximized: record.maximized === true
+      maximized: record.maximized === true,
+      tasksView: record.tasksView === true
     }
   } catch {
     return null
@@ -53,14 +55,31 @@ export function persistFloatingTerminalPanelViewState(state: FloatingTerminalPan
   }
 }
 
-// Why field-scoped writers: `open` is owned by the app shell and `maximized` by the panel,
-// so a whole-record write from either side would clobber the other's flag.
+// Why field-scoped writers: `open` is owned by the app shell while `maximized` and
+// `tasksView` are owned by the panel, so a whole-record write would clobber the rest.
 export function persistFloatingTerminalPanelOpen(open: boolean): void {
   const current = readPersistedFloatingTerminalPanelViewState()
-  persistFloatingTerminalPanelViewState({ maximized: current?.maximized === true, open })
+  persistFloatingTerminalPanelViewState({
+    maximized: current?.maximized === true,
+    tasksView: current?.tasksView === true,
+    open
+  })
 }
 
 export function persistFloatingTerminalPanelMaximized(maximized: boolean): void {
   const current = readPersistedFloatingTerminalPanelViewState()
-  persistFloatingTerminalPanelViewState({ open: current?.open === true, maximized })
+  persistFloatingTerminalPanelViewState({
+    open: current?.open === true,
+    tasksView: current?.tasksView === true,
+    maximized
+  })
+}
+
+export function persistFloatingTerminalPanelTasksView(tasksView: boolean): void {
+  const current = readPersistedFloatingTerminalPanelViewState()
+  persistFloatingTerminalPanelViewState({
+    open: current?.open === true,
+    maximized: current?.maximized === true,
+    tasksView
+  })
 }
