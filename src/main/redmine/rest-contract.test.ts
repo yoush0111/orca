@@ -88,6 +88,20 @@ describe('parseRedmineProjects', () => {
       }).map((project) => project.name)
     ).toEqual(['Alpha', 'Zeta'])
   })
+
+  it('keeps the parent ref for subprojects', () => {
+    expect(
+      parseRedmineProjects({
+        projects: [{ id: 3, name: 'Sub', identifier: 'sub', parent: { id: 1, name: 'Alpha' } }]
+      })[0]
+    ).toEqual({ id: 3, name: 'Sub', identifier: 'sub', parent: { id: 1, name: 'Alpha' } })
+  })
+
+  it('leaves the parent null for top-level projects', () => {
+    expect(
+      parseRedmineProjects({ projects: [{ id: 1, name: 'Alpha', identifier: 'alpha' }] })[0].parent
+    ).toBeNull()
+  })
 })
 
 describe('parseRedmineViewer', () => {
