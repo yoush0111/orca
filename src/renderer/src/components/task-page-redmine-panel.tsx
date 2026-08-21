@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { LoaderCircle } from 'lucide-react'
+import { LoaderCircle, Settings2 } from 'lucide-react'
 
 import { RedmineIcon } from '@/components/icons/RedmineIcon'
 import { TaskPageRedmineIssueList } from '@/components/task-page-redmine-issue-list'
@@ -21,6 +21,7 @@ import {
 } from '@/runtime/runtime-redmine-client'
 import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
 import { useAppStore } from '@/store'
+import { REDMINE_INTEGRATION_SECTION_ID } from '@/components/settings/task-provider-integration-section-ids'
 import type { TaskSourceContext } from '../../../shared/task-source-context'
 import type { RedmineIssue, RedmineNamedRef, RedmineProject } from '../../../shared/redmine-types'
 
@@ -47,6 +48,8 @@ export function TaskPageRedminePanel({
   const redmineStatus = useAppStore((s) => s.redmineStatus)
   const redmineStatusChecked = useAppStore((s) => s.redmineStatusChecked)
   const redmineStatusContextKey = useAppStore((s) => s.redmineStatusContextKey)
+  const openSettingsPage = useAppStore((s) => s.openSettingsPage)
+  const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
   // Why: a status read from the previous runtime must not render as connected
   // while the new host's check is still in flight.
   const statusCurrent = redmineStatusContextKey === getProviderRuntimeContextKey(settings)
@@ -213,8 +216,33 @@ export function TaskPageRedminePanel({
             </SelectContent>
           </Select>
         </div>
-        <div className="shrink-0 text-[11px] text-muted-foreground">
-          {issues.length} {translate('auto.components.task.page.redmine.panel.shown', 'shown')}
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-[11px] text-muted-foreground">
+            {issues.length} {translate('auto.components.task.page.redmine.panel.shown', 'shown')}
+          </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7"
+            onClick={() => {
+              openSettingsPage()
+              openSettingsTarget({
+                pane: 'integrations',
+                repoId: null,
+                sectionId: REDMINE_INTEGRATION_SECTION_ID
+              })
+            }}
+            aria-label={translate(
+              'auto.components.task.page.redmine.panel.openSettings',
+              'Redmine settings'
+            )}
+            title={translate(
+              'auto.components.task.page.redmine.panel.openSettings',
+              'Redmine settings'
+            )}
+          >
+            <Settings2 className="size-3.5" />
+          </Button>
         </div>
       </div>
 
