@@ -29,7 +29,14 @@ const IssuesResponseSchema = z.object({ issues: z.array(IssueSchema).nullish() }
 
 const ProjectsResponseSchema = z.object({
   projects: z
-    .array(z.object({ id: z.number(), name: z.string(), identifier: z.string().nullish() }))
+    .array(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        identifier: z.string().nullish(),
+        parent: NamedRefSchema.nullish()
+      })
+    )
     .nullish()
 })
 
@@ -105,7 +112,8 @@ export function parseRedmineProjects(payload: unknown): RedmineProject[] {
     .map((project) => ({
       id: project.id,
       name: project.name,
-      identifier: project.identifier ?? String(project.id)
+      identifier: project.identifier ?? String(project.id),
+      parent: toNamedRef(project.parent)
     }))
     .sort((a, b) => a.name.localeCompare(b.name))
 }

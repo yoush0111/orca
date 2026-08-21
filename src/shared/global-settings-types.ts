@@ -195,6 +195,8 @@ export type GlobalSettings = {
   openLinksInApp: boolean
   /** Default-on: Redmine issue links open as a Floating Workspace browser tab instead of a tab in the active worktree. Requires floatingTerminalEnabled. Readers treat absent as on. */
   redmineLinksOpenInFloatingWorkspace?: boolean
+  /** Redmine project id -> repo id for the composer's repo default; unmapped projects keep the active-repo fallback. */
+  redmineProjectRepoMap?: Record<string, string>
   /** Worktree-scoped localhost hostnames to distinguish tabs; opt-in since a non-localhost host can break apps binding cookies/sessions to localhost. */
   localhostWorktreeLabelsEnabled?: boolean
   /** Tracks the one-time first-use prompt for terminal link routing (avoid silently changing where links open). */

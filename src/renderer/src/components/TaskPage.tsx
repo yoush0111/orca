@@ -121,7 +121,9 @@ import { useTaskPageJiraFetch } from '@/components/task-page/hooks/use-task-page
 import { useTaskPageJiraActions } from '@/components/task-page/hooks/use-task-page-jira-actions'
 import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
 import { redmineWorkspaceSeedName } from '../../../shared/redmine-workspace-name'
-import type { RedmineIssue } from '../../../shared/redmine-types'
+import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
+import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
+import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { useTaskPageGitHubFilteredItems } from '@/components/task-page/hooks/use-task-page-github-filtered-items'
 import { useTaskPageGitHubPageLoader } from '@/components/task-page/hooks/use-task-page-github-page-loader'
 import { useTaskPageCreateLinearSubmits } from '@/components/task-page/hooks/use-task-page-create-linear-submits'
@@ -1303,6 +1305,7 @@ export default function TaskPage(): React.JSX.Element {
 
   const [jiraConnectOpen, setJiraConnectOpen] = useState(false)
   const [redmineConnectOpen, setRedmineConnectOpen] = useState(false)
+  const [redmineProjects, setRedmineProjects] = useState<RedmineProject[]>([])
   useContextualTour(
     'tasks',
     !dialogWorkItem &&
@@ -2559,14 +2562,21 @@ export default function TaskPage(): React.JSX.Element {
 
   const handleUseRedmineItem = useCallback(
     (issue: RedmineIssue): void => {
+      const mappedRepoId = resolveRedmineRepoId({
+        map: settings?.redmineProjectRepoMap,
+        projectId: issue.project?.id ?? null,
+        projects: redmineProjects,
+        eligibleRepoIds: getComposerEligibleRepos(repos).map((repo) => repo.id)
+      })
       openModal('new-workspace-composer', {
         linkedWorkItem: buildRedmineWorkspaceSource(issue),
         taskSourceContext: redmineTaskSourceContext,
         prefilledName: redmineWorkspaceSeedName(issue),
+        ...(mappedRepoId ? { initialRepoId: mappedRepoId } : {}),
         telemetrySource: 'sidebar'
       })
     },
-    [openModal, redmineTaskSourceContext]
+    [openModal, redmineProjects, redmineTaskSourceContext, repos, settings?.redmineProjectRepoMap]
   )
 
   const { handleUseJiraItem } = useTaskPageJiraActions({
@@ -3089,6 +3099,7 @@ export default function TaskPage(): React.JSX.Element {
     onConnectRequest: () => setRedmineConnectOpen(true),
     onHideProvider: () => hideTaskSource('redmine', 'Redmine'),
     onStartWorkspace: handleUseRedmineItem,
+    onProjectsLoaded: setRedmineProjects,
     sourceContext: redmineTaskSourceContext
   }
   const connectDialogs: TaskPageConnectDialogsProps = {

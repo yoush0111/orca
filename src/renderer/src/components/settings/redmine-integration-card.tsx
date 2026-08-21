@@ -15,6 +15,7 @@ import { getProviderAccountScope } from './provider-account-scope'
 import { ProviderHostScopeControl } from './ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 import { SettingsSwitchRow } from './SettingsFormControls'
+import { RedmineProjectRepoMapping } from './redmine-project-repo-mapping'
 import { translate } from '@/i18n/i18n'
 
 type VerificationResult = { state: 'ok' | 'error'; error?: string }
@@ -244,6 +245,7 @@ export function RedmineIntegrationCard(): React.JSX.Element {
             })
           }
         />
+        {connected ? <RedmineProjectRepoMapping /> : null}
       </IntegrationCardDetails>
 
       <RedmineConnectDialog
