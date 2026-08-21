@@ -113,3 +113,27 @@ test('floating workspace tasks view covers an active browser webview', async ({
   expect(viewBox!.width).toBeGreaterThan(panelBox!.width * 0.9)
   await expect(panel.locator('webview')).toHaveCount(1)
 })
+
+test('floating workspace tasks view steps aside for a tab it opens', async ({ orcaPage }) => {
+  await enableFloatingWorkspace(orcaPage)
+
+  const panel = orcaPage.locator(OPEN_PANEL_SELECTOR).first()
+  await panel.locator(TASKS_TOGGLE).click()
+  await expect(panel.locator(TASKS_VIEW)).toBeVisible()
+
+  // Why: this is what "Open in Redmine" does from the task list — without the
+  // step-aside the new page loads invisibly under the overlay.
+  await orcaPage.evaluate((worktreeId) => {
+    const store = (window as E2EWindow).__store
+    if (!store) {
+      throw new Error('Store unavailable')
+    }
+    store.getState().createBrowserTab(worktreeId, 'about:blank', {
+      title: 'Redmine',
+      browserRuntimeEnvironmentId: null
+    })
+  }, FLOATING_WORKTREE_ID)
+
+  await expect(panel.locator(TASKS_VIEW)).toHaveCount(0)
+  await expect(panel.locator('webview')).toHaveCount(1, { timeout: 30_000 })
+})
