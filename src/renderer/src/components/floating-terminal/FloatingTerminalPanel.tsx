@@ -114,6 +114,7 @@ import {
 } from './floating-terminal-panel-bounds'
 import {
   persistFloatingTerminalPanelMaximized,
+  persistFloatingTerminalPanelTasksView,
   readPersistedFloatingTerminalPanelViewState
 } from './floating-terminal-panel-view-state'
 import { useSettledPanelViewport } from './use-settled-panel-viewport'
@@ -294,9 +295,13 @@ export function FloatingTerminalPanel({
     () => readPersistedFloatingTerminalPanelViewState()?.maximized === true
   )
   const panelViewportSettled = useSettledPanelViewport()
-  // Why not persisted: the panel stays mounted while closed, so this survives the
-  // whole session; only a restart drops back to the terminal view.
-  const [tasksViewOpen, setTasksViewOpen] = useState(false)
+  const [tasksViewOpen, setTasksViewOpen] = useState(
+    () => readPersistedFloatingTerminalPanelViewState()?.tasksView === true
+  )
+  const setTasksViewOpenPersisted = useCallback((next: boolean): void => {
+    setTasksViewOpen(next)
+    persistFloatingTerminalPanelTasksView(next)
+  }, [])
   const [orchestrationDialogOpen, setOrchestrationDialogOpen] = useState(false)
   const [showOrchestrationSetup, setShowOrchestrationSetup] = useState(
     () => !hasOrchestrationSetupMarker() && !isOrchestrationSetupDismissed()
@@ -1890,7 +1895,7 @@ export function FloatingTerminalPanel({
               'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
               'Tasks'
             )}
-            onClick={() => setTasksViewOpen((previous) => !previous)}
+            onClick={() => setTasksViewOpenPersisted(!tasksViewOpen)}
           >
             <ListTodo className="size-3.5" />
           </Button>
@@ -2021,7 +2026,7 @@ export function FloatingTerminalPanel({
               data-floating-workspace-tasks-view
               data-floating-terminal-no-drag
             >
-              <FloatingWorkspaceTasksView onClose={() => setTasksViewOpen(false)} />
+              <FloatingWorkspaceTasksView onClose={() => setTasksViewOpenPersisted(false)} />
             </div>
           ) : null}
         </div>
