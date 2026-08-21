@@ -1,18 +1,22 @@
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { translate } from '@/i18n/i18n'
 import { openHttpLink } from '@/lib/http-link-routing'
+import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
 import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
-import type { RedmineIssue } from '../../../shared/redmine-types'
+import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
+import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 
 type TaskPageRedmineIssueListProps = {
   issues: readonly RedmineIssue[]
+  /** Feeds subproject inheritance when resolving the mapped repo per row. */
+  projects: readonly RedmineProject[]
   onStartWorkspace: (issue: RedmineIssue) => void
 }
 
@@ -30,10 +34,12 @@ function clampDoneRatio(value: number): number {
 
 function RedmineIssueRow({
   issue,
+  repoName,
   onOpenExternal,
   onStartWorkspace
 }: {
   issue: RedmineIssue
+  repoName: string | null
   onOpenExternal: (issue: RedmineIssue, event: React.MouseEvent) => void
   onStartWorkspace: (issue: RedmineIssue) => void
 }): React.JSX.Element {
@@ -77,9 +83,20 @@ function RedmineIssueRow({
         ) : null}
       </div>
 
-      <span className="block truncate text-[12px] text-muted-foreground max-md:!hidden">
-        {issue.project?.name ?? ''}
-      </span>
+      <div className="min-w-0 max-md:!hidden">
+        <span className="block truncate text-[12px] text-muted-foreground">
+          {issue.project?.name ?? ''}
+        </span>
+        {repoName ? (
+          <span className="block truncate text-[11px] text-muted-foreground/70">
+            {translate(
+              'auto.components.task.page.redmine.issue.list.mappedRepo',
+              'Repo: {{value0}}',
+              { value0: repoName }
+            )}
+          </span>
+        ) : null}
+      </div>
 
       <span className="block truncate text-[12px] text-muted-foreground max-md:!hidden">
         {assignee}
@@ -141,9 +158,34 @@ function RedmineIssueRow({
 
 export function TaskPageRedmineIssueList({
   issues,
+  projects,
   onStartWorkspace
 }: TaskPageRedmineIssueListProps): React.JSX.Element {
   const activeWorktreeId = useAppStore((s) => s.activeWorktreeId)
+  const repos = useAppStore((s) => s.repos)
+  const projectRepoMap = useAppStore((s) => s.settings?.redmineProjectRepoMap)
+  const repoNameByProjectId = useMemo(() => {
+    const eligibleRepos = getComposerEligibleRepos(repos)
+    const eligibleRepoIds = eligibleRepos.map((repo) => repo.id)
+    const labels = new Map<number, string>()
+    for (const issue of issues) {
+      const projectId = issue.project?.id
+      if (typeof projectId !== 'number' || labels.has(projectId)) {
+        continue
+      }
+      const repoId = resolveRedmineRepoId({
+        map: projectRepoMap,
+        projectId,
+        projects,
+        eligibleRepoIds
+      })
+      const repo = repoId ? eligibleRepos.find((entry) => entry.id === repoId) : null
+      if (repo) {
+        labels.set(projectId, repo.displayName)
+      }
+    }
+    return labels
+  }, [issues, projectRepoMap, projects, repos])
   // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
   // if the panel feature itself is off, so the toggle only takes effect when
   // floatingTerminalEnabled is also on.
@@ -153,7 +195,9 @@ export function TaskPageRedmineIssueList({
       s.settings?.redmineLinksOpenInFloatingWorkspace !== false &&
       s.settings?.floatingTerminalEnabled === true
   )
-  const targetWorktreeId = openInFloatingWorkspace ? FLOATING_TERMINAL_WORKTREE_ID : activeWorktreeId
+  const targetWorktreeId = openInFloatingWorkspace
+    ? FLOATING_TERMINAL_WORKTREE_ID
+    : activeWorktreeId
   // Why: route through Link Routing so the issue can land in an Orca browser
   // tab; Shift+Cmd/Ctrl stays the system-browser escape hatch.
   const handleOpenExternal = useCallback(
@@ -202,6 +246,11 @@ export function TaskPageRedmineIssueList({
           <RedmineIssueRow
             key={issue.id}
             issue={issue}
+            repoName={
+              (typeof issue.project?.id === 'number'
+                ? repoNameByProjectId.get(issue.project.id)
+                : null) ?? null
+            }
             onOpenExternal={handleOpenExternal}
             onStartWorkspace={onStartWorkspace}
           />
