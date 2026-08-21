@@ -11301,7 +11301,10 @@
               "statusNotConnected": "Not connected",
               "replace": "Replace connection",
               "connect": "Connect Redmine",
-              "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key."
+              "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key.",
+              "floatingLabel": "Open issue links in the Floating Workspace",
+              "floatingDescription": "Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.",
+              "floatingDisabled": "Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect."
             }
           }
         }
@@ -13382,7 +13385,8 @@
             "8b14ba6c17": "New Browser Tab",
             "b085fb58b5": "This file has unsaved changes.",
             "5ddc688c52": "\"{{value0}}\" has unsaved changes. Do you want to save before closing?",
-            "25d7817f79": "terminal"
+            "25d7817f79": "terminal",
+            "tasksToggle": "Tasks"
           },
           "FloatingTerminalToggleButton": {
             "3b04b065b5": "Show floating workspace",
