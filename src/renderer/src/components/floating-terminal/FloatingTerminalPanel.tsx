@@ -4,7 +4,7 @@
  * main tab model while still keeping the DOM-mounted panes local. */
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { lazyWithRetry as lazy } from '@/lib/lazy-with-retry'
-import { FileText, Globe, Minus, TerminalSquare } from 'lucide-react'
+import { FileText, Globe, ListTodo, Minus, TerminalSquare } from 'lucide-react'
 import { toast } from 'sonner'
 import EmulatorPane from '@/components/emulator-pane/EmulatorPane'
 import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
@@ -95,6 +95,7 @@ import { isFloatingTerminalDragTarget } from './floating-terminal-titlebar-drag-
 import { FloatingTerminalOrchestrationDialog } from './FloatingTerminalOrchestrationDialog'
 import { FloatingTerminalResizeHandles } from './FloatingTerminalResizeHandles'
 import { FloatingTerminalWindowControls } from './FloatingTerminalWindowControls'
+import { FloatingWorkspaceTasksView } from './FloatingWorkspaceTasksView'
 export { FloatingTerminalToggleButton } from './FloatingTerminalToggleButton'
 import {
   anchorFloatingTerminalPanelBounds,
@@ -293,6 +294,9 @@ export function FloatingTerminalPanel({
     () => readPersistedFloatingTerminalPanelViewState()?.maximized === true
   )
   const panelViewportSettled = useSettledPanelViewport()
+  // Why not persisted: the panel stays mounted while closed, so this survives the
+  // whole session; only a restart drops back to the terminal view.
+  const [tasksViewOpen, setTasksViewOpen] = useState(false)
   const [orchestrationDialogOpen, setOrchestrationDialogOpen] = useState(false)
   const [showOrchestrationSetup, setShowOrchestrationSetup] = useState(
     () => !hasOrchestrationSetupMarker() && !isOrchestrationSetupDismissed()
@@ -1871,6 +1875,25 @@ export function FloatingTerminalPanel({
               tabStripChrome="floating-panel"
             />
           </FloatingWorkspaceTabDragContext>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="mr-1 shrink-0 self-center"
+            data-floating-workspace-tasks-toggle
+            aria-pressed={tasksViewOpen}
+            aria-label={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            title={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            onClick={() => setTasksViewOpen((previous) => !previous)}
+          >
+            <ListTodo className="size-3.5" />
+          </Button>
           <FloatingTerminalWindowControls
             maximized={maximized}
             onToggleMaximized={toggleMaximized}
@@ -1990,9 +2013,16 @@ export function FloatingTerminalPanel({
               closeShortcut={closeShortcut}
             />
           ) : null}
+          {/* Why an overlay rather than a swap: unmounting the panes would detach
+              the PTY and reflow the xterm buffer under whatever is running. */}
+          {tasksViewOpen ? (
+            <div className="absolute inset-0 z-20 bg-background" data-floating-terminal-no-drag>
+              <FloatingWorkspaceTasksView onClose={() => setTasksViewOpen(false)} />
+            </div>
+          ) : null}
         </div>
       </div>
-      {showOrchestrationSetup && activeTabType === 'terminal' ? (
+      {showOrchestrationSetup && activeTabType === 'terminal' && !tasksViewOpen ? (
         <div
           className="absolute right-4 bottom-4 z-10 w-[280px] rounded-md border border-border/60 bg-card/95 p-3 text-card-foreground shadow-xs"
           data-floating-terminal-no-drag
