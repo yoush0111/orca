@@ -31,10 +31,17 @@ jobs:
       # Run directly (not via the pnpm script) so --publish=never reaches it —
       # `pnpm run build:win -- --publish=never` did not forward through the
       # chained (&&) script.
-      - env:
+      # Why ORCA_LOCAL_BUILD_VERSION: without it every build ships package.json's
+      # version, so latest.yml reports the same version each release and
+      # electron-updater never sees a newer one. Derived from the tag (v prefix
+      # stripped) so the app version and the release tag always agree.
+      - shell: bash
+        env:
           ORCA_FORK_PUBLISH_OWNER: yoush0111
           ORCA_FORK_PUBLISH_REPO: orca-releases
-        run: npx electron-builder --config config/electron-builder.config.cjs --win --publish=never
+        run: |
+          export ORCA_LOCAL_BUILD_VERSION="${GITHUB_REF_NAME#v}"
+          npx electron-builder --config config/electron-builder.config.cjs --win --publish=never
 
       - name: Publish to public releases repo
         shell: bash

@@ -205,31 +205,6 @@ export function RedmineIntegrationCard(): React.JSX.Element {
                 'One Redmine instance is connected per runtime. Connecting again replaces the stored key.'
               )}
             </p>
-            <SettingsSwitchRow
-              label={translate(
-                'auto.components.settings.redmine.integration.card.floatingLabel',
-                'Open issue links in the Floating Workspace'
-              )}
-              description={
-                floatingTerminalEnabled
-                  ? translate(
-                      'auto.components.settings.redmine.integration.card.floatingDescription',
-                      'Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.'
-                    )
-                  : translate(
-                      'auto.components.settings.redmine.integration.card.floatingDisabled',
-                      'Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect.'
-                    )
-              }
-              checked={settings?.redmineLinksOpenInFloatingWorkspace === true}
-              disabled={!floatingTerminalEnabled}
-              onChange={() =>
-                updateSettings({
-                  redmineLinksOpenInFloatingWorkspace:
-                    settings?.redmineLinksOpenInFloatingWorkspace !== true
-                })
-              }
-            />
           </div>
         ) : !checking ? (
           <>
@@ -242,6 +217,33 @@ export function RedmineIntegrationCard(): React.JSX.Element {
             </Button>
           </>
         ) : null}
+        {/* Outside the connected branch: the routing preference is worth finding
+            before a connection exists, and it survives a disconnect. */}
+        <SettingsSwitchRow
+          label={translate(
+            'auto.components.settings.redmine.integration.card.floatingLabel',
+            'Open issue links in the Floating Workspace'
+          )}
+          description={
+            floatingTerminalEnabled
+              ? translate(
+                  'auto.components.settings.redmine.integration.card.floatingDescription',
+                  'Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.'
+                )
+              : translate(
+                  'auto.components.settings.redmine.integration.card.floatingDisabled',
+                  'Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect.'
+                )
+          }
+          checked={settings?.redmineLinksOpenInFloatingWorkspace !== false}
+          disabled={!floatingTerminalEnabled}
+          onChange={() =>
+            updateSettings({
+              redmineLinksOpenInFloatingWorkspace:
+                settings?.redmineLinksOpenInFloatingWorkspace === false
+            })
+          }
+        />
       </IntegrationCardDetails>
 
       <RedmineConnectDialog
