@@ -242,4 +242,62 @@ describe('FloatingTerminalPanel tasks view', () => {
       expect.stringContaining('"tasksView":true')
     )
   })
+
+  it('reveals a newly activated floating tab by closing the tasks view', async () => {
+    // Why: opening a Redmine issue from the list lands a browser tab underneath
+    // the overlay, so leaving the overlay up hides the very page it just opened.
+    setFloatingTabs([makeTab({ id: 'tab-1' })])
+    const tree = await renderPanel(true)
+    runEffects()
+    ;(findTasksToggle(tree).props.onClick as () => void)()
+
+    const opened = await renderPanel(true)
+    runEffects()
+    expect(findAllByTypeName(opened, 'FloatingWorkspaceTasksView')).toHaveLength(1)
+
+    setFloatingTabs([makeTab({ id: 'tab-2' }), makeTab({ id: 'tab-1' })])
+    await renderPanel(true)
+    runEffects()
+
+    const settled = await renderPanel(true)
+    runEffects()
+    expect(findAllByTypeName(settled, 'FloatingWorkspaceTasksView')).toHaveLength(0)
+  })
+
+  it('keeps a restored tasks view up when the active tab has not changed', async () => {
+    getMockedLocalStorage().getItem.mockImplementation((key: string) =>
+      key === FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY
+        ? JSON.stringify({ open: true, maximized: false, tasksView: true })
+        : null
+    )
+    setFloatingTabs([makeTab({ id: 'tab-1' })])
+
+    await renderPanel(true)
+    runEffects()
+    const settled = await renderPanel(true)
+    runEffects()
+
+    expect(findAllByTypeName(settled, 'FloatingWorkspaceTasksView')).toHaveLength(1)
+  })
+
+  it('steps aside for the first tab opened from an otherwise empty floating panel', async () => {
+    // Why pinned: the Redmine link action is the common case and it usually runs
+    // on an empty floating workspace, where there is no prior active tab at all.
+    setFloatingTabs([])
+    const tree = await renderPanel(true)
+    runEffects()
+    ;(findTasksToggle(tree).props.onClick as () => void)()
+
+    const opened = await renderPanel(true)
+    runEffects()
+    expect(findAllByTypeName(opened, 'FloatingWorkspaceTasksView')).toHaveLength(1)
+
+    setFloatingTabs([makeTab({ id: 'browser-tab' })])
+    await renderPanel(true)
+    runEffects()
+
+    const settled = await renderPanel(true)
+    runEffects()
+    expect(findAllByTypeName(settled, 'FloatingWorkspaceTasksView')).toHaveLength(0)
+  })
 })

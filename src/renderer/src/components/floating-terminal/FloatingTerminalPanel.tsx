@@ -306,6 +306,8 @@ export function FloatingTerminalPanel({
     setTasksViewOpen(next)
     persistFloatingTerminalPanelTasksView(next)
   }, [])
+  // `undefined` means "not observed yet" — distinct from an empty panel's null.
+  const tasksViewActiveTabIdRef = useRef<string | null | undefined>(undefined)
   const [orchestrationDialogOpen, setOrchestrationDialogOpen] = useState(false)
   const [showOrchestrationSetup, setShowOrchestrationSetup] = useState(
     () => !hasOrchestrationSetupMarker() && !isOrchestrationSetupDismissed()
@@ -372,6 +374,18 @@ export function FloatingTerminalPanel({
       null,
     [activeGroup, groupTabs]
   )
+  // Why: the tasks view covers the body but not the tab strip, so anything that
+  // activates a tab — a Redmine link opening a browser tab, or a plain tab click —
+  // would otherwise land invisibly underneath it.
+  useEffect(() => {
+    const activeTabId = activeTab?.id ?? null
+    const previousActiveTabId = tasksViewActiveTabIdRef.current
+    tasksViewActiveTabIdRef.current = activeTabId
+    if (tasksViewOpen && previousActiveTabId !== undefined && previousActiveTabId !== activeTabId) {
+      setTasksViewOpenPersisted(false)
+    }
+  }, [activeTab, setTasksViewOpenPersisted, tasksViewOpen])
+
   const activeTerminalId = activeTab?.contentType === 'terminal' ? activeTab.entityId : null
   const activeBrowserId = activeTab?.contentType === 'browser' ? activeTab.entityId : null
   const activeEditorUnifiedId =
