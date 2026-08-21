@@ -4,6 +4,7 @@ import {
   FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY,
   persistFloatingTerminalPanelMaximized,
   persistFloatingTerminalPanelOpen,
+  persistFloatingTerminalPanelTasksView,
   readPersistedFloatingTerminalPanelViewState
 } from './floating-terminal-panel-view-state'
 import { shouldRestoreMaximizedPanelBounds } from './floating-terminal-panel-restore-geometry'
@@ -20,7 +21,11 @@ describe('floating terminal panel view state', () => {
   it('round-trips both flags', () => {
     persistFloatingTerminalPanelOpen(true)
     persistFloatingTerminalPanelMaximized(true)
-    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({ open: true, maximized: true })
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: true,
+      maximized: true,
+      tasksView: false
+    })
   })
 
   it('does not clobber the other owner_s flag', () => {
@@ -28,11 +33,19 @@ describe('floating terminal panel view state', () => {
     // whole-record write from either would drop the other's value.
     persistFloatingTerminalPanelMaximized(true)
     persistFloatingTerminalPanelOpen(false)
-    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({ open: false, maximized: true })
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: false,
+      maximized: true,
+      tasksView: false
+    })
 
     persistFloatingTerminalPanelOpen(true)
     persistFloatingTerminalPanelMaximized(false)
-    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({ open: true, maximized: false })
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: true,
+      maximized: false,
+      tasksView: false
+    })
   })
 
   it('lets a later write destroy a restored open preference', () => {
@@ -53,7 +66,32 @@ describe('floating terminal panel view state', () => {
       FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY,
       JSON.stringify({ open: true })
     )
-    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({ open: true, maximized: false })
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: true,
+      maximized: false,
+      tasksView: false
+    })
+  })
+
+  it('round-trips the tasks view flag without clobbering the other owners', () => {
+    persistFloatingTerminalPanelOpen(true)
+    persistFloatingTerminalPanelMaximized(true)
+    persistFloatingTerminalPanelTasksView(true)
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: true,
+      maximized: true,
+      tasksView: true
+    })
+
+    persistFloatingTerminalPanelMaximized(false)
+    expect(readPersistedFloatingTerminalPanelViewState()?.tasksView).toBe(true)
+
+    persistFloatingTerminalPanelTasksView(false)
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: true,
+      maximized: false,
+      tasksView: false
+    })
   })
 
   it('treats malformed storage as absent instead of throwing', () => {
@@ -66,28 +104,41 @@ describe('floating terminal panel view state', () => {
   it('ignores non-boolean flag values rather than coercing them', () => {
     window.localStorage.setItem(
       FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY,
-      JSON.stringify({ open: 'yes', maximized: 1 })
+      JSON.stringify({ open: 'yes', maximized: 1, tasksView: 'on' })
     )
-    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({ open: false, maximized: false })
+    expect(readPersistedFloatingTerminalPanelViewState()).toEqual({
+      open: false,
+      maximized: false,
+      tasksView: false
+    })
   })
 })
 
 describe('shouldRestoreMaximizedPanelBounds', () => {
   it('restores maximized geometry only when the viewport can hold it', () => {
-    expect(shouldRestoreMaximizedPanelBounds({ open: true, maximized: true }, () => true)).toBe(
-      true
-    )
+    expect(
+      shouldRestoreMaximizedPanelBounds(
+        { open: true, maximized: true, tasksView: false },
+        () => true
+      )
+    ).toBe(true)
     // Why: maximized bounds come from the live viewport, so restoring against one too small
     // pins terminals to a grid the window is about to leave - the jump this restore removes.
-    expect(shouldRestoreMaximizedPanelBounds({ open: true, maximized: true }, () => false)).toBe(
-      false
-    )
+    expect(
+      shouldRestoreMaximizedPanelBounds(
+        { open: true, maximized: true, tasksView: false },
+        () => false
+      )
+    ).toBe(false)
   })
 
   it('does not restore maximized geometry for a non-maximized or absent record', () => {
-    expect(shouldRestoreMaximizedPanelBounds({ open: true, maximized: false }, () => true)).toBe(
-      false
-    )
+    expect(
+      shouldRestoreMaximizedPanelBounds(
+        { open: true, maximized: false, tasksView: false },
+        () => true
+      )
+    ).toBe(false)
     expect(shouldRestoreMaximizedPanelBounds(null, () => true)).toBe(false)
   })
 })
