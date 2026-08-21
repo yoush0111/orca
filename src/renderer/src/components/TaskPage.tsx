@@ -365,7 +365,9 @@ import type {
   JiraProject,
   JiraProjectStatusOrder
 } from '../../../shared/jira-types'
-import type { RedmineIssue } from '../../../shared/redmine-types'
+import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
+import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
+import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
 import { redmineWorkspaceSeedName } from '../../../shared/redmine-workspace-name'
 import type { LinearIssue } from '../../../shared/linear/issue-types'
@@ -5907,6 +5909,7 @@ export default function TaskPage(): React.JSX.Element {
   const [linearConnectOpen, setLinearConnectOpen] = useState(false)
   const [jiraConnectOpen, setJiraConnectOpen] = useState(false)
   const [redmineConnectOpen, setRedmineConnectOpen] = useState(false)
+  const [redmineProjects, setRedmineProjects] = useState<RedmineProject[]>([])
   useContextualTour(
     'tasks',
     !dialogWorkItem &&
@@ -8890,14 +8893,21 @@ export default function TaskPage(): React.JSX.Element {
 
   const handleUseRedmineItem = useCallback(
     (issue: RedmineIssue): void => {
+      const mappedRepoId = resolveRedmineRepoId({
+        map: settings?.redmineProjectRepoMap,
+        projectId: issue.project?.id ?? null,
+        projects: redmineProjects,
+        eligibleRepoIds: getComposerEligibleRepos(repos).map((repo) => repo.id)
+      })
       openModal('new-workspace-composer', {
         linkedWorkItem: buildRedmineWorkspaceSource(issue),
         taskSourceContext: redmineTaskSourceContext,
         prefilledName: redmineWorkspaceSeedName(issue),
+        ...(mappedRepoId ? { initialRepoId: mappedRepoId } : {}),
         telemetrySource: 'sidebar'
       })
     },
-    [openModal, redmineTaskSourceContext]
+    [openModal, redmineProjects, redmineTaskSourceContext, repos, settings?.redmineProjectRepoMap]
   )
 
   const taskPageListChromeHidden = shouldHideTaskPageListChrome({
@@ -11031,6 +11041,7 @@ export default function TaskPage(): React.JSX.Element {
               onConnectRequest={() => setRedmineConnectOpen(true)}
               onHideProvider={() => hideTaskSource('redmine', 'Redmine')}
               onStartWorkspace={handleUseRedmineItem}
+              onProjectsLoaded={setRedmineProjects}
               sourceContext={redmineTaskSourceContext}
             />
           ) : taskSource === 'linear' && selectedLinearIssue ? (

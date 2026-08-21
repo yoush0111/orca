@@ -10,6 +10,8 @@ export type RedmineProject = {
   id: number
   name: string
   identifier: string
+  /** Present for subprojects; drives repo-mapping inheritance. */
+  parent?: RedmineNamedRef | null
 }
 
 export type RedmineIssue = {

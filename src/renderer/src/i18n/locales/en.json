@@ -11465,7 +11465,20 @@
               "statusNotConnected": "Not connected",
               "replace": "Replace connection",
               "connect": "Connect Redmine",
-              "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key."
+              "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key.",
+              "floatingLabel": "Open issue links in the Floating Workspace",
+              "floatingDescription": "Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.",
+              "floatingDisabled": "Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect."
+            }
+          },
+          "project": {
+            "repo": {
+              "mapping": {
+                "title": "Project repositories",
+                "description": "Start Workspace picks this repository for issues in the project. Subprojects inherit their parent.",
+                "remove": "Remove mapping",
+                "add": "Add a project…"
+              }
             }
           }
         }
