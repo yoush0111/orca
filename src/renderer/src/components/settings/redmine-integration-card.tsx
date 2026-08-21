@@ -14,6 +14,7 @@ import { useIntegrationSubordinateRowClass } from './integration-card-presentati
 import { getProviderAccountScope } from './provider-account-scope'
 import { ProviderHostScopeControl } from './ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
+import { SettingsSwitchRow } from './SettingsFormControls'
 import { translate } from '@/i18n/i18n'
 
 type VerificationResult = { state: 'ok' | 'error'; error?: string }
@@ -26,6 +27,8 @@ export function RedmineIntegrationCard(): React.JSX.Element {
   const disconnectRedmine = useAppStore((s) => s.disconnectRedmine)
   const testRedmineConnection = useAppStore((s) => s.testRedmineConnection)
   const settings = useAppStore((s) => s.settings)
+  const updateSettings = useAppStore((s) => s.updateSettings)
+  const floatingTerminalEnabled = useAppStore((s) => s.settings?.floatingTerminalEnabled === true)
   const mountedRef = useMountedRef()
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -202,6 +205,31 @@ export function RedmineIntegrationCard(): React.JSX.Element {
                 'One Redmine instance is connected per runtime. Connecting again replaces the stored key.'
               )}
             </p>
+            <SettingsSwitchRow
+              label={translate(
+                'auto.components.settings.redmine.integration.card.floatingLabel',
+                'Open issue links in the Floating Workspace'
+              )}
+              description={
+                floatingTerminalEnabled
+                  ? translate(
+                      'auto.components.settings.redmine.integration.card.floatingDescription',
+                      'Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.'
+                    )
+                  : translate(
+                      'auto.components.settings.redmine.integration.card.floatingDisabled',
+                      'Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect.'
+                    )
+              }
+              checked={settings?.redmineLinksOpenInFloatingWorkspace === true}
+              disabled={!floatingTerminalEnabled}
+              onChange={() =>
+                updateSettings({
+                  redmineLinksOpenInFloatingWorkspace:
+                    settings?.redmineLinksOpenInFloatingWorkspace !== true
+                })
+              }
+            />
           </div>
         ) : !checking ? (
           <>
