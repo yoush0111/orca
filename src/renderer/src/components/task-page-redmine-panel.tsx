@@ -288,7 +288,11 @@ export function TaskPageRedminePanel({
         ) : null}
 
         {issues.length > 0 ? (
-          <TaskPageRedmineIssueList issues={issues} onStartWorkspace={onStartWorkspace} />
+          <TaskPageRedmineIssueList
+            issues={issues}
+            projects={projects}
+            onStartWorkspace={onStartWorkspace}
+          />
         ) : null}
       </div>
     </div>
