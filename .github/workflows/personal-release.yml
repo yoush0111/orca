@@ -34,6 +34,7 @@ jobs:
       - run: npx electron-builder --config config/electron-builder.config.cjs --win --publish=never
 
       - name: Publish to public releases repo
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.RELEASES_REPO_TOKEN }}
         run: |
