@@ -119,7 +119,7 @@ export function buildDefaultSettings(args: {
     httpProxyBypassRules: '',
     electronHttp1CompatibilityMode: false,
     openLinksInApp: false,
-    redmineLinksOpenInFloatingWorkspace: false,
+    redmineLinksOpenInFloatingWorkspace: true,
     localhostWorktreeLabelsEnabled: false,
     openLinksInAppPreferencePrompted: false,
     openLinksInAppModifierInverts: false,
