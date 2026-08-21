@@ -123,6 +123,7 @@ import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/works
 import { redmineWorkspaceSeedName } from '../../../shared/redmine-workspace-name'
 import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
 import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
+import { buildRedmineTaskSourceContext } from '@/components/redmine-task-source-context'
 import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { useTaskPageGitHubFilteredItems } from '@/components/task-page/hooks/use-task-page-github-filtered-items'
 import { useTaskPageGitHubPageLoader } from '@/components/task-page/hooks/use-task-page-github-page-loader'
@@ -304,15 +305,10 @@ export default function TaskPage(): React.JSX.Element {
   })
   const redmineTaskSourceContext = useMemo(
     () =>
-      normalizeTaskSourceContext({
-        provider: 'redmine',
+      buildRedmineTaskSourceContext({
         projectId: fallbackTaskSourceProjectId,
         hostId: accountBackedTaskSourceHostId,
-        providerIdentity: {
-          provider: 'redmine',
-          baseUrl: redmineStatus.connection?.baseUrl ?? null
-        },
-        accountLabel: redmineStatus.connection?.baseUrl ?? null
+        baseUrl: redmineStatus.connection?.baseUrl ?? null
       }),
     [accountBackedTaskSourceHostId, fallbackTaskSourceProjectId, redmineStatus.connection]
   )
