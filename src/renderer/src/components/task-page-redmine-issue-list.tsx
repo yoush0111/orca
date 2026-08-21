@@ -147,9 +147,10 @@ export function TaskPageRedmineIssueList({
   // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
   // if the panel feature itself is off, so the toggle only takes effect when
   // floatingTerminalEnabled is also on.
+  // `!== false` because the setting is default-on and absent in older profiles.
   const openInFloatingWorkspace = useAppStore(
     (s) =>
-      s.settings?.redmineLinksOpenInFloatingWorkspace === true &&
+      s.settings?.redmineLinksOpenInFloatingWorkspace !== false &&
       s.settings?.floatingTerminalEnabled === true
   )
   const targetWorktreeId = openInFloatingWorkspace ? FLOATING_TERMINAL_WORKTREE_ID : activeWorktreeId
