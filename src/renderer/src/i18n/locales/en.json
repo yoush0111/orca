@@ -13407,7 +13407,8 @@
             "8b14ba6c17": "New Browser Tab",
             "b085fb58b5": "This file has unsaved changes.",
             "5ddc688c52": "\"{{value0}}\" has unsaved changes. Do you want to save before closing?",
-            "25d7817f79": "terminal"
+            "25d7817f79": "terminal",
+            "tasksToggle": "Tasks"
           },
           "FloatingTerminalToggleButton": {
             "3b04b065b5": "Show floating workspace",
