@@ -3,12 +3,17 @@
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
 import type { RedmineIssue } from '../../../../shared/redmine-types'
 
 const openModal = vi.fn()
+const checkRedmineConnection = vi.fn(() => Promise.resolve())
 const storeState = {
   openModal,
+  checkRedmineConnection,
   settings: { activeRuntimeEnvironmentId: null },
+  redmineStatusChecked: false,
+  redmineStatusContextKey: null as string | null,
   redmineStatus: { connected: true, connection: { baseUrl: 'https://redmine.example.com' } }
 }
 
@@ -44,6 +49,9 @@ describe('FloatingWorkspaceTasksView', () => {
 
   beforeEach(() => {
     openModal.mockClear()
+    checkRedmineConnection.mockClear()
+    storeState.redmineStatusChecked = false
+    storeState.redmineStatusContextKey = null
     panelProps.mockClear()
     connectDialogProps.mockClear()
     container = document.createElement('div')
@@ -135,5 +143,24 @@ describe('FloatingWorkspaceTasksView', () => {
     })
 
     expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
+  it('checks the Redmine connection on mount so an unchecked status does not spin forever', () => {
+    act(() => {
+      root.render(<FloatingWorkspaceTasksView onClose={() => {}} />)
+    })
+
+    expect(checkRedmineConnection).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not re-check a Redmine status that is already settled for this runtime', () => {
+    storeState.redmineStatusChecked = true
+    storeState.redmineStatusContextKey = getProviderRuntimeContextKey(storeState.settings)
+
+    act(() => {
+      root.render(<FloatingWorkspaceTasksView onClose={() => {}} />)
+    })
+
+    expect(checkRedmineConnection).not.toHaveBeenCalled()
   })
 })

@@ -2016,7 +2016,11 @@ export function FloatingTerminalPanel({
           {/* Why an overlay rather than a swap: unmounting the panes would detach
               the PTY and reflow the xterm buffer under whatever is running. */}
           {tasksViewOpen ? (
-            <div className="absolute inset-0 z-20 bg-background" data-floating-terminal-no-drag>
+            <div
+              className="absolute inset-0 z-20 bg-background"
+              data-floating-workspace-tasks-view
+              data-floating-terminal-no-drag
+            >
               <FloatingWorkspaceTasksView onClose={() => setTasksViewOpen(false)} />
             </div>
           ) : null}
