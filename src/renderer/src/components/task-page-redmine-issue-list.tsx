@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
 import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
 import type { RedmineIssue } from '../../../shared/redmine-types'
+import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 
 type TaskPageRedmineIssueListProps = {
   issues: readonly RedmineIssue[]
@@ -143,16 +144,25 @@ export function TaskPageRedmineIssueList({
   onStartWorkspace
 }: TaskPageRedmineIssueListProps): React.JSX.Element {
   const activeWorktreeId = useAppStore((s) => s.activeWorktreeId)
+  // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
+  // if the panel feature itself is off, so the toggle only takes effect when
+  // floatingTerminalEnabled is also on.
+  const openInFloatingWorkspace = useAppStore(
+    (s) =>
+      s.settings?.redmineLinksOpenInFloatingWorkspace === true &&
+      s.settings?.floatingTerminalEnabled === true
+  )
+  const targetWorktreeId = openInFloatingWorkspace ? FLOATING_TERMINAL_WORKTREE_ID : activeWorktreeId
   // Why: route through Link Routing so the issue can land in an Orca browser
   // tab; Shift+Cmd/Ctrl stays the system-browser escape hatch.
   const handleOpenExternal = useCallback(
     (issue: RedmineIssue, event: React.MouseEvent): void => {
       openHttpLink(
         issue.url,
-        resolveRedmineIssueOpenOptions(event, isMacShortcutPlatform(), activeWorktreeId)
+        resolveRedmineIssueOpenOptions(event, isMacShortcutPlatform(), targetWorktreeId)
       )
     },
-    [activeWorktreeId]
+    [targetWorktreeId]
   )
 
   return (
