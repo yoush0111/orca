@@ -31,7 +31,10 @@ jobs:
       # Run directly (not via the pnpm script) so --publish=never reaches it —
       # `pnpm run build:win -- --publish=never` did not forward through the
       # chained (&&) script.
-      - run: npx electron-builder --config config/electron-builder.config.cjs --win --publish=never
+      - env:
+          ORCA_FORK_PUBLISH_OWNER: yoush0111
+          ORCA_FORK_PUBLISH_REPO: orca-releases
+        run: npx electron-builder --config config/electron-builder.config.cjs --win --publish=never
 
       - name: Publish to public releases repo
         shell: bash

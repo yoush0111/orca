@@ -52,6 +52,13 @@ const devChannelBuildVersion = isHourlyChannel
 // never signed it.
 const forkPublishOwner = process.env.ORCA_FORK_PUBLISH_OWNER?.trim() || null
 
+// Why a separate repo override: a fork's source repo can go private (e.g. to
+// keep code closed while still shipping public binaries) while its release
+// repo stays public. Without this, publish.repo falls back to 'orca', which
+// would point the updater at the now-private source repo and break update
+// checks. Only takes effect alongside forkPublishOwner.
+const forkPublishRepo = process.env.ORCA_FORK_PUBLISH_REPO?.trim() || null
+
 // Why each dev channel gets its own repo rather than tagging into the main one:
 // the releases atom feed exposes only the 10 newest entries, so 24 hourly tags a
 // day would evict every stable/RC entry and strand users on a feed with nothing
@@ -550,7 +557,7 @@ module.exports = {
   publish: {
     provider: 'github',
     owner: forkPublishOwner ?? 'stablyai',
-    repo: devChannelRepo ?? 'orca',
+    repo: devChannelRepo ?? forkPublishRepo ?? 'orca',
     releaseType: devChannelRepo ? 'prerelease' : 'release'
   }
 }
