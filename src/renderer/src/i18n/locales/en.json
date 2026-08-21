@@ -15635,7 +15635,8 @@
               "statusAll": "Any status",
               "shown": "shown",
               "emptyTitle": "No Redmine issues found",
-              "emptyBody": "No issues match the selected filters."
+              "emptyBody": "No issues match the selected filters.",
+              "openSettings": "Redmine settings"
             }
           }
         }
