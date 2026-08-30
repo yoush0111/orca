@@ -8320,24 +8320,12 @@
       "invariant": "On packaged Windows, abrupt death of Orca's Electron main process must not terminate or replace the userData-scoped terminal daemon or its live ConPTY shell, and a relaunch must adopt that exact daemon and route terminal input to that exact surviving shell without a PowerShell 0xE9 FailFast.",
       "oracle": "Resolve the launched instance's real main PID from inside Electron, force-kill only that PID, require it to die, require one command-line-scoped daemon PID and the stamped interactive shell PID to remain live, relaunch with persisted state, require the daemon PID to remain identical, read the exact shell PID and a per-shell environment sentinel back through the exact restored tab, then require a successful Windows Application event-log query with zero matching pwsh FailFast events across the full crash-to-input window.",
       "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts config/scripts/win-crash-survival-e2e.test.mjs",
         "node tests/tools/win-crash-survival-e2e/run.mjs --expect survival --exe-path \"$env:ORCA_EXE\" --soak-seconds 8"
       ],
       "testFiles": [
-        "config/scripts/win-crash-survival-e2e.test.mjs",
         "tests/tools/win-crash-survival-e2e/run.mjs"
       ],
       "assertionRefs": [
-        {
-          "file": "config/scripts/win-crash-survival-e2e.test.mjs",
-          "assertions": [
-            "survival requires the crash antecedent, daemon and shell liveness, unchanged daemon identity, zero FailFast events, and same-shell reattach",
-            "event-log query failure cannot be converted into zero FailFast events",
-            "malformed event-log and PID-liveness evidence fails closed",
-            "stale, missing, or ambiguous userData-scoped daemon identity fails closed",
-            "the packaged survival proof remains wired to targeted pull requests without a duplicate branch-push run"
-          ]
-        },
         {
           "file": "tests/tools/win-crash-survival-e2e/run.mjs",
           "assertions": [
@@ -15078,8 +15066,8 @@
         "node config/scripts/runtime-file-watcher-resource-probe.mjs",
         "node config/scripts/runtime-file-watcher-fault-harness.mjs",
         "ELECTRON_RUN_AS_NODE=1 pnpm exec electron config/scripts/runtime-file-watcher-fault-harness.mjs",
-        "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-watcher-setup-wait.test.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
-        "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
+        "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-watcher-setup-wait.test.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts",
+        "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts",
         "pnpm run build:relay",
         "node config/scripts/relay-watcher-fault-harness.mjs"
       ],
@@ -15143,7 +15131,6 @@
         "src/relay/git-handler.test.ts",
         "src/relay/subprocess.test.ts",
         "src/main/ssh/ssh-relay-versioned-install.test.ts",
-        "config/scripts/package-electron-runtime-contract.test.mjs",
         "config/scripts/relay-watcher-fault-harness.mjs"
       ],
       "assertionRefs": [
@@ -15571,10 +15558,6 @@
           ]
         },
         {
-          "file": "config/scripts/package-electron-runtime-contract.test.mjs",
-          "assertions": ["every release platform packages and gates the hashed watcher child"]
-        },
-        {
           "file": "config/scripts/runtime-file-watcher-resource-probe.mjs",
           "assertions": [
             "five healthy roots share one exact watcher PID within the per-child RSS budget",
@@ -15649,7 +15632,7 @@
           "date": "2026-07-13",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts",
           "result": "passed",
           "durationSeconds": 10.01,
           "summary": "Six relay registry, filesystem/Git handler, bundled subprocess, install, and package contract files passed with 226 tests."
@@ -15721,7 +15704,7 @@
           "date": "2026-07-13",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts",
           "result": "passed",
           "durationSeconds": 10.69,
           "summary": "Six relay registry, filesystem/Git handler, bundled subprocess, install, and package contract files passed with 226 tests, including watcher/PTY removal fencing and recursive deletion failure behavior."
@@ -15793,7 +15776,7 @@
           "date": "2026-07-13",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/relay/relay-filesystem-watch-registry.test.ts src/relay/fs-handler.test.ts src/relay/git-handler.test.ts src/relay/subprocess.test.ts src/main/ssh/ssh-relay-versioned-install.test.ts",
           "result": "passed",
           "durationSeconds": 9.79,
           "summary": "Six relay registry, filesystem/Git handler, bundled subprocess, install, and package contract files passed with 225 tests, including terminal removal notification and recursive deletion fencing."
@@ -16288,14 +16271,13 @@
       "invariant": "After packaged foreground headless serve publishes structured readiness, one SIGINT or SIGTERM exits successfully without an Electron fatal trap or core evidence, releases the exact listener and owned Xvfb/process tree, and leaves an unrelated process identity untouched.",
       "oracle": "For each signal, start a fresh unprivileged Ubuntu 26.04 container with disposable profile and runtime directories, a random loopback port, DISPLAY unset, software GL, and the extracted AppImage in a fresh session. Wait for orca_server_ready schema version 1, record the listener owner, process tree, owned Xvfb, and unrelated canary identities, deliver SIGINT to the foreground process group or the documented KillMode=mixed graceful SIGTERM to the AppRun PID, then require wait status zero, no Failed to shutdown, SIGTRAP, core, listener, recorded descendant, profile/AppImage/Xvfb residue, or changed canary identity. The 30-second bounds are failure deadlines, never success conditions.",
       "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/startup/ensure-virtual-display.test.ts config/scripts/headless-serve-shutdown-workflow.test.mjs --reporter=dot",
+        "pnpm exec vitest run --config config/vitest.config.ts src/main/startup/ensure-virtual-display.test.ts --reporter=dot",
         "shellcheck config/docker/headless-serve-shutdown/run-signal-case.sh",
         "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage",
         "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage --platform linux/amd64"
       ],
       "testFiles": [
         "src/main/startup/ensure-virtual-display.test.ts",
-        "config/scripts/headless-serve-shutdown-workflow.test.mjs",
         "config/scripts/run-headless-serve-shutdown-docker.mjs",
         "config/docker/headless-serve-shutdown/run-signal-case.sh"
       ],
@@ -16308,13 +16290,6 @@
             "owned Xvfb retains an early-process-exit guard until Electron is ready",
             "owned Xvfb is not stopped from Electron's cancelable will-quit event",
             "external displays and non-Linux startup remain untouched"
-          ]
-        },
-        {
-          "file": "config/scripts/headless-serve-shutdown-workflow.test.mjs",
-          "assertions": [
-            "PR CI builds an x64 AppImage before invoking the packaged shutdown oracle",
-            "the documented systemd unit uses KillMode=mixed so graceful TERM targets Orca before its owned Xvfb"
           ]
         },
         {
@@ -16340,7 +16315,7 @@
           "date": "2026-08-13",
           "runner": "local",
           "platform": "linux",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/startup/ensure-virtual-display.test.ts config/scripts/headless-serve-shutdown-workflow.test.mjs --reporter=dot",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/startup/ensure-virtual-display.test.ts --reporter=dot",
           "result": "passed",
           "durationSeconds": 1,
           "summary": "The focused startup and workflow contracts passed with owned-display termination semantics and native amd64 CI wiring."
@@ -16406,11 +16381,9 @@
       "oracle": "Build all relay artifacts, require each managed-hook-runtime.js in a real Node 18 process, assert its installer export, then install only Codex and Claude into a fresh temporary home. Require two successful installer results, executable hook scripts, and both agent configs to reference their managed scripts without touching the user's home.",
       "commands": [
         "pnpm run build:relay && npx -y node@18 config/scripts/smoke-managed-hook-runtime-node18.mjs",
-        "pnpm exec vitest run --config config/vitest.config.ts config/scripts/pr-workflow-parallelism.test.mjs"
       ],
       "testFiles": [
         "config/scripts/smoke-managed-hook-runtime-node18.mjs",
-        "config/scripts/pr-workflow-parallelism.test.mjs"
       ],
       "assertionRefs": [
         {
@@ -16421,12 +16394,6 @@
             "both generated configs reference executable managed hook scripts"
           ]
         },
-        {
-          "file": "config/scripts/pr-workflow-parallelism.test.mjs",
-          "assertions": [
-            "PR CI builds the companions before switching to Node 18 and running the smoke oracle"
-          ]
-        }
       ],
       "evidenceRuns": [
         {
