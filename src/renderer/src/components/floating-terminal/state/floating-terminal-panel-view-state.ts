@@ -4,6 +4,7 @@ export const FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY =
 export type FloatingTerminalPanelViewState = {
   open: boolean
   maximized: boolean
+  tasksView: boolean
 }
 
 function getWindowStorage(): Storage | null {
@@ -25,7 +26,8 @@ export function readPersistedFloatingTerminalPanelViewState(): FloatingTerminalP
     // Read flags independently so older records still restore the field they contain.
     return {
       open: record.open === true,
-      maximized: record.maximized === true
+      maximized: record.maximized === true,
+      tasksView: record.tasksView === true
     }
   } catch {
     return null
@@ -43,13 +45,30 @@ export function persistFloatingTerminalPanelViewState(state: FloatingTerminalPan
   }
 }
 
-// Preserve the other owner’s flag: the app shell writes open, the panel writes maximized.
+// Preserve the other owner’s flags: the app shell writes open, the panel writes maximized and tasksView.
 export function persistFloatingTerminalPanelOpen(open: boolean): void {
   const current = readPersistedFloatingTerminalPanelViewState()
-  persistFloatingTerminalPanelViewState({ maximized: current?.maximized === true, open })
+  persistFloatingTerminalPanelViewState({
+    maximized: current?.maximized === true,
+    tasksView: current?.tasksView === true,
+    open
+  })
 }
 
 export function persistFloatingTerminalPanelMaximized(maximized: boolean): void {
   const current = readPersistedFloatingTerminalPanelViewState()
-  persistFloatingTerminalPanelViewState({ open: current?.open === true, maximized })
+  persistFloatingTerminalPanelViewState({
+    open: current?.open === true,
+    tasksView: current?.tasksView === true,
+    maximized
+  })
+}
+
+export function persistFloatingTerminalPanelTasksView(tasksView: boolean): void {
+  const current = readPersistedFloatingTerminalPanelViewState()
+  persistFloatingTerminalPanelViewState({
+    open: current?.open === true,
+    maximized: current?.maximized === true,
+    tasksView
+  })
 }
