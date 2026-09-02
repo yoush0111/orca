@@ -1,19 +1,26 @@
 import { net } from 'electron'
 import { parse } from 'yaml'
 import { compareVersions, isPrereleaseVersion, isValidVersion } from './updater-fallback'
+import { getInstalledReleaseRepo } from './release-repo-source'
 
-const ATOM_FEED_URL = 'https://github.com/stablyai/orca/releases.atom'
-const RELEASES_DOWNLOAD_BASE = 'https://github.com/stablyai/orca/releases/download'
 const FETCH_TIMEOUT_MS = 5000
 const MAX_MANIFEST_PROBE_CANDIDATES = 6
+
+function getReleasesBaseUrl(): string {
+  return `https://github.com/${getInstalledReleaseRepo()}/releases`
+}
 
 // Why: GitHub's atom feed lists every release (prerelease or stable) in a
 // single flat list. Each entry has a /releases/tag/<tag> URL we can mine
 // without any channel filtering.
-const TAG_HREF_RE = /href="https:\/\/github\.com\/stablyai\/orca\/releases\/tag\/([^"]+)"/g
+function buildTagHrefRe(): RegExp {
+  // GitHub owner/repo names only ever add `.` to the URL's regex-special chars.
+  const base = getReleasesBaseUrl().replaceAll('.', '\\.')
+  return new RegExp(`href="${base}/tag/([^"]+)"`, 'g')
+}
 
 export function getReleaseDownloadUrl(tag: string): string {
-  return `${RELEASES_DOWNLOAD_BASE}/${encodeURIComponent(tag)}`
+  return `${getReleasesBaseUrl()}/download/${encodeURIComponent(tag)}`
 }
 
 function getPlatformManifestName(): string {
@@ -57,14 +64,16 @@ export function isPerfPrereleaseTag(tag: string): boolean {
 
 async function fetchReleaseFeedTags(): Promise<ReleaseFeedTag[] | null> {
   try {
-    const res = await net.fetch(ATOM_FEED_URL, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+    const res = await net.fetch(`${getReleasesBaseUrl()}.atom`, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
+    })
     if (!res.ok) {
       return null
     }
     const body = await res.text()
     const tags: ReleaseFeedTag[] = []
 
-    for (const match of body.matchAll(TAG_HREF_RE)) {
+    for (const match of body.matchAll(buildTagHrefRe())) {
       const tag = match[1]
       const version = normalizeTagToVersion(tag)
       if (isValidVersion(version)) {
