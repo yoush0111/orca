@@ -21,7 +21,8 @@ const mocks = vi.hoisted(() => ({
     checking: boolean
     onOpenIntegrations: () => void
   }[],
-  jiraSetupProps: [] as { onOpenIntegrations: () => void }[]
+  jiraSetupProps: [] as { onOpenIntegrations: () => void }[],
+  redmineSetupProps: [] as { onOpenIntegrations: () => void }[]
 }))
 
 vi.mock('./use-task-source-provider-readiness', () => ({
@@ -65,6 +66,10 @@ vi.mock('./TaskSourceSimpleSetup', () => ({
   JiraSetupSteps: (props: { onOpenIntegrations: () => void }) => {
     mocks.jiraSetupProps.push(props)
     return <div data-testid="jira-setup">Jira setup</div>
+  },
+  RedmineSetupSteps: (props: { onOpenIntegrations: () => void }) => {
+    mocks.redmineSetupProps.push(props)
+    return <div data-testid="redmine-setup">Redmine setup</div>
   }
 }))
 
@@ -124,6 +129,7 @@ describe('TasksPane', () => {
   beforeEach(() => {
     mocks.linearSetupProps = []
     mocks.jiraSetupProps = []
+    mocks.redmineSetupProps = []
     mocks.openSettingsPage.mockClear()
     mocks.openSettingsTarget.mockClear()
     mocks.readiness = {
@@ -137,7 +143,8 @@ describe('TasksPane', () => {
         skillChecking: false,
         visible: true
       },
-      jira: { connected: false, checking: false, visible: false }
+      jira: { connected: false, checking: false, visible: false },
+      redmine: { connected: false, checking: false, visible: false }
     }
   })
 
