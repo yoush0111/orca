@@ -55,6 +55,20 @@ const devChannelBuildVersion = isHourlyChannel
     : isAdhocChannel
       ? process.env.ORCA_ADHOC_BUILD_VERSION
       : undefined
+// Why: an internally distributed fork build must update from the fork's own
+// releases, never stablyai's — otherwise the first update swaps the custom build
+// for upstream Orca. Such a build also carries no SignPath cert, so the updater
+// has to skip the Authenticode check it would fail against a publisher that
+// never signed it.
+const forkPublishOwner = process.env.ORCA_FORK_PUBLISH_OWNER?.trim() || null
+
+// Why a separate repo override: a fork's source repo can go private (e.g. to
+// keep code closed while still shipping public binaries) while its release
+// repo stays public. Without this, publish.repo falls back to 'orca', which
+// would point the updater at the now-private source repo and break update
+// checks. Only takes effect alongside forkPublishOwner.
+const forkPublishRepo = process.env.ORCA_FORK_PUBLISH_REPO?.trim() || null
+
 // Why each dev channel gets its own repo rather than tagging into the main one:
 // the releases atom feed exposes only the 10 newest entries, so 24 hourly tags a
 // day would evict every stable/RC entry and strand users on a feed with nothing
@@ -433,9 +447,9 @@ module.exports = {
     // its existing channel split above.
     signtoolOptions: {
       sign: signWindowsUninstallerViaSignPath,
-      ...(isWinDevChannel ? {} : { publisherName: 'SignPath Foundation' })
+      ...(isWinDevChannel || forkPublishOwner ? {} : { publisherName: 'SignPath Foundation' })
     },
-    ...(isWinDevChannel ? { verifyUpdateCodeSignature: false } : {}),
+    ...(isWinDevChannel || forkPublishOwner ? { verifyUpdateCodeSignature: false } : {}),
     extraResources: [
       ...commonExtraResources,
       ...windowsRuntimeResources,
@@ -663,13 +677,14 @@ module.exports = {
   npmRebuild: true,
   publish: {
     provider: 'github',
-    owner: 'stablyai',
-    repo: devChannelRepo ?? 'orca',
+    owner: forkPublishOwner ?? 'stablyai',
+    repo: devChannelRepo ?? forkPublishRepo ?? 'orca',
     // Why draft on the main repo: `--publish always` otherwise creates a
     // public GitHub release as soon as the first platform uploads, and
     // /releases/latest serves a missing Windows exe. release-cut undrafts
-    // only after every required asset exists.
-    releaseType: devChannelRepo ? 'prerelease' : 'draft'
+    // only after every required asset exists. Fork publishes go straight to a
+    // real release because the fork uploads every asset in one run.
+    releaseType: devChannelRepo ? 'prerelease' : forkPublishOwner ? 'release' : 'draft'
   }
 }
 
