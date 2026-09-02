@@ -17,6 +17,7 @@ import {
 import { isValidVersion } from './updater-fallback'
 import { rejectReleaseApiToken, resolveReleaseApiToken } from './updater-release-api-token'
 import { UpdaterCodedError } from '../lifecycle/updater-coded-error'
+import { getInstalledReleaseRepo } from './release-repo-source'
 
 const FETCH_TIMEOUT_MS = 8000
 const MAX_LISTED_BUILDS = 100
@@ -173,7 +174,7 @@ async function fetchReleaseBuildsPage(
   page: ReleasePage,
   budget?: AbortSignal
 ): Promise<{ builds: ReleaseBuild[]; isLastPage: boolean }> {
-  const repo = getReleaseRepoForChannel(channel)
+  const repo = getReleaseRepoForChannel(channel, getInstalledReleaseRepo())
   // Skip a known-exhausted token bucket and try the separate per-IP quota.
   const credential = await resolveReleaseApiToken()
   const tokenBucketBlocked =
@@ -252,6 +253,6 @@ export function resolveTargetBuild(channel: ReleaseChannel, tag: string): Resolv
   if (!isValidVersion(version)) {
     throw new UpdaterCodedError('invalidReleaseTag', { tag })
   }
-  const repo = getReleaseRepoForChannel(channel)
+  const repo = getReleaseRepoForChannel(channel, getInstalledReleaseRepo())
   return { tag, version, feedUrl: getReleaseDownloadUrlForRepo(repo, tag) }
 }
