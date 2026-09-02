@@ -131,8 +131,14 @@ export function prepareLoadedProfileSettings(
     : rawTaskProviderSettings.visibleTaskProviders.includes('jira')
       ? rawTaskProviderSettings.visibleTaskProviders
       : [...rawTaskProviderSettings.visibleTaskProviders, 'jira' as const]
+  const visibleTaskProvidersDefaultedForRedmine =
+    parsed.settings?.visibleTaskProvidersDefaultedForRedmine === true
+  const migratedVisibleTaskProvidersWithRedmine =
+    visibleTaskProvidersDefaultedForRedmine || migratedVisibleTaskProviders.includes('redmine')
+      ? migratedVisibleTaskProviders
+      : [...migratedVisibleTaskProviders, 'redmine' as const]
   const taskProviderSettings = normalizeTaskProviderSettings({
-    visibleTaskProviders: migratedVisibleTaskProviders,
+    visibleTaskProviders: migratedVisibleTaskProvidersWithRedmine,
     defaultTaskSource: rawTaskProviderSettings.defaultTaskSource
   })
   const primarySelectionDefaultedForLinux =
@@ -151,7 +157,7 @@ export function prepareLoadedProfileSettings(
   if (migratePrimarySelectionPlatformDefault || stampPrimarySelectionTerminalDefaults) {
     markNeedsSave()
   }
-  if (!visibleTaskProvidersDefaultedForJira) {
+  if (!visibleTaskProvidersDefaultedForJira || !visibleTaskProvidersDefaultedForRedmine) {
     markNeedsSave()
   }
   const claudeAgentTeamsDefaultDisabledMigrated =

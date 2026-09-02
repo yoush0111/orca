@@ -26,7 +26,8 @@ export function useTaskPageSourceSummary(model: TaskPageSourceAvailabilityPrelud
     hostLabelById,
     taskSourceHostAvailability,
     accountBackedTaskSourceHostId,
-    accountBackedTaskSourceHostAvailability
+    accountBackedTaskSourceHostAvailability,
+    redmineStatus
   } = model
   const taskSourceAvailabilityNoticeByProvider = useMemo<
     Partial<Record<TaskProvider, TaskSourceAvailabilityNotice>>
@@ -92,6 +93,13 @@ export function useTaskPageSourceSummary(model: TaskPageSourceAvailabilityPrelud
       jira:
         getTaskSourceAvailabilityNotice({
           providerLabel: labelFor('jira'),
+          sourceCount: 1,
+          hostLabelById,
+          hostAvailability: accountAvailability
+        }) ?? undefined,
+      redmine:
+        getTaskSourceAvailabilityNotice({
+          providerLabel: labelFor('redmine'),
           sourceCount: 1,
           hostLabelById,
           hostAvailability: accountAvailability

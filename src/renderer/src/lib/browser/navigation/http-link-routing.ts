@@ -14,6 +14,7 @@ import {
 import type { LinkOpenIntent, LinkSourceState } from '../../links/placement/link-open-intent'
 import { translate } from '@/i18n/i18n'
 import { isFloatingWorkspaceId } from '../../../../../shared/floating-workspace-worktree'
+import { OPEN_FLOATING_TERMINAL_EVENT } from '@/components/floating-terminal/floating-terminal'
 import { toast } from 'sonner'
 import { reselectWorkspaceKeepingHost } from '../../workspace/ownership/active-workspace-host'
 import { captureBrowserLinkReveal } from './browser-link-reveal'
@@ -245,6 +246,9 @@ function executeHttpLink(
       if (opts.linkContext?.isCurrentRequest?.() === false) {
         reveal.dispose()
         return
+      }
+      if (isHttpLinkBackgroundOpen(state) || isFloatingWorkspaceId(worktreeId)) {
+        window.dispatchEvent(new Event(OPEN_FLOATING_TERMINAL_EVENT))
       }
       if (workspaceHttpLinkBrowserOpener) {
         const opening = workspaceHttpLinkBrowserOpener({
