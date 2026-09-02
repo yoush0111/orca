@@ -1,4 +1,8 @@
 export const TOGGLE_FLOATING_TERMINAL_EVENT = 'orca-toggle-floating-terminal'
+// Why a separate event from toggle: a caller that routes a link into the
+// floating workspace needs the panel open regardless of its current state —
+// toggling would close it if it happened to already be open.
+export const OPEN_FLOATING_TERMINAL_EVENT = 'orca-open-floating-terminal'
 
 // Keep one-shot maximize intent across closed→mounted: the panel’s keyboard handler is absent until App opens it.
 let openMaximizedIntentAt: number | null = null
