@@ -255,3 +255,4 @@ function ProviderAccountScopeRow({ scope }: { scope: ProviderHostScope }) {
 }
 
 export { JiraIntegrationCard } from './jira-integration-card'
+export { RedmineIntegrationCard } from './redmine-integration-card'
