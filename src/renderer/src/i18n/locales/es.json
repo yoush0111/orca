@@ -1918,7 +1918,8 @@
         "jiraLinkSourceUnavailable": "Couldn’t link this Jira issue. Reconnect Jira or pick the matching site, then try again.",
         "loadPageUnreachable": "La página {{value0}} está más allá de lo que la búsqueda de GitHub puede devolver.",
         "loadPageFailed": "No se pudo cargar la página {{value0}} desde GitHub.",
-        "loadPageNoMoreResults": "No hay más resultados en la página {{value0}}."
+        "loadPageNoMoreResults": "No hay más resultados en la página {{value0}}.",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "Cerrar",
@@ -7329,7 +7330,13 @@
           "integrationsHint": "Las credenciales de todos los proveedores también están en",
           "integrationsLink": "Integraciones",
           "skillHint": ". Después de conectar Linear, los ejemplos de uso están en Ajustes → Linear.",
-          "incompleteBannerBodyWithLinear": "Oculta los proveedores que no uses o expande una tarjeta y completa sus pasos. Para Linear: acceso a la API, la habilidad del agente y Mostrar en Tareas."
+          "incompleteBannerBodyWithLinear": "Oculta los proveedores que no uses o expande una tarjeta y completa sus pasos. Para Linear: acceso a la API, la habilidad del agente y Mostrar en Tareas.",
+          "connectRedmineTitle": "Conectar Redmine",
+          "connectRedmineDescription": "Añade una instancia de Redmine con su clave de API REST.",
+          "manageRedmine": "Gestionar clave",
+          "addRedmine": "Añadir acceso a Redmine",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "Conecta una instancia de Redmine con su clave de API REST y muéstrala en Tareas."
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "Grosor de la línea divisoria del panel.",
@@ -10283,6 +10290,22 @@
           "saveFailed": "No se pudieron guardar los valores predeterminados de visibilidad.",
           "updateServer": "Actualiza este servidor para configurar los valores predeterminados de las fuentes.",
           "updateServerDefaults": "Actualiza este servidor para configurar los valores predeterminados de visibilidad."
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "Conecta una instancia de Redmine con su clave de API REST. La clave se envía al entorno de ejecución remoto seleccionado y se guarda allí con el cifrado que admita.",
+              "credentialLocal": "Conecta una instancia de Redmine con su clave de API REST. La clave se guarda localmente y se cifra cuando el almacenamiento local lo admite.",
+              "connectedFallback": "Instancia de Redmine conectada",
+              "checking": "Comprobando el acceso a Redmine antes de mostrar las acciones de configuración.",
+              "pitch": "Explora incidencias de Redmine e inicia espacios de trabajo desde ellas.",
+              "statusConnected": "Conectado",
+              "statusNotConnected": "Sin conectar",
+              "replace": "Reemplazar conexión",
+              "connect": "Conectar Redmine",
+              "singleConnection": "Se conecta una instancia de Redmine por entorno de ejecución. Volver a conectar reemplaza la clave guardada."
+            }
+          }
         }
       },
       "right": {
@@ -14349,6 +14372,40 @@
               "chooseSource": "Elige el origen de tareas"
             }
           }
+        },
+        "page": {
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "Sin asignar",
+                "startWorkspaceFrom": "Iniciar espacio de trabajo desde #{{value0}}",
+                "startWorkspace": "Iniciar espacio de trabajo",
+                "openInRedmine": "Abrir #{{value0}} en Redmine",
+                "openInRedmineShort": "Abrir en Redmine",
+                "columnId": "ID",
+                "columnSubject": "Asunto",
+                "columnStatus": "Estado",
+                "columnProject": "Proyecto",
+                "columnAssignee": "Asignado a",
+                "columnDone": "Avance"
+              }
+            },
+            "panel": {
+              "loadFailed": "No se pudieron cargar las incidencias de Redmine.",
+              "connectTitle": "Conectar Redmine",
+              "connectBody": "Explora incidencias de Redmine y empieza a trabajar en ellas directamente desde aquí.",
+              "connectAction": "Conectar Redmine",
+              "hideAction": "Ocultar Redmine",
+              "mineOnly": "Asignadas a mí",
+              "allProjects": "Todos los proyectos",
+              "statusOpen": "Abiertas",
+              "statusClosed": "Cerradas",
+              "statusAll": "Cualquier estado",
+              "shown": "mostradas",
+              "emptyTitle": "No se encontraron incidencias de Redmine",
+              "emptyBody": "Ninguna incidencia coincide con los filtros seleccionados."
+            }
+          }
         }
       },
       "taskPageEmptyState": {
@@ -14499,6 +14556,24 @@
         "description": "Anida este espacio de trabajo bajo otro en la barra lateral. No cambia la rama base.",
         "searchPlaceholder": "Buscar espacios de trabajo...",
         "noMatches": "No hay coincidencias."
+      },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "Tu clave de API se envía al entorno de ejecución remoto seleccionado y se guarda allí con el cifrado que admita.",
+            "credentialLocal": "Tu clave de API se guarda localmente y se cifra cuando el almacenamiento local lo admite.",
+            "title": "Conectar Redmine",
+            "description": "Usa la URL base de Redmine y la clave de API REST de tu página de cuenta para explorar incidencias.",
+            "baseUrlLabel": "URL base",
+            "apiKeyLabel": "Clave de API",
+            "apiKeyPlaceholder": "Clave de API REST de Redmine",
+            "apiKeyHint": "Encuentra la clave en Mi cuenta, clave de acceso de API. El acceso a la API REST debe estar habilitado en la administración de Redmine.",
+            "cancel": "Cancelar",
+            "verifying": "Verificando…",
+            "connect": "Conectar",
+            "baseUrlPlaceholder": "https://redmine.example.com"
+          }
+        }
       }
     },
     "i18n": {
