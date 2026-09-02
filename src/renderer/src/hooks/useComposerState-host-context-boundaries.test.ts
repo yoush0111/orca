@@ -465,11 +465,13 @@ describe('useComposerState host-context boundaries', () => {
     )
   })
 
-  it('keeps a Linear branch override when its workspace-scoped issue survives a repo change', () => {
+  it('keeps a workspace-scoped branch override when its issue survives a repo change', () => {
     const section = COMPOSER_SOURCE.targetChange
 
-    expect(section).toContain('const preservedLinearBranchName = preserveLinearLinkedWorkItem')
-    expect(section).toContain('getLinearLinkedWorkItemBranchName(linkedWorkItem)')
+    expect(section).toContain(
+      'const preservedLinearBranchName = shouldPreserveWorkspaceSourceOnRepoChange(linkedWorkItem)'
+    )
+    expect(section).toContain('getLinkedWorkItemBranchNameOverride(linkedWorkItem)')
     expect(section).toContain('setBranchNameOverride(preservedLinearBranchName)')
     expect(section).toContain(
       'setBranchNameOverridePreservesNameEdits(Boolean(preservedLinearBranchName))'

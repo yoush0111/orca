@@ -2,6 +2,8 @@ import { getLinearOrganizationUrlKeyFromIssueUrl } from '../linear/links'
 import type { FolderWorkspaceLinkedTask } from '../folder-workspace-types'
 import type { JiraIssue } from '../jira-types'
 import type { LinearIssue } from '../linear/issue-types'
+import type { RedmineIssue } from '../redmine-types'
+import { redmineWorkspaceBranchName } from '../redmine-workspace-name'
 import {
   getLinkedWorkItemSuggestedName,
   getLinkedWorkItemWorkspaceName,
@@ -15,6 +17,7 @@ export type WorkspaceSourceLinkedItem = FolderWorkspaceLinkedTask & {
   linearWorkspaceId?: string
   linearOrganizationUrlKey?: string
   linearBranchName?: string
+  redmineBranchName?: string
 }
 
 export type GitHubWorkspaceSource = WorkspaceSourceLinkedItem & {
@@ -37,6 +40,11 @@ export type JiraWorkspaceSource = WorkspaceSourceLinkedItem & {
   type: 'issue'
 }
 
+export type RedmineWorkspaceSource = WorkspaceSourceLinkedItem & {
+  provider: 'redmine'
+  type: 'issue'
+}
+
 export type WorkspaceSourceItemLike = Omit<WorkspaceSourceLinkedItem, 'provider'> & {
   provider?: WorkspaceSourceProvider
 }
@@ -49,6 +57,7 @@ export type WorkspaceSourceSelectionKind =
   | 'branch'
   | 'linear'
   | 'jira'
+  | 'redmine'
 
 export type WorkspaceSourceSelection = {
   kind: WorkspaceSourceSelectionKind
@@ -157,6 +166,19 @@ export function buildJiraWorkspaceSource(
   }
 }
 
+export function buildRedmineWorkspaceSource(
+  issue: Pick<RedmineIssue, 'id' | 'subject' | 'url'>
+): RedmineWorkspaceSource {
+  return {
+    provider: 'redmine',
+    type: 'issue',
+    number: issue.id,
+    title: issue.subject,
+    url: issue.url,
+    redmineBranchName: redmineWorkspaceBranchName({ id: issue.id, subject: issue.subject })
+  }
+}
+
 export function shouldApplyWorkspaceSourceAutoName(args: {
   currentName: string
   lastAutoName: string
@@ -198,13 +220,15 @@ export function buildWorkspaceSourceSelection(args: {
       ? 'linear'
       : provider === 'jira'
         ? 'jira'
-        : provider === 'gitlab'
-          ? linkedWorkItem.type === 'mr'
-            ? 'gitlab-mr'
-            : 'gitlab-issue'
-          : linkedWorkItem.type === 'pr'
-            ? 'github-pr'
-            : 'github-issue'
+        : provider === 'redmine'
+          ? 'redmine'
+          : provider === 'gitlab'
+            ? linkedWorkItem.type === 'mr'
+              ? 'gitlab-mr'
+              : 'gitlab-issue'
+            : linkedWorkItem.type === 'pr'
+              ? 'github-pr'
+              : 'github-issue'
   return {
     kind,
     label:
@@ -222,5 +246,5 @@ export function shouldPreserveWorkspaceSourceOnRepoChange(
     return false
   }
   const provider = getWorkspaceSourceProvider(item)
-  return provider === 'linear' || provider === 'jira'
+  return provider === 'linear' || provider === 'jira' || provider === 'redmine'
 }
