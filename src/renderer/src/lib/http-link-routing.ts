@@ -13,6 +13,8 @@ import { captureLinkOpenIntent, canOpenLinkInSourceGroup } from './link-open-int
 import type { AppState } from '@/store/types'
 import { translate } from '@/i18n/i18n'
 import { isFloatingWorkspaceId } from '../../../shared/floating-workspace-worktree'
+import { OPEN_FLOATING_TERMINAL_EVENT } from './floating-terminal'
+import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
 import { toast } from 'sonner'
 import type { ExecutionHostId } from '../../../shared/execution-host'
@@ -246,6 +248,9 @@ export function openHttpLink(url: string, opts: OpenHttpLinkOptions = {}): void 
       if (opts.linkContext?.isCurrentRequest?.() === false) {
         reveal.dispose()
         return
+      }
+      if (isHttpLinkBackgroundOpen(state) || isFloatingWorkspaceId(worktreeId)) {
+        window.dispatchEvent(new Event(OPEN_FLOATING_TERMINAL_EVENT))
       }
       if (workspaceHttpLinkBrowserOpener) {
         void workspaceHttpLinkBrowserOpener({
