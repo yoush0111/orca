@@ -94,6 +94,10 @@ const devChannelBuildVersion = isHourlyChannel
     : isAdhocChannel
       ? process.env.ORCA_ADHOC_BUILD_VERSION
       : undefined
+// Fork builds update from the fork's own releases (never stablyai's) and carry no SignPath cert.
+const forkPublishOwner = process.env.ORCA_FORK_PUBLISH_OWNER?.trim() || null
+// Release repo may differ from the (possibly private) source repo; only applies with forkPublishOwner.
+const forkPublishRepo = process.env.ORCA_FORK_PUBLISH_REPO?.trim() || null
 // Separate dev-channel repos: 24 hourly tags/day would evict stable/RC from the ten-entry release feed; isolate adhoc/daily from hourly subscribers too.
 const devChannelRepo = isHourlyChannel
   ? 'orca-hourly'
@@ -479,9 +483,9 @@ module.exports = {
     // Sign hook signs nothing: it relays transient NSIS uninstaller files to CI SignPath; unset relay env leaves local/dev builds inert.
     signtoolOptions: {
       sign: signWindowsUninstallerViaSignPath,
-      ...(isWinDevChannel ? {} : { publisherName: 'SignPath Foundation' })
+      ...(isWinDevChannel || forkPublishOwner ? {} : { publisherName: 'SignPath Foundation' })
     },
-    ...(isWinDevChannel ? { verifyUpdateCodeSignature: false } : {}),
+    ...(isWinDevChannel || forkPublishOwner ? { verifyUpdateCodeSignature: false } : {}),
     extraResources: [
       ...commonExtraResources,
       ...windowsRuntimeResources,
@@ -692,10 +696,11 @@ module.exports = {
   npmRebuild: true,
   publish: {
     provider: 'github',
-    owner: 'stablyai',
-    repo: devChannelRepo ?? 'orca',
+    owner: forkPublishOwner ?? 'stablyai',
+    repo: devChannelRepo ?? forkPublishRepo ?? 'orca',
     // Keep main-repo releases draft until release-cut verifies all assets; early --publish always would expose missing Windows installers.
-    releaseType: devChannelRepo ? 'prerelease' : 'draft'
+    // Fork publishes upload every asset in one run, so they go straight to a real release.
+    releaseType: devChannelRepo ? 'prerelease' : forkPublishOwner ? 'release' : 'draft'
   }
 }
 
