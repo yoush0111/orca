@@ -16,6 +16,7 @@ import { useFloatingTerminalPanelLocalState } from './use-floating-terminal-pane
 import { useFloatingTerminalPanelMaximize } from './use-floating-terminal-panel-maximize'
 import { useFloatingTerminalPanelShortcuts } from './use-floating-terminal-panel-shortcuts'
 import { useFloatingTerminalPanelStoreState } from './use-floating-terminal-panel-store-state'
+import { useFloatingTerminalPanelTasksView } from './use-floating-terminal-panel-tasks-view'
 import { useFloatingTerminalShortcutDetails } from './use-floating-terminal-shortcut-details'
 
 export function useFloatingTerminalPanelController({
@@ -73,6 +74,7 @@ export function useFloatingTerminalPanelController({
     ...maximize
   })
   const orchestrationDismissal = useFloatingTerminalOrchestrationDismissal(localState)
+  const tasksView = useFloatingTerminalPanelTasksView(items)
 
   return {
     open,
@@ -89,6 +91,7 @@ export function useFloatingTerminalPanelController({
     ...maximize,
     ...shortcuts,
     ...dragActions,
-    ...orchestrationDismissal
+    ...orchestrationDismissal,
+    ...tasksView
   }
 }
