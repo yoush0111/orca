@@ -1,0 +1,207 @@
+import { net, session } from 'electron'
+import { ensureElectronProxyFromEnvironment } from '../network/proxy-settings'
+import { CredentialDecryptionError } from '../integration-credential-file'
+import type {
+  RedmineConnectArgs,
+  RedmineConnectResult,
+  RedmineConnectionStatus,
+  RedmineIssue,
+  RedmineIssueQuery,
+  RedmineNamedRef,
+  RedmineProject
+} from '../../shared/redmine-types'
+import {
+  buildRedmineIssuesQuery,
+  normalizeRedmineBaseUrl,
+  parseRedmineIssues,
+  parseRedmineProjects,
+  parseRedmineStatuses,
+  parseRedmineViewer
+} from './rest-contract'
+import {
+  clearConnection,
+  getCredentialError,
+  hasStoredApiKey,
+  readApiKey,
+  readConnectionRecord,
+  saveConnection
+} from './credential-store'
+
+const REQUEST_TIMEOUT_MS = 20_000
+
+class RedmineApiError extends Error {
+  status: number | null
+
+  constructor(message: string, status: number | null = null) {
+    super(message)
+    this.name = 'RedmineApiError'
+    this.status = status
+  }
+}
+
+async function redmineGet(baseUrl: string, apiKey: string, path: string): Promise<unknown> {
+  const url = `${baseUrl}${path}`
+  await ensureElectronProxyFromEnvironment({
+    proxySession: session.defaultSession,
+    probeUrl: url
+  }).catch(() => {
+    // Proxy discovery is best-effort; the request below reports the real failure.
+  })
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+  try {
+    // Why: Electron's network stack follows Chromium proxy/session state,
+    // avoiding stale keep-alive sockets after VPN path changes.
+    const response = await net.fetch(url, {
+      headers: {
+        Accept: 'application/json',
+        // Redmine's own header auth — never put the key in the query string,
+        // where proxies and access logs would capture it.
+        'X-Redmine-API-Key': apiKey
+      },
+      signal: controller.signal
+    })
+    if (!response.ok) {
+      throw new RedmineApiError(
+        response.status === 401 || response.status === 403
+          ? 'Redmine rejected the API key.'
+          : `Redmine request failed (${response.status}).`,
+        response.status
+      )
+    }
+    return await response.json()
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+type ActiveClient = { baseUrl: string; apiKey: string }
+
+/** Throws CredentialDecryptionError so the renderer can surface the decrypt banner. */
+function getClient(): ActiveClient | null {
+  const record = readConnectionRecord()
+  if (!record) {
+    return null
+  }
+  const apiKey = readApiKey()
+  return apiKey ? { baseUrl: record.baseUrl, apiKey } : null
+}
+
+export function getStatus(): RedmineConnectionStatus {
+  const record = readConnectionRecord()
+  const connected = record !== null && hasStoredApiKey()
+  const credentialError = getCredentialError()
+  return {
+    connected,
+    connection:
+      connected && record
+        ? {
+            baseUrl: record.baseUrl,
+            viewer: {
+              id: record.viewerId,
+              login: record.login,
+              displayName: record.displayName,
+              email: record.email
+            }
+          }
+        : null,
+    ...(credentialError ? { credentialError } : {})
+  }
+}
+
+export async function connect(args: RedmineConnectArgs): Promise<RedmineConnectResult> {
+  let baseUrl: string
+  try {
+    baseUrl = normalizeRedmineBaseUrl(args.baseUrl)
+  } catch {
+    return { ok: false, error: 'Enter a valid Redmine base URL.' }
+  }
+  const apiKey = args.apiKey.trim()
+  if (!apiKey) {
+    return { ok: false, error: 'API key is required.' }
+  }
+  try {
+    const viewer = parseRedmineViewer(await redmineGet(baseUrl, apiKey, '/users/current.json'))
+    saveConnection(
+      {
+        version: 1,
+        baseUrl,
+        viewerId: viewer.id,
+        login: viewer.login,
+        displayName: viewer.displayName,
+        email: viewer.email
+      },
+      apiKey
+    )
+    return { ok: true, viewer }
+  } catch (error) {
+    console.error('[redmine] connect failed', {
+      baseUrl,
+      error: error instanceof Error ? error.message : String(error)
+    })
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Could not reach Redmine.'
+    }
+  }
+}
+
+export function disconnect(): void {
+  clearConnection()
+}
+
+export async function testConnection(): Promise<RedmineConnectResult> {
+  let client: ActiveClient | null
+  try {
+    client = getClient()
+  } catch (error) {
+    return {
+      ok: false,
+      error: error instanceof CredentialDecryptionError ? error.message : 'Test failed'
+    }
+  }
+  if (!client) {
+    return { ok: false, error: 'Redmine is not connected.' }
+  }
+  try {
+    const viewer = parseRedmineViewer(
+      await redmineGet(client.baseUrl, client.apiKey, '/users/current.json')
+    )
+    return { ok: true, viewer }
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : 'Test failed' }
+  }
+}
+
+export async function listIssues(query: RedmineIssueQuery = {}): Promise<RedmineIssue[]> {
+  const client = getClient()
+  if (!client) {
+    return []
+  }
+  const payload = await redmineGet(
+    client.baseUrl,
+    client.apiKey,
+    `/issues.json?${buildRedmineIssuesQuery(query)}`
+  )
+  return parseRedmineIssues(payload, client.baseUrl)
+}
+
+export async function listProjects(): Promise<RedmineProject[]> {
+  const client = getClient()
+  if (!client) {
+    return []
+  }
+  return parseRedmineProjects(
+    await redmineGet(client.baseUrl, client.apiKey, '/projects.json?limit=100')
+  )
+}
+
+export async function listStatuses(): Promise<RedmineNamedRef[]> {
+  const client = getClient()
+  if (!client) {
+    return []
+  }
+  return parseRedmineStatuses(
+    await redmineGet(client.baseUrl, client.apiKey, '/issue_statuses.json')
+  )
+}
