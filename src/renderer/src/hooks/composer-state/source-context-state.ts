@@ -28,7 +28,7 @@ type ComposerSourceContextStateInput = Pick<
 import { useCallback, useMemo, useState } from 'react'
 import { getWorkspaceSourceProvider } from '../../../../shared/new-workspace/workspace-source'
 import type { LinkedWorkItemSummary } from '@/lib/workspace/creation/new-workspace'
-import { getLinearLinkedWorkItemBranchName } from '@/lib/work-items/linear/linear-linked-work-item'
+import { getLinkedWorkItemBranchNameOverride } from '@/lib/linked-work-item-branch-name'
 import {
   type TaskSourceContext,
   buildTaskSourceContextFromRepo,
@@ -135,7 +135,7 @@ export function useComposerSourceContextState(input: ComposerSourceContextStateI
     () => linkedWorkItemSeed
   )
 
-  const initialLinearBranchName = getLinearLinkedWorkItemBranchName(linkedWorkItemSeed)
+  const initialLinkedBranchName = getLinkedWorkItemBranchNameOverride(linkedWorkItemSeed)
 
   const [linkedTaskSourceContext, setLinkedTaskSourceContext] = useState<TaskSourceContext | null>(
     () => draftLinkedTaskSourceContext ?? initialLinkedTaskSourceContext
@@ -248,7 +248,7 @@ export function useComposerSourceContextState(input: ComposerSourceContextStateI
     linkedWorkItemSeedIdentity,
     linkedWorkItem,
     setLinkedWorkItem,
-    initialLinearBranchName,
+    initialLinkedBranchName,
     linkedTaskSourceContext,
     setLinkedTaskSourceContext,
     derivedGitHubTaskSourceContext,
