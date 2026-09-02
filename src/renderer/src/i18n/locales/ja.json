@@ -1919,7 +1919,8 @@
         "jiraLinkSourceUnavailable": "この Jira Issue をリンクできませんでした。Jira に再接続するか該当するサイトを選択してから、もう一度お試しください。",
         "loadPageUnreachable": "ページ {{value0}} は GitHub 検索が返せる範囲を超えています。",
         "loadPageFailed": "GitHub からページ {{value0}} を読み込めませんでした。",
-        "loadPageNoMoreResults": "ページ {{value0}} にはこれ以上結果がありません。"
+        "loadPageNoMoreResults": "ページ {{value0}} にはこれ以上結果がありません。",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "閉じる",
@@ -7351,7 +7352,13 @@
           "integrationsHint": "すべてのプロバイダーの認証情報は次の場所でも管理できます：",
           "integrationsLink": "連携",
           "skillHint": "。Linear の接続後、使用例は設定 → Linear で確認できます。",
-          "incompleteBannerBodyWithLinear": "使用しないプロバイダーを非表示にするか、カードを展開して手順を完了してください。Linear では API アクセス、Agent スキル、タスクへの表示が必要です。"
+          "incompleteBannerBodyWithLinear": "使用しないプロバイダーを非表示にするか、カードを展開して手順を完了してください。Linear では API アクセス、Agent スキル、タスクへの表示が必要です。",
+          "connectRedmineTitle": "Redmine に接続",
+          "connectRedmineDescription": "REST API キーで Redmine インスタンスを追加します。",
+          "manageRedmine": "キーを管理",
+          "addRedmine": "Redmine アクセスを追加",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "REST API キーで Redmine インスタンスを接続し、タスクに表示します。"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "ペイン分割線の太さ。",
@@ -10283,6 +10290,22 @@
           "saveFailed": "表示設定のデフォルトを保存できませんでした。",
           "updateServer": "ソースのデフォルトを設定するには、このサーバーを更新してください。",
           "updateServerDefaults": "表示のデフォルトを設定するには、このサーバーを更新してください。"
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "REST API キーで Redmine インスタンスを接続します。キーは選択したリモートランタイムに送信され、そのランタイムが対応する暗号化で保存されます。",
+              "credentialLocal": "REST API キーで Redmine インスタンスを接続します。キーはローカルに保存され、ローカルランタイムのストレージが対応していれば暗号化されます。",
+              "connectedFallback": "Redmine インスタンスに接続済み",
+              "checking": "セットアップ操作を表示する前に Redmine へのアクセスを確認しています。",
+              "pitch": "Redmine のチケットを閲覧し、そこからワークスペースを開始します。",
+              "statusConnected": "接続済み",
+              "statusNotConnected": "未接続",
+              "replace": "接続を置き換える",
+              "connect": "Redmine に接続",
+              "singleConnection": "ランタイムごとに 1 つの Redmine インスタンスが接続されます。再接続すると保存済みのキーが置き換わります。"
+            }
+          }
         }
       },
       "right": {
@@ -14377,6 +14400,40 @@
               "chooseSource": "タスクソースを選択"
             }
           }
+        },
+        "page": {
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "担当者なし",
+                "startWorkspaceFrom": "#{{value0}} からワークスペースを開始",
+                "startWorkspace": "ワークスペースを開始",
+                "openInRedmine": "Redmine で #{{value0}} を開く",
+                "openInRedmineShort": "Redmine で開く",
+                "columnId": "ID",
+                "columnSubject": "題名",
+                "columnStatus": "ステータス",
+                "columnProject": "プロジェクト",
+                "columnAssignee": "担当者",
+                "columnDone": "進捗"
+              }
+            },
+            "panel": {
+              "loadFailed": "Redmine のチケットを読み込めませんでした。",
+              "connectTitle": "Redmine に接続",
+              "connectBody": "Redmine のチケットを閲覧し、ここから直接作業を開始します。",
+              "connectAction": "Redmine に接続",
+              "hideAction": "Redmine を非表示",
+              "mineOnly": "自分の担当",
+              "allProjects": "すべてのプロジェクト",
+              "statusOpen": "未完了",
+              "statusClosed": "完了",
+              "statusAll": "すべてのステータス",
+              "shown": "件表示",
+              "emptyTitle": "Redmine のチケットが見つかりません",
+              "emptyBody": "選択したフィルターに一致するチケットはありません。"
+            }
+          }
         }
       },
       "taskPageEmptyState": {
@@ -14527,6 +14584,24 @@
         "description": "このワークスペースをサイドバー内の別のワークスペースの配下にネストします。ベースブランチは変更されません。",
         "searchPlaceholder": "ワークスペースを検索...",
         "noMatches": "一致する項目がありません。"
+      },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "API キーは選択したリモートランタイムに送信され、そのランタイムが対応する暗号化で保存されます。",
+            "credentialLocal": "API キーはローカルに保存され、ローカルランタイムのストレージが対応していれば暗号化されます。",
+            "title": "Redmine に接続",
+            "description": "Redmine のベース URL とアカウントページの REST API キーでチケットを閲覧します。",
+            "baseUrlLabel": "ベース URL",
+            "apiKeyLabel": "API キー",
+            "apiKeyPlaceholder": "Redmine REST API キー",
+            "apiKeyHint": "キーは「個人設定」の API アクセスキーで確認できます。Redmine の管理画面で REST API を有効にしておく必要があります。",
+            "cancel": "キャンセル",
+            "verifying": "確認中…",
+            "connect": "接続",
+            "baseUrlPlaceholder": "https://redmine.example.com"
+          }
+        }
       }
     },
     "i18n": {

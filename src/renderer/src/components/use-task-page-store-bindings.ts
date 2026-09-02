@@ -69,6 +69,10 @@ export function useTaskPageStoreBindings() {
   const searchJiraIssues = useAppStore((s) => s.searchJiraIssues)
   const listJiraIssues = useAppStore((s) => s.listJiraIssues)
   const checkJiraConnection = useAppStore((s) => s.checkJiraConnection)
+  const redmineStatus = useAppStore((s) => s.redmineStatus)
+  const redmineStatusChecked = useAppStore((s) => s.redmineStatusChecked)
+  const redmineStatusContextKey = useAppStore((s) => s.redmineStatusContextKey)
+  const checkRedmineConnection = useAppStore((s) => s.checkRedmineConnection)
   const providerRuntimeContextKey = getProviderRuntimeContextKey(settings)
   const providerRuntimeContextKeyRef = useRef(providerRuntimeContextKey)
   // Submit handlers must fence against the current provider context immediately.
@@ -79,6 +83,8 @@ export function useTaskPageStoreBindings() {
   const preflightStatusCurrent = preflightStatusContextKey === expectedPreflightContextKey
   const linearStatusReady = linearStatusCurrent && linearStatusChecked
   const jiraStatusReady = jiraStatusCurrent && jiraStatusChecked
+  const redmineStatusReady =
+    redmineStatusContextKey === providerRuntimeContextKey && redmineStatusChecked
   const linearConnected = linearStatusCurrent && linearStatus.connected
   const jiraConnected = jiraStatusCurrent && jiraStatus.connected
   const submitShortcutLabel = getScreenSubmitShortcutLabel()
@@ -142,6 +148,11 @@ export function useTaskPageStoreBindings() {
     searchJiraIssues,
     listJiraIssues,
     checkJiraConnection,
+    redmineStatus,
+    redmineStatusChecked,
+    redmineStatusContextKey,
+    checkRedmineConnection,
+    redmineStatusReady,
     providerRuntimeContextKey,
     providerRuntimeContextKeyRef,
     linearStatusCurrent,
