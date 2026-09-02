@@ -36,10 +36,7 @@ type TargetChangeActionsInput = Pick<
 >
 
 import { useCallback } from 'react'
-import {
-  isLinearLinkedWorkItem,
-  getLinearLinkedWorkItemBranchName
-} from '@/lib/linear-linked-work-item'
+import { getLinkedWorkItemBranchNameOverride } from '@/lib/linked-work-item-branch-name'
 import { shouldPreserveWorkspaceSourceOnRepoChange } from '../../../../shared/new-workspace/workspace-source'
 import {
   buildProjectHostSetupOptions,
@@ -109,9 +106,10 @@ export function useTargetChangeActions(input: TargetChangeActionsInput) {
           hint = `was ${baseBranch}`
         }
       }
-      const preserveLinearLinkedWorkItem = isLinearLinkedWorkItem(linkedWorkItem)
-      const preservedLinearBranchName = preserveLinearLinkedWorkItem
-        ? getLinearLinkedWorkItemBranchName(linkedWorkItem)
+      // Why: Linear and Redmine sources are workspace-scoped, so their canonical
+      // branch survives choosing a different implementation repo.
+      const preservedLinearBranchName = shouldPreserveWorkspaceSourceOnRepoChange(linkedWorkItem)
+        ? getLinkedWorkItemBranchNameOverride(linkedWorkItem)
         : undefined
       setRepoId(value)
       if (!options.preserveStartFrom) {
