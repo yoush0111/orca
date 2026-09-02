@@ -5,6 +5,8 @@ import {
   getReleaseDownloadUrl
 } from '../updater-prerelease-feed'
 import { isMissingUpdateManifestFailure, isPrereleaseVersion } from '../updater-fallback'
+import { getInstalledReleaseRepo } from '../release-repo-source'
+import { MAIN_RELEASE_REPO } from '../../shared/release-channel'
 import type { CheckFailureSource } from './updater-state'
 import type { UpdateCheckVariant } from './updater-types'
 import { ReleaseFeedPreflightError } from './updater-state'
@@ -208,6 +210,14 @@ export abstract class UpdaterReleaseFeed extends UpdaterInstallExecution {
     }
     this.clearPrereleaseFallbackContext()
     this.clearPublishingWindowLastGoodCheck()
+    const releaseRepo = getInstalledReleaseRepo()
+    if (releaseRepo !== MAIN_RELEASE_REPO) {
+      // Why: fork releases are `-personal` prereleases on their own repo, so upstream's stable-tag pin never matches.
+      const url = `https://github.com/${releaseRepo}/releases/latest/download`
+      console.info(`[updater] fork release feed fallback: current=${currentVersion} → ${url}`)
+      autoUpdater.setFeedURL({ provider: 'generic', url })
+      return 'ready'
+    }
     const stableTag = await fetchLatestStableReleaseTag()
     if (!this.isActiveUpdateCheckAttempt(attemptId)) {
       return 'not-available'
