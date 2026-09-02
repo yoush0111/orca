@@ -1,11 +1,15 @@
 import { net } from 'electron'
 import { parse } from 'yaml'
+import { getInstalledReleaseRepo } from './release-repo-source'
 
-const RELEASES_DOWNLOAD_BASE = 'https://github.com/stablyai/orca/releases/download'
 export const FETCH_TIMEOUT_MS = 5000
 
+export function getReleasesBaseUrl(): string {
+  return `https://github.com/${getInstalledReleaseRepo()}/releases`
+}
+
 export function getReleaseDownloadUrl(tag: string): string {
-  return `${RELEASES_DOWNLOAD_BASE}/${encodeURIComponent(tag)}`
+  return `${getReleasesBaseUrl()}/download/${encodeURIComponent(tag)}`
 }
 
 function getPlatformManifestName(): string {
