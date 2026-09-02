@@ -95,7 +95,7 @@ export function useComposerTargetState(
     })?.target.workspace,
     initialBaseBranch: composerTargetStore.initialBaseBranch,
     initialParentWorktreeId: composerTargetStore.initialParentWorktreeId,
-    initialLinearBranchName: sourceContextState.initialLinearBranchName,
+    initialLinkedBranchName: sourceContextState.initialLinkedBranchName,
     initialLinkedWorkItem: composerTargetStore.initialLinkedWorkItem,
     linkedWorkItem: sourceContextState.linkedWorkItem,
     linkedWorkItemSeedIdentity: sourceContextState.linkedWorkItemSeedIdentity,
