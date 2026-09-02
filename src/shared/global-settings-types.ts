@@ -200,6 +200,10 @@ export type GlobalSettings = {
   electronHttp1CompatibilityMode?: boolean
   /** Opt-in in-app browsing (isolated guest surface); default keeps links opening in the system browser. */
   openLinksInApp: boolean
+  /** Default-on: Redmine issue links open as a Floating Workspace browser tab instead of a tab in the active worktree. Requires floatingTerminalEnabled. Readers treat absent as on. */
+  redmineLinksOpenInFloatingWorkspace?: boolean
+  /** Redmine project id -> repo id for the composer's repo default; unmapped projects keep the active-repo fallback. */
+  redmineProjectRepoMap?: Record<string, string>
   /** Worktree-scoped localhost hostnames to distinguish tabs; opt-in since a non-localhost host can break apps binding cookies/sessions to localhost. */
   localhostWorktreeLabelsEnabled?: boolean
   /** Tracks the one-time first-use prompt for terminal link routing (avoid silently changing where links open). */
@@ -353,6 +357,8 @@ export type GlobalSettings = {
   visibleTaskProviders: TaskProvider[]
   /** Why: one-shot guard to make Jira visible for existing profiles once, without re-adding after a later opt-out. */
   visibleTaskProvidersDefaultedForJira: boolean
+  /** Same one-shot guard as the Jira flag, for the later Redmine provider. */
+  visibleTaskProvidersDefaultedForRedmine: boolean
   /** Persisted repo selection (cross-repo tasks view). null = sticky-all (includes future-added repos);
    *  string[] = frozen curated subset (ineligible ids dropped on load; empty after drop is treated as null). */
   defaultRepoSelection: string[] | null
