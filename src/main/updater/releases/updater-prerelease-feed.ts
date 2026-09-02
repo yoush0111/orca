@@ -3,6 +3,7 @@ import { compareVersions, isPrereleaseVersion, isValidVersion } from './updater-
 import {
   FETCH_TIMEOUT_MS,
   getPlatformManifestReadiness,
+  getReleasesBaseUrl,
   requestGitHubReleaseHead
 } from './updater-release-readiness'
 
@@ -12,12 +13,15 @@ import {
   type ReleaseDelayResult
 } from './updater-release-delay'
 
-const ATOM_FEED_URL = 'https://github.com/stablyai/orca/releases.atom'
 const MAX_MANIFEST_PROBE_CANDIDATES = 6
 
 // Atom includes stable and prerelease tags without channel filtering.
 const ENTRY_RE = /<entry>([\s\S]*?)<\/entry>/g
-const TAG_HREF_RE = /href="https:\/\/github\.com\/stablyai\/orca\/releases\/tag\/([^"]+)"/
+function buildTagHrefRe(): RegExp {
+  // GitHub owner/repo names only ever add `.` to the URL's regex-special chars.
+  const base = getReleasesBaseUrl().replaceAll('.', '\\.')
+  return new RegExp(`href="${base}/tag/([^"]+)"`)
+}
 const ENTRY_UPDATED_RE = /<updated>([^<]+)<\/updated>/
 
 export function normalizeTagToVersion(tag: string): string {
@@ -40,7 +44,9 @@ export function isPerfPrereleaseTag(tag: string): boolean {
 
 async function fetchReleaseFeedTags(): Promise<ReleaseFeedTag[] | null> {
   try {
-    const res = await net.fetch(ATOM_FEED_URL, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
+    const res = await net.fetch(`${getReleasesBaseUrl()}.atom`, {
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS)
+    })
     if (!res.ok) {
       return null
     }
@@ -48,7 +54,7 @@ async function fetchReleaseFeedTags(): Promise<ReleaseFeedTag[] | null> {
     const tags: ReleaseFeedTag[] = []
 
     for (const entry of body.matchAll(ENTRY_RE)) {
-      const tag = entry[1].match(TAG_HREF_RE)?.[1]
+      const tag = entry[1].match(buildTagHrefRe())?.[1]
       if (!tag) {
         continue
       }
