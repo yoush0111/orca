@@ -17,6 +17,7 @@ import {
 import { isValidVersion } from './updater-fallback'
 import { rejectReleaseApiToken, resolveReleaseApiToken } from './updater-release-api-token'
 import { UpdaterCodedError } from '../lifecycle/updater-coded-error'
+import { getInstalledReleaseRepo } from './release-repo-source'
 
 const FETCH_TIMEOUT_MS = 8000
 const MAX_LISTED_BUILDS = 100
@@ -158,8 +159,9 @@ export async function listReleaseBuilds(
   channel: ReleaseChannel,
   platform: NodeJS.Platform = process.platform
 ): Promise<ReleaseBuild[]> {
-  const repo = getReleaseRepoForChannel(channel)
-  // Skip a known-exhausted token bucket and try the separate per-IP quota.
+  const repo = getReleaseRepoForChannel(channel, getInstalledReleaseRepo())
+  // Why: while the gh breaker has the token's core bucket marked spent, an
+  // authenticated request is a guaranteed 403 — go straight to the per-IP bucket.
   const credential = await resolveReleaseApiToken()
   const tokenBucketBlocked =
     credential !== null &&
@@ -205,6 +207,6 @@ export function resolveTargetBuild(channel: ReleaseChannel, tag: string): Resolv
   if (!isValidVersion(version)) {
     throw new UpdaterCodedError('invalidReleaseTag', { tag })
   }
-  const repo = getReleaseRepoForChannel(channel)
+  const repo = getReleaseRepoForChannel(channel, getInstalledReleaseRepo())
   return { tag, version, feedUrl: getReleaseDownloadUrlForRepo(repo, tag) }
 }
