@@ -1,4 +1,4 @@
-import type { TaskPageComposerActionsModel } from '../use-task-page-composer-actions'
+import type { TaskPageRedmineStateModel } from '../use-task-page-redmine-state'
 import PullRequestPage from '@/components/PullRequestPage'
 import GitHubItemDialog from '@/components/GitHubItemDialog'
 import ProjectViewWrapper from '@/components/github-project/ProjectViewWrapper'
@@ -6,10 +6,11 @@ import { TaskPageGitHubList } from './github/List'
 import { TaskPageGitLabTodoList } from './gitlab/TodoList'
 import { TaskPageGitLabItemList } from './gitlab/ItemList'
 import { TaskPageJiraContent } from './jira/Content'
+import { TaskPageRedmineContent } from './redmine/Content'
 export function TaskPageContent({
   model
 }: {
-  model: TaskPageComposerActionsModel
+  model: TaskPageRedmineStateModel
 }): React.JSX.Element | null {
   const {
     repoSelection,
@@ -69,6 +70,8 @@ export function TaskPageContent({
     <TaskPageGitLabTodoList model={model} />
   ) : taskSource === 'gitlab' ? (
     <TaskPageGitLabItemList model={model} />
+  ) : taskSource === 'redmine' ? (
+    <TaskPageRedmineContent model={model} />
   ) : (
     <TaskPageJiraContent model={model} />
   )

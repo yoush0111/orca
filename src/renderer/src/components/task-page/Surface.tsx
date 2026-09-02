@@ -1,4 +1,4 @@
-import type { TaskPageComposerActionsModel } from '../use-task-page-composer-actions'
+import type { TaskPageRedmineStateModel } from '../use-task-page-redmine-state'
 import { TaskPageFrame } from './Frame'
 import { TaskPageGitHubIssueDialog } from './github/IssueDialog'
 import { TaskPageLinearProjectDialog } from './linear/ProjectDialog'
@@ -7,10 +7,11 @@ import { TaskPageJiraIssueDialog } from './jira/IssueDialog'
 import { TaskPageGitLabDialog } from './gitlab/Dialog'
 import { TaskPageLinearConnectDialog } from './linear/ConnectDialog'
 import { TaskPageJiraConnectDialog } from './jira/ConnectDialog'
+import { TaskPageRedmineConnectDialog } from './redmine/ConnectDialog'
 export function TaskPageSurface({
   model
 }: {
-  model: TaskPageComposerActionsModel
+  model: TaskPageRedmineStateModel
 }): React.JSX.Element {
   return (
     <div className="relative flex h-full min-h-0 flex-1 overflow-hidden bg-background text-foreground">
@@ -29,6 +30,8 @@ export function TaskPageSurface({
       <TaskPageLinearConnectDialog model={model} />
 
       <TaskPageJiraConnectDialog model={model} />
+
+      <TaskPageRedmineConnectDialog model={model} />
     </div>
   )
 }

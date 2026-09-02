@@ -1,4 +1,6 @@
 import { Suspense } from 'react'
+import { ListTodo } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import { lazyWithRetry as lazy } from '@/lib/lazy-with-retry'
 import EmulatorPane from '@/components/emulator-pane/EmulatorPane'
 import TabBar from '@/components/tab-bar/TabBar'
@@ -19,6 +21,7 @@ import { FloatingTerminalResizeHandles } from './FloatingTerminalResizeHandles'
 import { renderFloatingTerminalSaveDialog } from './FloatingTerminalSaveDialog'
 import { FloatingTerminalWindowControls } from './FloatingTerminalWindowControls'
 import { FloatingWorkspaceTabDragContext } from './FloatingWorkspaceTabDragContext'
+import { FloatingWorkspaceTasksView } from './FloatingWorkspaceTasksView'
 import type { useFloatingTerminalPanelController } from './use-floating-terminal-panel-controller'
 
 const EditorPanel = lazy(() => import('@/components/editor/EditorPanel'))
@@ -83,6 +86,8 @@ export function renderFloatingTerminalPanelSurface({
   openMarkdownShortcut,
   closeShortcut,
   showOrchestrationSetup,
+  tasksViewOpen,
+  setTasksViewOpenPersisted,
   dismissOrchestrationSetup,
   setOrchestrationDialogOpen,
   previewUserBounds,
@@ -195,6 +200,25 @@ export function renderFloatingTerminalPanelSurface({
               tabStripChrome="floating-panel"
             />
           </FloatingWorkspaceTabDragContext>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon-xs"
+            className="mr-1 shrink-0 self-center"
+            data-floating-workspace-tasks-toggle
+            aria-pressed={tasksViewOpen}
+            aria-label={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            title={translate(
+              'auto.components.floating.terminal.FloatingTerminalPanel.tasksToggle',
+              'Tasks'
+            )}
+            onClick={() => setTasksViewOpenPersisted(!tasksViewOpen)}
+          >
+            <ListTodo className="size-3.5" />
+          </Button>
           <FloatingTerminalWindowControls
             maximized={maximized}
             onToggleMaximized={toggleMaximized}
@@ -318,10 +342,21 @@ export function renderFloatingTerminalPanelSurface({
               closeShortcut={closeShortcut}
             />
           ) : null}
+          {/* Why an overlay rather than a swap: unmounting the panes would detach
+              the PTY and reflow the xterm buffer under whatever is running. */}
+          {tasksViewOpen ? (
+            <div
+              className="absolute inset-0 z-20 bg-background"
+              data-floating-workspace-tasks-view
+              data-floating-terminal-no-drag
+            >
+              <FloatingWorkspaceTasksView onClose={() => setTasksViewOpenPersisted(false)} />
+            </div>
+          ) : null}
         </div>
       </div>
       {renderFloatingTerminalOrchestrationCard({
-        visible: showOrchestrationSetup && activeTabType === 'terminal',
+        visible: showOrchestrationSetup && activeTabType === 'terminal' && !tasksViewOpen,
         onDismiss: dismissOrchestrationSetup,
         onEnable: () => setOrchestrationDialogOpen(true)
       })}
