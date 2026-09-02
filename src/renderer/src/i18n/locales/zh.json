@@ -3489,7 +3489,8 @@
           "linearViewNotFound": "未找到已保存的 Linear 视图",
           "linearViewRestoreFailed": "恢复已保存的 Linear 视图失败"
         },
-        "gitlabLoadFailed": "无法加载 GitLab 工作项，请刷新重试"
+        "gitlabLoadFailed": "无法加载 GitLab 工作项，请刷新重试",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "关闭",
@@ -4621,7 +4622,6 @@
             "terminalListNeedsServerUpdate": "更新此服务器上的 Orca 以列出终端智能体",
             "terminalListFailed": "无法列出此工作区的终端智能体",
             "chatNotInstalled": "未安装",
-            "chatInstallRequired": "需要安装",
             "startChat": "与 {{value0}} 开始聊天",
             "chatUnavailableAfterSelection": "无法启动 {{value0}} 聊天",
             "chatCheckFailed": "无法检查聊天可用性",
@@ -4631,7 +4631,8 @@
             "chatNotInWsl": "WSL 中不支持聊天",
             "cliTag": "（CLI）",
             "chatNotOverSsh": "SSH 下不支持聊天",
-            "chatNotOnWindows": "Windows 暂不支持聊天"
+            "chatNotOnWindows": "Windows 暂不支持聊天",
+            "chatInstallRequired": "需要安装"
           },
           "RecentTabSwitcher": {
             "329638ff6f": "切换选项卡",
@@ -6424,8 +6425,8 @@
           "removeDescriptionSsh": "此操作仅将 {{name}} 从 Orca 中移除，文件仍保留在 {{host}} 上 — 重新添加该 SSH 主机即可恢复",
           "removeDescriptionLocal": "此操作仅将 {{name}} 从 Orca 中移除，文件仍保留在您的磁盘上",
           "removeDescriptionVmRecipe": "这将从 Orca 中移除 {{name}}，其 VM 配方决定是否永久删除环境及其文件",
-          "linkedWorkspaceWarning_other": "此项目中的 {{count}} 个工作区也将从 Orca 中移除",
-          "openTerminalWarning_other": "此项目中打开的 {{count}} 个终端将被关闭"
+          "openTerminalWarning_other": "此项目中打开的 {{count}} 个终端将被关闭",
+          "linkedWorkspaceWarning_other": "此项目中的 {{count}} 个工作区也将从 Orca 中移除"
         },
         "SetupGuideSidebarEntry": {
           "b0a7bfc34c": "从侧边栏隐藏",
@@ -9456,7 +9457,13 @@
           "integrationsLink": "集成",
           "skillHint": " 中管理，连接 Linear 后，可到设置 → Linear 查看使用示例",
           "incompleteBannerBodyWithLinear": "隐藏不用的提供商，或展开卡片完成其中的步骤，Linear 需要 API 访问权限、代理技能，并在任务中显示",
-          "30255b39dc": "任务提供者"
+          "30255b39dc": "任务提供者",
+          "connectRedmineTitle": "连接 Redmine",
+          "connectRedmineDescription": "使用 REST API 密钥添加一个 Redmine 实例。",
+          "manageRedmine": "管理密钥",
+          "addRedmine": "添加 Redmine 访问",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "使用 REST API 密钥连接 Redmine 实例，并在任务中显示。"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "窗格分隔线的厚度",
@@ -13906,6 +13913,22 @@
           "cancel": "取消",
           "confirm": "移除",
           "unknownHost": "未知主机"
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "使用 REST API 密钥连接 Redmine 实例。密钥会发送到所选的远程运行时，并按该运行时支持的加密方式保存。",
+              "credentialLocal": "使用 REST API 密钥连接 Redmine 实例。密钥保存在本地，若本地运行时存储支持则会加密。",
+              "connectedFallback": "Redmine 实例已连接",
+              "checking": "正在检查 Redmine 访问权限，然后显示设置操作。",
+              "pitch": "浏览 Redmine 问题并从中启动工作区。",
+              "statusConnected": "已连接",
+              "statusNotConnected": "未连接",
+              "replace": "替换连接",
+              "connect": "连接 Redmine",
+              "singleConnection": "每个运行时连接一个 Redmine 实例。再次连接会替换已保存的密钥。"
+            }
+          }
         }
       },
       "right": {
@@ -18876,6 +18899,38 @@
                 }
               }
             }
+          },
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "未指派",
+                "startWorkspaceFrom": "从 #{{value0}} 启动工作区",
+                "startWorkspace": "启动工作区",
+                "openInRedmine": "在 Redmine 中打开 #{{value0}}",
+                "openInRedmineShort": "在 Redmine 中打开",
+                "columnId": "编号",
+                "columnSubject": "主题",
+                "columnStatus": "状态",
+                "columnProject": "项目",
+                "columnAssignee": "指派给",
+                "columnDone": "完成度"
+              }
+            },
+            "panel": {
+              "loadFailed": "无法加载 Redmine 问题。",
+              "connectTitle": "连接 Redmine",
+              "connectBody": "浏览 Redmine 问题并直接从这里开始处理。",
+              "connectAction": "连接 Redmine",
+              "hideAction": "隐藏 Redmine",
+              "mineOnly": "指派给我",
+              "allProjects": "所有项目",
+              "statusOpen": "未关闭",
+              "statusClosed": "已关闭",
+              "statusAll": "任意状态",
+              "shown": "条显示",
+              "emptyTitle": "未找到 Redmine 问题",
+              "emptyBody": "没有问题符合所选筛选条件。"
+            }
           }
         }
       },
@@ -19321,6 +19376,16 @@
         "3d8e5f1b9c": "通过非公开链接分享技能，并在你使用的任何计算机上安装",
         "c5b3e8a17d": "登录 Orca"
       },
+      "NativeChatResumeFailureGuidance": {
+        "fallbackShort": "无法恢复。",
+        "unconfirmedShort": "无法确认已继续。",
+        "supersededShort": "重启后有新的工作。",
+        "conflictShort": "已在其他窗口或终端中打开。",
+        "ownershipUnknownShort": "尚未准备好恢复。",
+        "notAttachedShort": "未重新连接。",
+        "dispatchRejectedShort": "智能体拒绝继续。",
+        "unsupportedShort": "Orca 无法恢复此聊天。"
+      },
       "web": {
         "preloadApi": {
           "cursorAccounts": {
@@ -19519,6 +19584,24 @@
       "NewWorkspaceComposerFooter": {
         "create": "创建"
       },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "你的 API 密钥会发送到所选的远程运行时，并按该运行时支持的加密方式保存。",
+            "credentialLocal": "你的 API 密钥保存在本地，若本地运行时存储支持则会加密。",
+            "title": "连接 Redmine",
+            "description": "使用 Redmine 基础 URL 和账户页面的 REST API 密钥来浏览问题。",
+            "baseUrlLabel": "基础 URL",
+            "apiKeyLabel": "API 密钥",
+            "apiKeyPlaceholder": "Redmine REST API 密钥",
+            "apiKeyHint": "密钥位于“我的账号”的 API 访问键中。需要在 Redmine 管理中启用 REST API 访问。",
+            "cancel": "取消",
+            "verifying": "正在验证…",
+            "connect": "连接",
+            "baseUrlPlaceholder": "https://redmine.example.com"
+          }
+        }
+      },
       "NativeChatResumeToast": {
         "resumingOn_other": "正在恢复 {{machine}} 上的 {{count}} 个聊天…",
         "resuming_other": "正在恢复 {{count}} 个聊天…",
@@ -19547,16 +19630,6 @@
         "stateNeedsYou": "需要你处理",
         "stateResuming": "正在恢复",
         "stateStopped": "已停止"
-      },
-      "NativeChatResumeFailureGuidance": {
-        "fallbackShort": "无法恢复。",
-        "unconfirmedShort": "无法确认已继续。",
-        "supersededShort": "重启后有新的工作。",
-        "conflictShort": "已在其他窗口或终端中打开。",
-        "ownershipUnknownShort": "尚未准备好恢复。",
-        "notAttachedShort": "未重新连接。",
-        "dispatchRejectedShort": "智能体拒绝继续。",
-        "unsupportedShort": "Orca 无法恢复此聊天。"
       }
     },
     "i18n": {
@@ -19705,8 +19778,8 @@
         "checking": "正在检查 {{agent}} 是否已在此主机上就绪…",
         "cliInstall": "安装",
         "cliRecheck": "再次检查",
-        "openAgentSettings": "打开设置",
-        "cliRecheckFailed": "无法检查此主机上已安装的智能体，请重试"
+        "cliRecheckFailed": "无法检查此主机上已安装的智能体，请重试",
+        "openAgentSettings": "打开设置"
       },
       "reasoning": "推理",
       "contextMenu": {
@@ -19748,7 +19821,6 @@
         "claudeAccountFolderMissing": "所选 Claude 账户的文件夹不存在，请重新登录该账户或选择其他账户",
         "claudeAccountSetupFailed": "无法设置所选 Claude 账户，请重试或选择其他账户",
         "agentCommandNotRunnable": "设置 → 智能体中{{agent}}的“命令”必须以 Orca 能找到的程序开头。不支持变量、管道或其他 shell 语法；请在“环境”设置中配置变量。请修改或重置命令",
-        "agentCommandFailed": "设置 → 智能体中{{agent}}的“命令”未能启动 {{agent}}：{{detail}}。请修改或重置命令。",
         "runtimeNotInstalled": "运行此聊天的计算机上未安装 {{agent}}，请在最新版本的 Orca 中从聊天里安装",
         "fullAccessAsRoot": "{{agent}} 以 root 身份运行时不会使用完全访问。请在运行此聊天的计算机的“设置”→“智能体”中为 {{agent}} 选择其他权限，然后开始新的聊天",
         "launchPreparationFailed": "Orca 无法在运行此聊天的计算机上准备启动 {{agent}}",
@@ -19834,7 +19906,6 @@
         "providerUnavailable": "{{agent}} 因服务繁忙而无法回复。请选择其他模型，或稍等片刻后重新发送。",
         "providerSafetyStopped": "{{agent}} 在安全检查后停止了此次回复。请检查您的请求后重新发送。",
         "providerResponseFailed": "{{agent}} 未能完成此回复。打开详情了解更多信息。",
-        "providerResponseFailedQuoted": "{{agent}} 未能完成此回复：{{detail}}",
         "selectedModel": "所选模型",
         "forkOriginalMissing": "{{agent}} 在原始聊天中找不到此回复，请打开原始聊天并从那里创建分支",
         "forkOriginalUnavailable": "{{agent}} 无法在原始聊天中从此回复创建分支，请打开原始聊天并从那里创建分支",
@@ -19844,7 +19915,9 @@
         "forkOriginalLatestOnlyNamed": "{{agent}} 只能从“{{detail}}”中的最新回复创建分支，请打开该聊天，待最新回复完成后再从它创建分支",
         "antigravitySystemNotSignedIn": "Antigravity 尚未登录，请在运行此聊天的计算机上运行 `agy` 进行登录，然后重新发送消息",
         "claudeEffortInvalid": "Claude 推理强度无效，请选择 low、medium、high、xhigh 或 max，然后重新发送",
-        "unconfirmed": "无法确认是否已发送，也没有重新发送"
+        "unconfirmed": "无法确认是否已发送，也没有重新发送",
+        "agentCommandFailed": "设置 → 智能体中{{agent}}的“命令”未能启动 {{agent}}：{{detail}}。请修改或重置命令。",
+        "providerResponseFailedQuoted": "{{agent}} 未能完成此回复：{{detail}}"
       },
       "writeNotice": {
         "notDoneReadHistory": "无法加载此聊天的历史记录",
@@ -19987,7 +20060,6 @@
         "optionUpdateFailed": "无法更新选项",
         "optionValue": {
           "none": "无",
-          "off": "关闭",
           "fast": "快速",
           "minimal": "最小",
           "low": "低",
@@ -19997,7 +20069,8 @@
           "max": "最大",
           "ultra": "极致",
           "standard": "标准",
-          "ultracode": "Ultracode"
+          "ultracode": "Ultracode",
+          "off": "关闭"
         },
         "noCommandsOrSkills": "没有匹配的命令或技能",
         "commands": "命令",
@@ -20038,10 +20111,6 @@
         "permissionAuto": "替我批准",
         "permissionAutoDescription": "代你审核批准请求",
         "permissionFullAccess": "完全访问",
-        "permissionAgentSettings": "{{agent}} 设置",
-        "permissionAgentSettingsUsedHint": "使用你的 {{agent}} 权限设置。",
-        "permissionAgentSettingsUnnamedHint": "使用你的 {{agent}} 权限设置。Orca 无法显示此模式。",
-        "permissionFromAgentSettings": "{{mode}}，来自 {{agent}} 设置",
         "permissionFullAccessDescription": "编辑或运行命令前从不询问",
         "permissionFullAccessCodexDescription": "从不询问，可以编辑任何文件并使用网络",
         "permissionFullAccessSharedDescription": "编辑或运行命令前从不询问",
@@ -20056,7 +20125,11 @@
         "sessionAttachmentsFailed": "{{agent}} 聊天无法打开，请在聊天中点击重试，然后重新附加文件",
         "sessionAttachmentsStarting": "{{agent}} 聊天仍在打开中，请等待其打开后再重新附加文件",
         "moreControls": "更多聊天控件",
-        "exitPlanMode": "退出计划模式"
+        "exitPlanMode": "退出计划模式",
+        "permissionAgentSettings": "{{agent}} 设置",
+        "permissionAgentSettingsUsedHint": "使用你的 {{agent}} 权限设置。",
+        "permissionAgentSettingsUnnamedHint": "使用你的 {{agent}} 权限设置。Orca 无法显示此模式。",
+        "permissionFromAgentSettings": "{{mode}}，来自 {{agent}} 设置"
       },
       "tool": {
         "result": "结果",
@@ -21381,9 +21454,9 @@
         "chat": {
           "label": "聊天界面",
           "description": "智能体在聊天中回复，消息和差异会渲染显示",
-          "recommended": "推荐",
           "terminalFallback": "不支持聊天的 Agent 会改用终端打开。",
-          "noneDetected": "已检测的智能体都不支持聊天界面"
+          "noneDetected": "已检测的智能体都不支持聊天界面",
+          "recommended": "推荐"
         },
         "terminal": {
           "label": "终端",
@@ -22730,16 +22803,6 @@
       "confirm": "调整并显示",
       "cancel": "保留筛选条件"
     },
-    "revealCurrent": {
-      "label": "显示当前项",
-      "noWorkspace": "没有打开任何内容",
-      "fullPageView": "此页面在侧边栏中没有对应的行",
-      "archived": "已归档的工作区不会列在侧边栏中",
-      "botsOff": "Bots 已关闭，因此不会列出此 bot",
-      "botHidden": "此 bot 已暂停，并被 Bot 选项隐藏",
-      "renameBotPage": "bot 或群组的页面不是工作树。要重命名，请使用其行菜单中的“重命名”。",
-      "renameUnlisted": "此工作区当前未列在侧边栏中，因此无法在那里重命名。"
-    },
     "wslMoved": {
       "movedToHost": "已移至 {{distro}} 主机",
       "sectionTitle": "已移至 WSL 主机 ({{count}})",
@@ -22910,6 +22973,16 @@
       "detailsRow": "详情行",
       "workspaceUnread": "此工作区中有未读内容",
       "unreadTab": "未读标签页"
+    },
+    "revealCurrent": {
+      "label": "显示当前项",
+      "noWorkspace": "没有打开任何内容",
+      "fullPageView": "此页面在侧边栏中没有对应的行",
+      "archived": "已归档的工作区不会列在侧边栏中",
+      "botsOff": "Bots 已关闭，因此不会列出此 bot",
+      "botHidden": "此 bot 已暂停，并被 Bot 选项隐藏",
+      "renameBotPage": "bot 或群组的页面不是工作树。要重命名，请使用其行菜单中的“重命名”。",
+      "renameUnlisted": "此工作区当前未列在侧边栏中，因此无法在那里重命名。"
     }
   },
   "editor": {
@@ -24693,10 +24766,10 @@
     "controlledByHost": "由 {{host}} 控制"
   },
   "nativeChat": {
-    "linkedMessageMissing": "找不到该消息。",
     "math": {
       "scrollDisplayEquation": "滚动显示公式"
     },
+    "linkedMessageMissing": "找不到该消息。",
     "messageTime": {
       "yesterday": "昨天 {{time}}"
     }
@@ -25917,6 +25990,143 @@
     "branchName": "分支名称",
     "invalidBranchName": "此分支名称无效。请选择其他名称。",
     "createBranchFailed": "Orca 无法创建分支。请在终端中检查此仓库，然后重试。"
+  },
+  "speechModelUpdate": {
+    "update": "更新",
+    "cancel": "取消",
+    "pill": {
+      "updateNotice": "更快的语音输入已可安装",
+      "retiredNotice": "语音输入已改用更快的语音模型",
+      "install": "安装",
+      "installTooltip": "一次性下载 · {{size}} MB",
+      "downloading": "正在设置语音输入",
+      "downloadingTooltip": "{{done}} / {{size}} MB",
+      "ready": "语音输入已就绪。按 <kbd></kbd>",
+      "readyNoShortcut": "语音输入已就绪。",
+      "failed": "下载已中断。请检查网络连接。",
+      "tryAgain": "重试",
+      "deleteOld": "删除旧模型",
+      "deleteFailed": "无法删除 {{model}}。",
+      "dismiss": "关闭",
+      "cancelDownload": "取消下载"
+    }
+  },
+  "renderer": {
+    "lib": {
+      "filePreview": {
+        "remoteFileUnsupported": "仅本地文件可在 Orca 浏览器中打开",
+        "twinFileUnsupported": "该项目存在于多个主机上，Orca 无法确定要打开哪个副本"
+      }
+    }
+  },
+  "nestedImport": {
+    "error": {
+      "notInScan": "未在嵌套仓库扫描结果中找到该仓库",
+      "notGitRepository": "不是有效的 Git 仓库",
+      "importFailed": "无法导入仓库"
+    }
+  },
+  "wslDriveProject": {
+    "label": "Git",
+    "converted": "Orca 会在 Windows 上为此项目运行 Git，终端和智能体仍在 {{distro}} 中运行",
+    "checkFailed": "Orca 无法检查此项目",
+    "convertFailed": "Orca 无法切换 Git",
+    "description": "此项目位于 Windows 驱动器上，WSL 中的 Git 在这里速度很慢，还会漏掉在 Windows 中所做的更改，请改用 Git for Windows；终端和智能体仍留在 {{distro}} 中",
+    "useWindowsGit": "使用 Git for Windows",
+    "review": "此项目在 Orca 中的一切都保持不变：其标签页、终端、聊天和工作区都维持原样，正在运行的终端也会继续运行",
+    "lineEndings": "同时为此仓库设置 core.autocrlf，使 WSL 终端中的 git 不再把每个文件都显示为已更改",
+    "cancel": "取消",
+    "confirm": "使用 Git for Windows",
+    "blocker": {
+      "notWsl": "此项目已在 Windows 上运行 Git",
+      "repair": "请先修复此项目的 WSL 运行时：其发行版缺失，或 WSL 不可用",
+      "notWindowsDrive": "此项目的某个文件夹不在 Windows 驱动器上",
+      "gitMissing": "未安装 Git for Windows，请从 git-scm.com 安装，然后重试",
+      "wslWorktrees": "这些工作区由 WSL Git 创建，Git for Windows 无法读取它们：{{paths}}。请移除它们，或让此项目继续使用 WSL Git",
+      "worktreeFolder": "此项目的新工作区被设置为创建在 WSL 内，请先在此项目的设置中选择一个位于 Windows 驱动器上的文件夹"
+    }
+  },
+  "wslDriveUnc": {
+    "label": "位置",
+    "description": "Orca 目前通过 WSL 打开此项目，请改为在 {{drivePath}} 打开：Git 将在 Windows 上运行，在这里会快得多，终端和智能体仍留在 {{distro}} 中",
+    "convert": "在 {{drivePath}} 打开",
+    "review": "Orca 会暂停此项目的终端并重新启动，然后在 {{drivePath}} 重新打开此项目，标签页、终端及其历史记录、聊天和设置都会随之迁移，已暂停的终端会从中断处继续运行",
+    "cancel": "取消",
+    "confirm": "重新启动并转换",
+    "failed": "Orca 无法转换此项目",
+    "restarting": "正在重新启动 Orca 以转换此项目…",
+    "terminalsBusy": "此项目中的部分终端正忙，请等待其完成或将其关闭，然后重试",
+    "pauseFailed": "Orca 无法暂停此项目的终端，因此未做任何更改",
+    "blocker": {
+      "pending": "Orca 已在转换一个项目，该转换将在 Orca 重新启动时完成",
+      "state": "Orca 发现此项目有无法安全转换的已保存状态，因此未做任何更改",
+      "duplicate": "{{drivePath}} 已是 Orca 中的项目",
+      "mixed": "此项目的部分文件夹位于 WSL 内，而不在 Windows 驱动器上",
+      "overlap": "此项目与一个 Orca 无法转换的项目共用文件夹，转换会导致它们被拆分",
+      "notDriveMount": "在此发行版中，该文件夹并不是 {{drivePath}}：它不是从该 Windows 驱动器挂载的",
+      "notConvertible": "此项目不在此计算机的 Windows 驱动器上",
+      "differingState": "Orca 在此文件夹的 WSL 路径和 {{drivePath}} 下分别保存了不同的详细信息，因此未做任何更改",
+      "projectSplit": "此项目还包含一个不参与转换的仓库，因此未做任何更改"
+    }
+  },
+  "plugins": {
+    "frameSaveAs": {
+      "title": "保存文件",
+      "allFiles": "所有文件"
+    },
+    "frameOpenExternal": {
+      "open": "打开",
+      "cancel": "取消",
+      "message": "{{plugin}} 想要打开 {{host}}",
+      "alwaysAllow": "始终允许此插件打开 {{host}}"
+    },
+    "actionConfirmation": {
+      "cancel": "取消",
+      "deleteAutomation": "{{plugin}} 想要删除自动化“{{automation}}”",
+      "deleteAutomationDetail": "此自动化并非由该插件创建，删除后它将停止按计划运行，并从“自动化”中移除",
+      "delete": "删除",
+      "changeAutomation": "{{plugin}} 想要更改自动化“{{automation}}”",
+      "changeAutomationDetail": "此自动化并非由该插件创建，将会更改：{{fields}}",
+      "change": "更改",
+      "changeElevatedAutomationDetail": "此自动化会使用你选择的额外设置（参数、权限模式或预检查命令）运行其智能体，将会更改：{{fields}}",
+      "newPrompt": "新提示词：“{{prompt}}”",
+      "unknownProject": "未知项目",
+      "automationNewWorkspaces": "自动化 {{id}}：按 {{schedule}} 运行，每次都在 {{project}} 中新建工作区",
+      "automationInWorkspace": "自动化 {{id}}：在 {{project}} / {{workspace}} 中按 {{schedule}} 运行"
+    }
+  },
+  "checks": {
+    "gitlabAllowedFailure": "允许失败",
+    "rerunUnsuccessful": "重新运行未成功的检查"
+  },
+  "usage": {
+    "failure": {
+      "unavailable": "用量数据不可用，请点击“刷新”以重新连接",
+      "setting": "无法确认跟踪设置的更改，请再更改一次",
+      "refresh": "上次刷新未能完成，请再次点击“刷新”",
+      "read": "无法加载用量数据，请再次点击“刷新”",
+      "retry": "刷新"
+    }
+  },
+  "crashReport": {
+    "freeze": {
+      "attachmentsOmitted": "已保存的卡死报告和诊断日志未附加：{{value0}}",
+      "description": "发送已保存的卡死报告，帮助我们了解发生了什么",
+      "notSent": "卡死报告未发送",
+      "notes": "可选：Orca 卡死前你在做什么？",
+      "sent": "卡死报告已发送",
+      "sentWithoutAttachments": "详情已发送，但未附带已保存的卡死报告或诊断日志",
+      "summary": "Orca 停止响应",
+      "title": "报告卡死",
+      "uncheckAttachments": "取消勾选“包含已保存的卡顿报告和近期日志（已脱敏）”并重试，或复制详细信息",
+      "includeRedacted": "包含已保存的卡顿报告和近期日志（已脱敏）"
+    },
+    "copyDetails": "复制详情",
+    "sendReport": "发送报告",
+    "dontSend": "不发送",
+    "includeRecentLogsRedacted": "包含近期日志（已脱敏）",
+    "details": "详情",
+    "sending": "正在发送…"
   },
   "bots": {
     "deepLink": {
@@ -28276,143 +28486,6 @@
       "forOnHost": "用于 {{host}} 上的 {{name}}",
       "for": "用于 {{name}}"
     }
-  },
-  "speechModelUpdate": {
-    "update": "更新",
-    "cancel": "取消",
-    "pill": {
-      "updateNotice": "更快的语音输入已可安装",
-      "retiredNotice": "语音输入已改用更快的语音模型",
-      "install": "安装",
-      "installTooltip": "一次性下载 · {{size}} MB",
-      "downloading": "正在设置语音输入",
-      "downloadingTooltip": "{{done}} / {{size}} MB",
-      "ready": "语音输入已就绪。按 <kbd></kbd>",
-      "readyNoShortcut": "语音输入已就绪。",
-      "failed": "下载已中断。请检查网络连接。",
-      "tryAgain": "重试",
-      "deleteOld": "删除旧模型",
-      "deleteFailed": "无法删除 {{model}}。",
-      "dismiss": "关闭",
-      "cancelDownload": "取消下载"
-    }
-  },
-  "renderer": {
-    "lib": {
-      "filePreview": {
-        "remoteFileUnsupported": "仅本地文件可在 Orca 浏览器中打开",
-        "twinFileUnsupported": "该项目存在于多个主机上，Orca 无法确定要打开哪个副本"
-      }
-    }
-  },
-  "nestedImport": {
-    "error": {
-      "notInScan": "未在嵌套仓库扫描结果中找到该仓库",
-      "notGitRepository": "不是有效的 Git 仓库",
-      "importFailed": "无法导入仓库"
-    }
-  },
-  "wslDriveProject": {
-    "label": "Git",
-    "converted": "Orca 会在 Windows 上为此项目运行 Git，终端和智能体仍在 {{distro}} 中运行",
-    "checkFailed": "Orca 无法检查此项目",
-    "convertFailed": "Orca 无法切换 Git",
-    "description": "此项目位于 Windows 驱动器上，WSL 中的 Git 在这里速度很慢，还会漏掉在 Windows 中所做的更改，请改用 Git for Windows；终端和智能体仍留在 {{distro}} 中",
-    "useWindowsGit": "使用 Git for Windows",
-    "review": "此项目在 Orca 中的一切都保持不变：其标签页、终端、聊天和工作区都维持原样，正在运行的终端也会继续运行",
-    "lineEndings": "同时为此仓库设置 core.autocrlf，使 WSL 终端中的 git 不再把每个文件都显示为已更改",
-    "cancel": "取消",
-    "confirm": "使用 Git for Windows",
-    "blocker": {
-      "notWsl": "此项目已在 Windows 上运行 Git",
-      "repair": "请先修复此项目的 WSL 运行时：其发行版缺失，或 WSL 不可用",
-      "notWindowsDrive": "此项目的某个文件夹不在 Windows 驱动器上",
-      "gitMissing": "未安装 Git for Windows，请从 git-scm.com 安装，然后重试",
-      "wslWorktrees": "这些工作区由 WSL Git 创建，Git for Windows 无法读取它们：{{paths}}。请移除它们，或让此项目继续使用 WSL Git",
-      "worktreeFolder": "此项目的新工作区被设置为创建在 WSL 内，请先在此项目的设置中选择一个位于 Windows 驱动器上的文件夹"
-    }
-  },
-  "wslDriveUnc": {
-    "label": "位置",
-    "description": "Orca 目前通过 WSL 打开此项目，请改为在 {{drivePath}} 打开：Git 将在 Windows 上运行，在这里会快得多，终端和智能体仍留在 {{distro}} 中",
-    "convert": "在 {{drivePath}} 打开",
-    "review": "Orca 会暂停此项目的终端并重新启动，然后在 {{drivePath}} 重新打开此项目，标签页、终端及其历史记录、聊天和设置都会随之迁移，已暂停的终端会从中断处继续运行",
-    "cancel": "取消",
-    "confirm": "重新启动并转换",
-    "failed": "Orca 无法转换此项目",
-    "restarting": "正在重新启动 Orca 以转换此项目…",
-    "terminalsBusy": "此项目中的部分终端正忙，请等待其完成或将其关闭，然后重试",
-    "pauseFailed": "Orca 无法暂停此项目的终端，因此未做任何更改",
-    "blocker": {
-      "pending": "Orca 已在转换一个项目，该转换将在 Orca 重新启动时完成",
-      "state": "Orca 发现此项目有无法安全转换的已保存状态，因此未做任何更改",
-      "duplicate": "{{drivePath}} 已是 Orca 中的项目",
-      "mixed": "此项目的部分文件夹位于 WSL 内，而不在 Windows 驱动器上",
-      "overlap": "此项目与一个 Orca 无法转换的项目共用文件夹，转换会导致它们被拆分",
-      "notDriveMount": "在此发行版中，该文件夹并不是 {{drivePath}}：它不是从该 Windows 驱动器挂载的",
-      "notConvertible": "此项目不在此计算机的 Windows 驱动器上",
-      "differingState": "Orca 在此文件夹的 WSL 路径和 {{drivePath}} 下分别保存了不同的详细信息，因此未做任何更改",
-      "projectSplit": "此项目还包含一个不参与转换的仓库，因此未做任何更改"
-    }
-  },
-  "plugins": {
-    "frameSaveAs": {
-      "title": "保存文件",
-      "allFiles": "所有文件"
-    },
-    "frameOpenExternal": {
-      "open": "打开",
-      "cancel": "取消",
-      "message": "{{plugin}} 想要打开 {{host}}",
-      "alwaysAllow": "始终允许此插件打开 {{host}}"
-    },
-    "actionConfirmation": {
-      "cancel": "取消",
-      "deleteAutomation": "{{plugin}} 想要删除自动化“{{automation}}”",
-      "deleteAutomationDetail": "此自动化并非由该插件创建，删除后它将停止按计划运行，并从“自动化”中移除",
-      "delete": "删除",
-      "changeAutomation": "{{plugin}} 想要更改自动化“{{automation}}”",
-      "changeAutomationDetail": "此自动化并非由该插件创建，将会更改：{{fields}}",
-      "change": "更改",
-      "changeElevatedAutomationDetail": "此自动化会使用你选择的额外设置（参数、权限模式或预检查命令）运行其智能体，将会更改：{{fields}}",
-      "newPrompt": "新提示词：“{{prompt}}”",
-      "unknownProject": "未知项目",
-      "automationNewWorkspaces": "自动化 {{id}}：按 {{schedule}} 运行，每次都在 {{project}} 中新建工作区",
-      "automationInWorkspace": "自动化 {{id}}：在 {{project}} / {{workspace}} 中按 {{schedule}} 运行"
-    }
-  },
-  "checks": {
-    "gitlabAllowedFailure": "允许失败",
-    "rerunUnsuccessful": "重新运行未成功的检查"
-  },
-  "usage": {
-    "failure": {
-      "unavailable": "用量数据不可用，请点击“刷新”以重新连接",
-      "setting": "无法确认跟踪设置的更改，请再更改一次",
-      "refresh": "上次刷新未能完成，请再次点击“刷新”",
-      "read": "无法加载用量数据，请再次点击“刷新”",
-      "retry": "刷新"
-    }
-  },
-  "crashReport": {
-    "freeze": {
-      "attachmentsOmitted": "已保存的卡死报告和诊断日志未附加：{{value0}}",
-      "description": "发送已保存的卡死报告，帮助我们了解发生了什么",
-      "notSent": "卡死报告未发送",
-      "notes": "可选：Orca 卡死前你在做什么？",
-      "sent": "卡死报告已发送",
-      "sentWithoutAttachments": "详情已发送，但未附带已保存的卡死报告或诊断日志",
-      "summary": "Orca 停止响应",
-      "title": "报告卡死",
-      "uncheckAttachments": "取消勾选“包含已保存的卡顿报告和近期日志（已脱敏）”并重试，或复制详细信息",
-      "includeRedacted": "包含已保存的卡顿报告和近期日志（已脱敏）"
-    },
-    "copyDetails": "复制详情",
-    "sendReport": "发送报告",
-    "dontSend": "不发送",
-    "includeRecentLogsRedacted": "包含近期日志（已脱敏）",
-    "details": "详情",
-    "sending": "正在发送…"
   },
   "agentCliUpdate": {
     "thisComputer": "此计算机"
