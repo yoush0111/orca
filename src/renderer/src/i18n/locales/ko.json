@@ -2179,7 +2179,8 @@
         "jiraLinkSourceUnavailable": "Couldn’t link this Jira issue. Reconnect Jira or pick the matching site, then try again.",
         "loadPageUnreachable": "{{value0}} 페이지는 GitHub 검색이 반환할 수 있는 범위를 벗어났습니다.",
         "loadPageFailed": "GitHub에서 {{value0}} 페이지를 불러오지 못했습니다.",
-        "loadPageNoMoreResults": "{{value0}} 페이지에 더 이상 결과가 없습니다."
+        "loadPageNoMoreResults": "{{value0}} 페이지에 더 이상 결과가 없습니다.",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "닫기",
@@ -8494,7 +8495,13 @@
           "integrationsHint": "모든 제공업체의 자격 증명은 다음에서도 관리할 수 있습니다:",
           "integrationsLink": "연동",
           "skillHint": ". Linear를 연결한 후 사용 예시는 설정 → Linear에서 확인할 수 있습니다.",
-          "incompleteBannerBodyWithLinear": "사용하지 않는 제공업체를 숨기거나 카드를 펼쳐 단계를 완료하세요. Linear에는 API 액세스, 에이전트 스킬, 작업에 표시가 필요합니다."
+          "incompleteBannerBodyWithLinear": "사용하지 않는 제공업체를 숨기거나 카드를 펼쳐 단계를 완료하세요. Linear에는 API 액세스, 에이전트 스킬, 작업에 표시가 필요합니다.",
+          "connectRedmineTitle": "Redmine 연결",
+          "connectRedmineDescription": "REST API 키로 Redmine 인스턴스를 추가합니다.",
+          "manageRedmine": "키 관리",
+          "addRedmine": "Redmine 접근 추가",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "REST API 키로 Redmine 인스턴스를 연결하고 작업 탭에 표시합니다."
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "창 구분선의 두께입니다.",
@@ -12053,7 +12060,24 @@
           "title": "Cursor",
           "usageDescription": "Cursor는 요금 주기에 따라 초기화되는 두 가지 풀과, 소진 후에 발생하는 주문형 지출로 과금합니다.",
           "usageLabel": "사용량",
-          "usageTitle": "월간 플랜 사용량"
+          "usageTitle": "월간 플랜 사용량",
+          "openAutomationsDescription": "일정을 생성하고 최근 실행을 확인합니다."
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "REST API 키로 Redmine 인스턴스를 연결합니다. 키는 선택한 원격 런타임으로 전송되어 해당 런타임이 지원하는 암호화로 저장됩니다.",
+              "credentialLocal": "REST API 키로 Redmine 인스턴스를 연결합니다. 키는 로컬에 저장되며 로컬 런타임 저장소가 지원하면 암호화됩니다.",
+              "connectedFallback": "Redmine 인스턴스가 연결됨",
+              "checking": "설정 작업을 표시하기 전에 Redmine 접근을 확인하는 중입니다.",
+              "pitch": "Redmine 일감을 탐색하고 거기서 워크스페이스를 시작합니다.",
+              "statusConnected": "연결됨",
+              "statusNotConnected": "연결되지 않음",
+              "replace": "연결 교체",
+              "connect": "Redmine 연결",
+              "singleConnection": "런타임당 Redmine 인스턴스 하나가 연결됩니다. 다시 연결하면 저장된 키가 교체됩니다."
+            }
+          }
         }
       },
       "right": {
@@ -16840,6 +16864,38 @@
                 }
               }
             }
+          },
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "담당자 없음",
+                "startWorkspaceFrom": "#{{value0}}에서 워크스페이스 시작",
+                "startWorkspace": "워크스페이스 시작",
+                "openInRedmine": "Redmine에서 #{{value0}} 열기",
+                "openInRedmineShort": "Redmine에서 열기",
+                "columnId": "번호",
+                "columnSubject": "제목",
+                "columnStatus": "상태",
+                "columnProject": "프로젝트",
+                "columnAssignee": "담당자",
+                "columnDone": "진행률"
+              }
+            },
+            "panel": {
+              "loadFailed": "Redmine 일감을 불러오지 못했습니다.",
+              "connectTitle": "Redmine 연결",
+              "connectBody": "Redmine 일감을 탐색하고 여기서 바로 작업을 시작합니다.",
+              "connectAction": "Redmine 연결",
+              "hideAction": "Redmine 숨기기",
+              "mineOnly": "내 담당",
+              "allProjects": "모든 프로젝트",
+              "statusOpen": "진행 중",
+              "statusClosed": "완료",
+              "statusAll": "모든 상태",
+              "shown": "개 표시됨",
+              "emptyTitle": "Redmine 일감이 없습니다",
+              "emptyBody": "선택한 필터에 맞는 일감이 없습니다."
+            }
           }
         }
       },
@@ -17242,6 +17298,24 @@
         "preloadApi": {
           "cursorAccounts": {
             "hostOnly": "Cursor 로그인 정보는 Orca가 실행 중인 컴퓨터에서만 읽을 수 있습니다."
+          }
+        }
+      },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "API 키는 선택한 원격 런타임으로 전송되어 해당 런타임이 지원하는 암호화로 저장됩니다.",
+            "credentialLocal": "API 키는 로컬에 저장되며 로컬 런타임 저장소가 지원하면 암호화됩니다.",
+            "title": "Redmine 연결",
+            "description": "Redmine 기본 URL과 계정 페이지의 REST API 키로 일감을 탐색합니다.",
+            "baseUrlLabel": "기본 URL",
+            "apiKeyLabel": "API 키",
+            "apiKeyPlaceholder": "Redmine REST API 키",
+            "apiKeyHint": "키는 내 계정의 API 액세스 키에서 확인할 수 있습니다. Redmine 관리에서 REST API 접근이 활성화되어 있어야 합니다.",
+            "cancel": "취소",
+            "verifying": "확인 중…",
+            "connect": "연결",
+            "baseUrlPlaceholder": "https://redmine.example.com"
           }
         }
       }
