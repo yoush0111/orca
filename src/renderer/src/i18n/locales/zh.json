@@ -2199,7 +2199,8 @@
         "jiraLinkSourceUnavailable": "无法关联此 Jira 议题。请重新连接 Jira 或选择匹配的站点，然后重试。",
         "loadPageUnreachable": "第 {{value0}} 页超出了 GitHub 搜索可返回的范围。",
         "loadPageFailed": "无法从 GitHub 加载第 {{value0}} 页。",
-        "loadPageNoMoreResults": "第 {{value0}} 页没有更多结果。"
+        "loadPageNoMoreResults": "第 {{value0}} 页没有更多结果。",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "关闭",
@@ -8505,7 +8506,13 @@
           "integrationsHint": "所有提供商的凭据也可在此管理：",
           "integrationsLink": "集成",
           "skillHint": "。连接 Linear 后，可在设置 → Linear 中查看使用示例。",
-          "incompleteBannerBodyWithLinear": "隐藏不使用的提供商，或展开卡片并完成其中的步骤。Linear 需要 API 访问权限、智能体技能以及在任务中显示。"
+          "incompleteBannerBodyWithLinear": "隐藏不使用的提供商，或展开卡片并完成其中的步骤。Linear 需要 API 访问权限、智能体技能以及在任务中显示。",
+          "connectRedmineTitle": "连接 Redmine",
+          "connectRedmineDescription": "使用 REST API 密钥添加一个 Redmine 实例。",
+          "manageRedmine": "管理密钥",
+          "addRedmine": "添加 Redmine 访问",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "使用 REST API 密钥连接 Redmine 实例，并在任务中显示。"
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "窗格分隔线的厚度。",
@@ -12127,6 +12134,22 @@
           "offCount": "{{count}} 台已关闭",
           "machines": "机器",
           "machinesDescription": "选择哪些机器可以在此电脑上显示通知。已配对服务器的开关也控制通过该服务器开展的工作。"
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "使用 REST API 密钥连接 Redmine 实例。密钥会发送到所选的远程运行时，并按该运行时支持的加密方式保存。",
+              "credentialLocal": "使用 REST API 密钥连接 Redmine 实例。密钥保存在本地，若本地运行时存储支持则会加密。",
+              "connectedFallback": "Redmine 实例已连接",
+              "checking": "正在检查 Redmine 访问权限，然后显示设置操作。",
+              "pitch": "浏览 Redmine 问题并从中启动工作区。",
+              "statusConnected": "已连接",
+              "statusNotConnected": "未连接",
+              "replace": "替换连接",
+              "connect": "连接 Redmine",
+              "singleConnection": "每个运行时连接一个 Redmine 实例。再次连接会替换已保存的密钥。"
+            }
+          }
         }
       },
       "right": {
@@ -16899,6 +16922,38 @@
                 }
               }
             }
+          },
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "未指派",
+                "startWorkspaceFrom": "从 #{{value0}} 启动工作区",
+                "startWorkspace": "启动工作区",
+                "openInRedmine": "在 Redmine 中打开 #{{value0}}",
+                "openInRedmineShort": "在 Redmine 中打开",
+                "columnId": "编号",
+                "columnSubject": "主题",
+                "columnStatus": "状态",
+                "columnProject": "项目",
+                "columnAssignee": "指派给",
+                "columnDone": "完成度"
+              }
+            },
+            "panel": {
+              "loadFailed": "无法加载 Redmine 问题。",
+              "connectTitle": "连接 Redmine",
+              "connectBody": "浏览 Redmine 问题并直接从这里开始处理。",
+              "connectAction": "连接 Redmine",
+              "hideAction": "隐藏 Redmine",
+              "mineOnly": "指派给我",
+              "allProjects": "所有项目",
+              "statusOpen": "未关闭",
+              "statusClosed": "已关闭",
+              "statusAll": "任意状态",
+              "shown": "条显示",
+              "emptyTitle": "未找到 Redmine 问题",
+              "emptyBody": "没有问题符合所选筛选条件。"
+            }
           }
         }
       },
@@ -17298,6 +17353,24 @@
         "preloadApi": {
           "cursorAccounts": {
             "hostOnly": "Cursor 登录详情仅可在运行 Orca 的电脑上读取。"
+          }
+        }
+      },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "你的 API 密钥会发送到所选的远程运行时，并按该运行时支持的加密方式保存。",
+            "credentialLocal": "你的 API 密钥保存在本地，若本地运行时存储支持则会加密。",
+            "title": "连接 Redmine",
+            "description": "使用 Redmine 基础 URL 和账户页面的 REST API 密钥来浏览问题。",
+            "baseUrlLabel": "基础 URL",
+            "apiKeyLabel": "API 密钥",
+            "apiKeyPlaceholder": "Redmine REST API 密钥",
+            "apiKeyHint": "密钥位于“我的账号”的 API 访问键中。需要在 Redmine 管理中启用 REST API 访问。",
+            "cancel": "取消",
+            "verifying": "正在验证…",
+            "connect": "连接",
+            "baseUrlPlaceholder": "https://redmine.example.com"
           }
         }
       }

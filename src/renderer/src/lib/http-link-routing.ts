@@ -1,4 +1,5 @@
 import { translate } from '@/i18n/i18n'
+import { OPEN_FLOATING_TERMINAL_EVENT } from './floating-terminal'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 import {
   parseLoopbackUrlWithPort,
@@ -181,6 +182,8 @@ export function openHttpLink(url: string, opts: OpenHttpLinkOptions = {}): void 
       // Why: the floating workspace uses a synthetic worktree id. Promoting it
       // to the global activeWorktreeId deselects the real repo workspace.
       state.setActiveWorktree(worktreeId)
+    } else {
+      window.dispatchEvent(new Event(OPEN_FLOATING_TERMINAL_EVENT))
     }
     const localhostRoute = localhostLabelRouteForHttpLink(url, state, sourceOwner)
     if (!localhostRoute) {
