@@ -26,6 +26,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
     hostLabelById,
     selectedLinearWorkspace,
     selectedJiraSite,
+    redmineStatus,
     activeGithubTaskKind
   } = model
   // Why strict kind: Issues and PRs resolve independently; the other kind's repo is not this list's source.
@@ -39,6 +40,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
   const linearWorkspaceName =
     selectedLinearWorkspace?.organizationName ?? selectedLinearWorkspace?.id ?? null
   const jiraSiteName = selectedJiraSite?.displayName ?? selectedJiraSite?.siteUrl ?? null
+  const redmineBaseUrl = redmineStatus.connection?.baseUrl ?? null
   // Why the catalog dep: it changes with the language, and the summary's own copy is translated too.
   const taskSourceContextSummary = useMemo(() => {
     const providerLabel =
@@ -51,7 +53,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
         hostLabelById
       })
     }
-    if (taskSource === 'linear' || taskSource === 'jira') {
+    if (taskSource === 'linear' || taskSource === 'jira' || taskSource === 'redmine') {
       return getTaskSourceContextSummary({
         provider: taskSource,
         providerLabel,
@@ -59,7 +61,8 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
         accountHostId: accountBackedTaskSourceHostId,
         hostLabelById,
         linearWorkspaceName,
-        jiraSiteName
+        jiraSiteName,
+        redmineBaseUrl
       })
     }
     return getTaskSourceContextSummary({
@@ -86,6 +89,7 @@ export function useTaskPageSourceDisplay<Model extends TaskPageSourceDisplayInpu
     hostRegistryById,
     jiraSiteName,
     linearWorkspaceName,
+    redmineBaseUrl,
     selectedRepos.length,
     sourceOptions,
     taskSource,
