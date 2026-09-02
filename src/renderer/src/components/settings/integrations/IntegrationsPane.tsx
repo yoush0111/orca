@@ -9,6 +9,7 @@ import {
 } from '../../integrations/source-control/cli-source-control-integration-cards'
 import { JiraIntegrationCard } from '../../integrations/task-trackers/jira-integration-card'
 import { LinearIntegrationCard } from '../../integrations/task-trackers/linear-integration-card'
+import { RedmineIntegrationCard } from '../redmine-integration-card'
 import { IntegrationCardPresentationProvider } from '../../integrations/presentation/integration-card-presentation'
 import { useIntegrationProviderStatusRefresh } from '../../../hooks/use-integration-provider-status-refresh'
 import { SettingsGroup } from '../section-layout/SettingsGroup'
@@ -66,6 +67,9 @@ export function IntegrationsPane(): React.JSX.Element {
           </ProviderRow>
           <ProviderRow>
             <JiraIntegrationCard />
+          </ProviderRow>
+          <ProviderRow>
+            <RedmineIntegrationCard />
           </ProviderRow>
         </SettingsGroup>
       </div>
