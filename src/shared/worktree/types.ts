@@ -36,7 +36,7 @@ export type WorkspaceAttachment = {
 }
 
 export type WorkspaceLinkedItem = {
-  provider: 'github' | 'gitlab' | 'linear' | 'jira'
+  provider: 'github' | 'gitlab' | 'linear' | 'jira' | 'redmine'
   type: 'issue' | 'pr' | 'mr'
   number: number
   title: string

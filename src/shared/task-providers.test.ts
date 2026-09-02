@@ -16,7 +16,13 @@ describe('task providers', () => {
   })
 
   it('falls back to all providers when none are visible', () => {
-    expect(normalizeVisibleTaskProviders([])).toEqual(['github', 'gitlab', 'linear', 'jira'])
+    expect(normalizeVisibleTaskProviders([])).toEqual([
+      'github',
+      'gitlab',
+      'linear',
+      'jira',
+      'redmine'
+    ])
   })
 
   it('restores a valid saved default when provider settings drifted', () => {
@@ -115,5 +121,16 @@ describe('task providers', () => {
         linearConnected: false
       })
     ).toEqual(['github'])
+  })
+})
+
+describe('redmine availability', () => {
+  it('stays selectable while disconnected so Tasks can offer first-time setup', () => {
+    expect(
+      filterAvailableTaskProviders(['redmine'], {
+        gitlabInstalled: false,
+        linearConnected: false
+      })
+    ).toEqual(['redmine'])
   })
 })
