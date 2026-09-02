@@ -39,6 +39,7 @@ import { useTaskPageLinearInOrcaEffects } from './linear/use-task-page-linear-in
 import { useTaskPageLinearCollectionEffects } from './linear/use-task-page-linear-collection-effects'
 import { useTaskPageJiraListEffects } from '../use-task-page-jira-list-effects'
 import { useTaskPageComposerActions } from '../use-task-page-composer-actions'
+import { useTaskPageRedmineState } from '../use-task-page-redmine-state'
 import { TaskPageSurface } from './Surface'
 
 export default function TaskPage(): React.JSX.Element {
@@ -82,5 +83,6 @@ export default function TaskPage(): React.JSX.Element {
   const stage38 = useTaskPageLinearCollectionEffects(stage37)
   const stage39 = useTaskPageJiraListEffects(stage38)
   const stage40 = useTaskPageComposerActions(stage39)
-  return <TaskPageSurface model={stage40} />
+  const stage41 = useTaskPageRedmineState(stage40)
+  return <TaskPageSurface model={stage41} />
 }
