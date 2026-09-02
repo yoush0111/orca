@@ -100,3 +100,14 @@ describe('task providers', () => {
     ).toEqual(['github'])
   })
 })
+
+describe('redmine availability', () => {
+  it('stays selectable while disconnected so Tasks can offer first-time setup', () => {
+    expect(
+      filterAvailableTaskProviders(['redmine'], {
+        gitlabInstalled: false,
+        linearConnected: false
+      })
+    ).toEqual(['redmine'])
+  })
+})
