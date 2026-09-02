@@ -60,13 +60,14 @@ export function getTaskSourceContextSummary(
   args:
     | ({ provider: Extract<TaskProvider, 'github' | 'gitlab'> } & RepoBackedTaskSourceSummaryArgs)
     | {
-        provider: Extract<TaskProvider, 'linear' | 'jira'>
+        provider: Extract<TaskProvider, 'linear' | 'jira' | 'redmine'>
         providerLabel: string
         hostAvailability?: readonly TaskSourceHostAvailability[]
         hostLabelById?: HostLabelLookup
         accountHostId?: ExecutionHostScope | null
         linearWorkspaceName?: string | null
         jiraSiteName?: string | null
+        redmineBaseUrl?: string | null
       }
 ): TaskSourceContextSummary {
   switch (args.provider) {
@@ -83,6 +84,13 @@ export function getTaskSourceContextSummary(
     case 'jira':
       return getAccountBackedTaskSourceSummary(args.providerLabel, {
         accountLabel: args.jiraSiteName,
+        accountHostId: args.accountHostId,
+        hostLabelById: args.hostLabelById,
+        hostAvailability: args.hostAvailability
+      })
+    case 'redmine':
+      return getAccountBackedTaskSourceSummary(args.providerLabel, {
+        accountLabel: args.redmineBaseUrl,
         accountHostId: args.accountHostId,
         hostLabelById: args.hostLabelById,
         hostAvailability: args.hostAvailability
@@ -225,6 +233,8 @@ function getProviderIdentityLabel(
       return identity.workspaceName ?? identity.workspaceId ?? null
     case 'jira':
       return identity.siteUrl ?? identity.siteId ?? null
+    case 'redmine':
+      return identity.baseUrl ?? null
   }
 }
 

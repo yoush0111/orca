@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { JiraConnectDialog } from '@/components/jira-connect-dialog'
+import { RedmineConnectDialog } from '@/components/redmine-connect-dialog'
 import { Button } from '@/components/ui/button'
 import { TaskSourceShowInTasksStep } from './TaskSourceShowInTasksStep'
 import { TaskSourceStepRow } from './TaskSourceStepRow'
@@ -116,6 +117,55 @@ export function JiraSetupSteps(
         />
       </ol>
       <JiraConnectDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onConnected={props.onConnected}
+      />
+    </>
+  )
+}
+
+export function RedmineSetupSteps(
+  props: ConnectStepProps & { onConnected: () => void; onOpenIntegrations: () => void }
+): React.JSX.Element {
+  const [dialogOpen, setDialogOpen] = useState(false)
+
+  return (
+    <>
+      <ol className="divide-y divide-border/50">
+        <TaskSourceStepRow
+          index={1}
+          state={getConnectStepState(props)}
+          title={translate(
+            'auto.components.settings.TasksPane.connectRedmineTitle',
+            'Connect Redmine'
+          )}
+          description={translate(
+            'auto.components.settings.TasksPane.connectRedmineDescription',
+            'Add a Redmine instance with its REST API key.'
+          )}
+          action={
+            <Button
+              type="button"
+              size="sm"
+              variant={props.connected ? 'outline' : 'default'}
+              onClick={props.connected ? props.onOpenIntegrations : () => setDialogOpen(true)}
+            >
+              {props.connected
+                ? translate('auto.components.settings.TasksPane.manageRedmine', 'Manage key')
+                : translate('auto.components.settings.TasksPane.addRedmine', 'Add Redmine access')}
+            </Button>
+          }
+        />
+        <TaskSourceShowInTasksStep
+          index={2}
+          providerLabel={translate('auto.components.settings.TasksPane.redmineLabel', 'Redmine')}
+          visible={props.visible}
+          canHide={props.canHide}
+          onToggleVisible={props.onToggleVisible}
+        />
+      </ol>
+      <RedmineConnectDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         onConnected={props.onConnected}
