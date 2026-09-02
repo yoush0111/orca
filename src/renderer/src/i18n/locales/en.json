@@ -2267,7 +2267,8 @@
         "linearModeHasWorktreeTooltip": "Linear tickets linked to an Orca workspace",
         "linearEmptyHasWorktree": "No Linear tickets are linked to an Orca workspace yet. Start work from a Linear issue to see it here.",
         "linearOpenAttachedWorkspace": "Open workspace attached to {{value0}}",
-        "linearWorktreesColumn": "Workspaces"
+        "linearWorktreesColumn": "Workspaces",
+        "redmineSourceLabel": "Redmine"
       },
       "Terminal": {
         "73768427cf": "Close",
@@ -8495,7 +8496,13 @@
           "integrationsHint": "Credentials for all providers also live under",
           "integrationsLink": "Integrations",
           "skillHint": ". After Linear is connected, usage examples stay under Settings → Linear.",
-          "incompleteBannerBodyWithLinear": "Hide providers you do not use, or expand a card and finish its steps. For Linear: API access, the agent skill, and Show in Tasks."
+          "incompleteBannerBodyWithLinear": "Hide providers you do not use, or expand a card and finish its steps. For Linear: API access, the agent skill, and Show in Tasks.",
+          "connectRedmineTitle": "Connect Redmine",
+          "connectRedmineDescription": "Add a Redmine instance with its REST API key.",
+          "manageRedmine": "Manage key",
+          "addRedmine": "Add Redmine access",
+          "redmineLabel": "Redmine",
+          "redmineDescription": "Connect a Redmine instance with its REST API key and show it in Tasks."
         },
         "TerminalAppearanceSection": {
           "a14a427ae4": "Thickness of the pane divider line.",
@@ -11867,6 +11874,35 @@
           "targetDescription": "Higher values increase contrast where possible. Background colors stay unchanged.",
           "subtle": "Subtle",
           "strong": "Strong"
+        },
+        "redmine": {
+          "integration": {
+            "card": {
+              "credentialRemote": "Connect a Redmine instance with its REST API key. The key is sent to the selected remote runtime and stored there with runtime-supported encryption.",
+              "credentialLocal": "Connect a Redmine instance with its REST API key. The key is stored locally and encrypted when local runtime storage supports it.",
+              "connectedFallback": "Redmine instance connected",
+              "checking": "Checking Redmine access before showing setup actions.",
+              "pitch": "Browse Redmine issues and start workspaces from them.",
+              "statusConnected": "Connected",
+              "statusNotConnected": "Not connected",
+              "replace": "Replace connection",
+              "connect": "Connect Redmine",
+              "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key.",
+              "floatingLabel": "Open issue links in the Floating Workspace",
+              "floatingDescription": "Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.",
+              "floatingDisabled": "Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect."
+            }
+          },
+          "project": {
+            "repo": {
+              "mapping": {
+                "title": "Project repositories",
+                "description": "Start Workspace picks this repository for issues in the project. Subprojects inherit their parent.",
+                "remove": "Remove mapping",
+                "add": "Add a project…"
+              }
+            }
+          }
         }
       },
       "right": {
@@ -13969,7 +14005,8 @@
             "8b14ba6c17": "New Browser Tab",
             "b085fb58b5": "This file has unsaved changes.",
             "5ddc688c52": "\"{{value0}}\" has unsaved changes. Do you want to save before closing?",
-            "25d7817f79": "terminal"
+            "25d7817f79": "terminal",
+            "tasksToggle": "Tasks"
           },
           "FloatingTerminalToggleButton": {
             "3b04b065b5": "Show floating workspace",
@@ -16609,6 +16646,40 @@
                 }
               }
             }
+          },
+          "redmine": {
+            "issue": {
+              "list": {
+                "unassigned": "Unassigned",
+                "startWorkspaceFrom": "Start workspace from #{{value0}}",
+                "startWorkspace": "Start workspace",
+                "openInRedmine": "Open #{{value0}} in Redmine",
+                "openInRedmineShort": "Open in Redmine",
+                "columnId": "ID",
+                "columnSubject": "Subject",
+                "columnStatus": "Status",
+                "columnProject": "Project",
+                "columnAssignee": "Assignee",
+                "columnDone": "Done",
+                "mappedRepo": "Repo: {{value0}}"
+              }
+            },
+            "panel": {
+              "loadFailed": "Could not load Redmine issues.",
+              "connectTitle": "Connect Redmine",
+              "connectBody": "Browse Redmine issues and start work on them directly from here.",
+              "connectAction": "Connect Redmine",
+              "hideAction": "Hide Redmine",
+              "mineOnly": "Assigned to me",
+              "allProjects": "All projects",
+              "statusOpen": "Open",
+              "statusClosed": "Closed",
+              "statusAll": "Any status",
+              "shown": "shown",
+              "emptyTitle": "No Redmine issues found",
+              "emptyBody": "No issues match the selected filters.",
+              "openSettings": "Redmine settings"
+            }
           }
         }
       },
@@ -16946,6 +17017,24 @@
         "3d8e5f1b9c": "Share skills behind an unlisted link and install them on any machine you use.",
         "7e1a9c4d2f": "Signing in…",
         "c5b3e8a17d": "Sign in to Orca"
+      },
+      "redmine": {
+        "connect": {
+          "dialog": {
+            "credentialRemote": "Your API key is sent to the selected remote runtime and stored there with runtime-supported encryption.",
+            "credentialLocal": "Your API key is stored locally and encrypted when local runtime storage supports it.",
+            "title": "Connect Redmine",
+            "description": "Use your Redmine base URL and the REST API key from your account page to browse issues.",
+            "baseUrlLabel": "Base URL",
+            "apiKeyLabel": "API key",
+            "apiKeyPlaceholder": "Redmine REST API key",
+            "apiKeyHint": "Find the key under My account, API access key. REST API access must be enabled in Redmine administration.",
+            "cancel": "Cancel",
+            "verifying": "Verifying…",
+            "connect": "Connect",
+            "baseUrlPlaceholder": "https://redmine.example.com"
+          }
+        }
       }
     },
     "i18n": {
