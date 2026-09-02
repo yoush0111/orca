@@ -114,8 +114,13 @@ export function requiresManualDevChannelInstall(options: {
   return runningChannel === null || !hasDedicatedReleaseRepo(runningChannel)
 }
 
-export function getReleaseRepoForChannel(channel: ReleaseChannel): string {
-  return CHANNEL_RELEASE_REPOS[channel]
+/** `mainRepo` lets an installed build override stable/RC with the repo it was
+ *  actually published to; the dev channels always live in upstream's own repos. */
+export function getReleaseRepoForChannel(
+  channel: ReleaseChannel,
+  mainRepo: string = MAIN_RELEASE_REPO
+): string {
+  return hasDedicatedReleaseRepo(channel) ? CHANNEL_RELEASE_REPOS[channel] : mainRepo
 }
 
 export function normalizeTagToVersion(tag: string): string {
