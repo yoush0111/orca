@@ -10,6 +10,7 @@ import {
 } from '../model-lifetime/buffer-text/monaco-programmatic-sync'
 import { createMarkdownDocLinkDecorationController } from '../markdown-source-tools/monaco/monaco-markdown-doc-link-decorations'
 import { ensureMarkdownDocCompletionProvider } from '../markdown-source-tools/monaco/monaco-markdown-doc-completions'
+import { createImportGotoDefinitionLinkProvider } from '../monaco-import-goto-definition'
 import { clampMonacoAutoHeight } from './monaco-auto-height'
 import { installMonacoE2EProbe } from './monaco-e2e-probe'
 import { matchesPendingEditorFocusRequest } from '../commands/pending-editor-focus-request'
@@ -109,6 +110,10 @@ export function useMonacoEditorMount(params: MonacoEditorMountParams): OnMount {
         editorInstance,
         () => languageRef.current
       )
+      const importGotoDefinitionLinkProvider = createImportGotoDefinitionLinkProvider(
+        editorInstance,
+        () => ({ filePath, relativePath: propsRef.current.relativePath, worktreeId })
+      )
       ensureMarkdownDocCompletionProvider(monaco)
       updateMarkdownCompletionDocuments()
 
@@ -205,6 +210,7 @@ export function useMonacoEditorMount(params: MonacoEditorMountParams): OnMount {
         scrollStateSub.dispose()
         gutterMouseDownSub.dispose()
         disposeInputBindings()
+        importGotoDefinitionLinkProvider.dispose()
         autoHeightSub?.dispose()
         if (autoHeightFrame !== null) {
           window.cancelAnimationFrame(autoHeightFrame)
