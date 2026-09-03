@@ -1,5 +1,29 @@
 import { describe, expect, it } from 'vitest'
-import { findExportedSymbolLine } from './import-goto-definition-symbol-lookup'
+import {
+  findExportedSymbolLine,
+  findLocalDeclarationLine
+} from './import-goto-definition-symbol-lookup'
+
+describe('findLocalDeclarationLine', () => {
+  it('finds a local function declaration', () => {
+    const content = ['const a = 1', '', 'function helper() {}', 'helper()'].join('\n')
+    expect(findLocalDeclarationLine(content, 'helper')).toBe(3)
+  })
+
+  it('finds an exported declaration too', () => {
+    const content = ['export const CONFIG = {}', 'use(CONFIG)'].join('\n')
+    expect(findLocalDeclarationLine(content, 'CONFIG')).toBe(1)
+  })
+
+  it('finds an arrow function assigned to a name', () => {
+    const content = ['const obj = {', '  render: () => null', '}'].join('\n')
+    expect(findLocalDeclarationLine(content, 'render')).toBe(2)
+  })
+
+  it('returns null for a name it cannot resolve', () => {
+    expect(findLocalDeclarationLine('doSomething(param)', 'param')).toBeNull()
+  })
+})
 
 describe('findExportedSymbolLine', () => {
   it('finds an exported function declaration', () => {
