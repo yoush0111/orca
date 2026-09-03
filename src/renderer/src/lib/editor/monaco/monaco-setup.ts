@@ -32,6 +32,7 @@ import { installMonacoContextMenuPaste } from '@/components/editor/install-monac
 import { runMonacoSetupSteps } from './monaco-setup-steps'
 import { installMonacoTsWorkerIdleStop } from './monaco-ts-worker-idle-stop'
 import { onPluginFontLoadsChanged } from '@/store/plugins/appearance/plugin-fonts'
+import { installMonacoImportGotoDefinitionOpener } from '@/components/editor/monaco-import-goto-definition'
 
 globalThis.MonacoEnvironment = {
   getWorker(_workerId, label) {
@@ -99,7 +100,9 @@ runMonacoSetupSteps([
   ['context-menu paste', () => installMonacoContextMenuPaste(monaco)],
   ['TS worker idle stop', () => installMonacoTsWorkerIdleStop(monaco)],
   // Monaco caches glyph widths, so a plugin font that loads after first paint must re-measure.
-  ['plugin font remeasure', () => onPluginFontLoadsChanged(() => monaco.editor.remeasureFonts())]
+  ['plugin font remeasure', () => onPluginFontLoadsChanged(() => monaco.editor.remeasureFonts())],
+  // Ctrl/Cmd+Click on an import path opens the resolved file; on an imported symbol it jumps to its declaration.
+  ['import goto-definition opener', installMonacoImportGotoDefinitionOpener]
 ])
 
 loader.config({ monaco })
