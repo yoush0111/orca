@@ -23,6 +23,7 @@ import { installMonacoDiffEditorDisposalGuard } from './monaco-diff-editor-dispo
 import { installMonacoPeekReferencesPreviewOptions } from './monaco-peek-preview-options'
 import { installMonacoContextMenuPaste } from '@/components/editor/install-monaco-context-menu-paste'
 import { runMonacoSetupSteps } from './monaco-setup-steps'
+import { installMonacoImportGotoDefinitionOpener } from '@/components/editor/monaco-import-goto-definition'
 
 globalThis.MonacoEnvironment = {
   getWorker(_workerId, label) {
@@ -80,7 +81,9 @@ runMonacoSetupSteps([
   ['diff editor disposal guard', () => installMonacoDiffEditorDisposalGuard(monaco)],
   ['peek references preview options', installMonacoPeekReferencesPreviewOptions],
   // Sandboxed navigator.clipboard blocks Monaco Paste; use trusted IPC as native Cmd+V does.
-  ['context-menu paste', () => installMonacoContextMenuPaste(monaco)]
+  ['context-menu paste', () => installMonacoContextMenuPaste(monaco)],
+  // Ctrl/Cmd+Click on an import path opens the resolved file; on an imported symbol it jumps to its declaration.
+  ['import goto-definition opener', installMonacoImportGotoDefinitionOpener]
 ])
 
 loader.config({ monaco })
