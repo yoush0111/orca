@@ -58,6 +58,17 @@ const diagnosticsOptions = {
 monacoTS.typescriptDefaults.setDiagnosticsOptions(diagnosticsOptions)
 monacoTS.javascriptDefaults.setDiagnosticsOptions(diagnosticsOptions)
 
+// The sandboxed worker resolves imported names only to their import line; Orca's provider (monaco-import-goto-definition.ts) resolves across files.
+const modeConfigurationWithoutDefinitions = { definitions: false }
+monacoTS.typescriptDefaults.setModeConfiguration({
+  ...monacoTS.typescriptDefaults.modeConfiguration,
+  ...modeConfigurationWithoutDefinitions
+})
+monacoTS.javascriptDefaults.setModeConfiguration({
+  ...monacoTS.javascriptDefaults.modeConfiguration,
+  ...modeConfigurationWithoutDefinitions
+})
+
 // TSX/JSX share TypeScript/JavaScript defaults; preserve JSX parsing without emission to avoid TS17004 on tags.
 monacoTS.typescriptDefaults.setCompilerOptions({
   ...monacoTS.typescriptDefaults.getCompilerOptions(),
