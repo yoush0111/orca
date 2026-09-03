@@ -11,6 +11,7 @@ describe('findImportSymbolRanges', () => {
       {
         specifier: './foo',
         symbol: 'foo',
+        localName: 'foo',
         range: { startLineNumber: 1, startColumn: 10, endLineNumber: 1, endColumn: 13 }
       }
     ])
@@ -23,7 +24,17 @@ describe('findImportSymbolRanges', () => {
 
   it('uses the exported name, not the local alias', () => {
     const matches = findImportSymbolRanges("import { foo as bar } from './foo'\n")
-    expect(matches.map((m) => m.symbol)).toEqual(['foo'])
+    expect(matches.map((m) => [m.symbol, m.localName])).toEqual([['foo', 'bar']])
+  })
+
+  it('keeps the default import binding as its local name', () => {
+    const matches = findImportSymbolRanges("import Foo from './foo'\n")
+    expect(matches.map((m) => [m.symbol, m.localName])).toEqual([['default', 'Foo']])
+  })
+
+  it('does not treat a namespace alias as a default import', () => {
+    const matches = findImportSymbolRanges("import Foo, * as ns from './foo'\n")
+    expect(matches.map((m) => [m.symbol, m.localName])).toEqual([['default', 'Foo']])
   })
 
   it('ignores the `type` modifier', () => {
