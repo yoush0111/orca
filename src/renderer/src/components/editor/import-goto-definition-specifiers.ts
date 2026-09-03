@@ -21,6 +21,8 @@ export type ImportSymbolMatch = {
   specifier: string
   /** Name as exported by the target module; 'default' for a default import. */
   symbol: string
+  /** Name this import binds locally — what the file body actually references. */
+  localName: string
 }
 
 // Import clauses can span lines, so this matches whole statements rather than lines.
@@ -29,7 +31,6 @@ export type ImportSymbolMatch = {
 const IMPORT_CLAUSE_PATTERN =
   /\b(?:import|export)\s+([\w$*,{}\s]+?)\s+from\s+(['"])((?:(?!\2).)+)\2/g
 const CLAUSE_IDENTIFIER_PATTERN = /[A-Za-z_$][\w$]*/g
-const CLAUSE_KEYWORDS = new Set(['type', 'as'])
 
 function offsetToPosition(content: string, offset: number): { line: number; column: number } {
   let line = 1
@@ -55,21 +56,35 @@ export function findImportSymbolRanges(content: string): ImportSymbolMatch[] {
     }
     const clauseOffset = statement.index + statement[0].indexOf(clause)
     CLAUSE_IDENTIFIER_PATTERN.lastIndex = 0
-    let skipNext = false
+    let renamedMatch: ImportSymbolMatch | null = null
+    let skipNamespaceAlias = false
     let identifier: RegExpExecArray | null
     while ((identifier = CLAUSE_IDENTIFIER_PATTERN.exec(clause)) !== null) {
       const name = identifier[0]
-      if (CLAUSE_KEYWORDS.has(name)) {
-        // Why: `b as c` renames on import — only `b` exists in the target module.
-        skipNext = name === 'as'
+      if (name === 'type') {
         continue
       }
-      if (skipNext) {
-        skipNext = false
+      if (name === 'as') {
+        // A namespace import (`* as ns`) binds no single export, so it stays
+        // unlinked — the path link already covers opening that file.
+        if (clause.slice(0, identifier.index).trimEnd().endsWith('*')) {
+          skipNamespaceAlias = true
+        } else {
+          renamedMatch = matches.at(-1) ?? null
+        }
         continue
       }
-      // A namespace import (`* as ns`) binds no single export, so only its alias
-      // would be clickable — the path link already covers opening that file.
+      if (skipNamespaceAlias) {
+        skipNamespaceAlias = false
+        continue
+      }
+      if (renamedMatch) {
+        // Why: `foo as bar` — the body references `bar`, but only `foo` exists
+        // in the target module.
+        renamedMatch.localName = name
+        renamedMatch = null
+        continue
+      }
       const insideBraces =
         clause.lastIndexOf('{', identifier.index) > clause.lastIndexOf('}', identifier.index)
       const start = offsetToPosition(content, clauseOffset + identifier.index)
@@ -81,7 +96,8 @@ export function findImportSymbolRanges(content: string): ImportSymbolMatch[] {
           endColumn: start.column + name.length
         },
         specifier,
-        symbol: insideBraces ? name : 'default'
+        symbol: insideBraces ? name : 'default',
+        localName: name
       })
     }
   }
