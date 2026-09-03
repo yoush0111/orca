@@ -16,6 +16,7 @@ import { installMonacoDelayerCancellationGuard } from './monaco-delayer-cancella
 import { installMonacoDiffEditorDisposalGuard } from './monaco-diff-editor-disposal'
 import { installMonacoPeekReferencesPreviewOptions } from './monaco-peek-preview-options'
 import { installMonacoContextMenuPaste } from '@/components/editor/install-monaco-context-menu-paste'
+import { installMonacoImportGotoDefinitionOpener } from '@/components/editor/monaco-import-goto-definition'
 
 globalThis.MonacoEnvironment = {
   getWorker(_workerId, label) {
@@ -65,6 +66,20 @@ monacoTS.javascriptDefaults.setDiagnosticsOptions(diagnosticsOptions)
 // worker raises TS17004 "Cannot use JSX unless the '--jsx' flag is provided"
 // on every JSX tag. Preserve mode is enough to allow parsing without forcing
 // an emit transform (we never emit — this is a read-only language service).
+// Why: the sandboxed worker can't see the target module, so its only answer for
+// an imported name is that name's own import statement — Ctrl+Click landed on
+// the import line instead of the file it names. Orca's own definition provider
+// (monaco-import-goto-definition.ts) replaces it and resolves across files.
+const modeConfigurationWithoutDefinitions = { definitions: false }
+monacoTS.typescriptDefaults.setModeConfiguration({
+  ...monacoTS.typescriptDefaults.modeConfiguration,
+  ...modeConfigurationWithoutDefinitions
+})
+monacoTS.javascriptDefaults.setModeConfiguration({
+  ...monacoTS.javascriptDefaults.modeConfiguration,
+  ...modeConfigurationWithoutDefinitions
+})
+
 monacoTS.typescriptDefaults.setCompilerOptions({
   ...monacoTS.typescriptDefaults.getCompilerOptions(),
   jsx: monacoTS.JsxEmit.Preserve
@@ -86,6 +101,9 @@ installMonacoPeekReferencesPreviewOptions()
 // blocked in Orca's sandboxed renderer. Route it through the trusted IPC bridge
 // so right-click Paste works like Cmd+V (which already works via native events).
 installMonacoContextMenuPaste(monaco)
+// Ctrl/Cmd+Click on an import path opens the resolved workspace file; on an
+// imported symbol it also jumps to that symbol's declaration line.
+installMonacoImportGotoDefinitionOpener()
 
 // Configure Monaco to use the locally bundled editor instead of CDN
 loader.config({ monaco })
