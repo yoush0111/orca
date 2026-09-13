@@ -495,6 +495,7 @@ import {
   ProjectHostSetupUpdate,
   ProjectUpdate
 } from './project-runtime-params'
+import { RedmineConnect, RedmineIssueQuery } from './redmine-params'
 import { ReferenceFind, ReferenceList } from './reference-params'
 import {
   ProjectGroupCreate,
@@ -1278,6 +1279,13 @@ export const RPC_PARAMS_BY_METHOD = {
   'projectHostSetup.list': null,
   'projectHostSetup.setupExistingFolder': ProjectHostSetupExistingFolder,
   'projectHostSetup.update': ProjectHostSetupUpdate,
+  'redmine.connect': RedmineConnect,
+  'redmine.disconnect': null,
+  'redmine.listIssues': RedmineIssueQuery,
+  'redmine.listProjects': null,
+  'redmine.listStatuses': null,
+  'redmine.status': null,
+  'redmine.testConnection': null,
   'reference.find': ReferenceFind,
   'reference.list': ReferenceList,
   'repo.add': RepoPath,
