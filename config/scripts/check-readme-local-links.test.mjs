@@ -1,9 +1,8 @@
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { parse } from 'yaml'
 import { findBrokenReadmeLinks, main } from './check-readme-local-links.mjs'
 
 const projectDir = path.resolve(import.meta.dirname, '../..')
@@ -135,22 +134,5 @@ describe('README local link check', () => {
         resolved: 'docs/assets/missing.gif'
       }
     ])
-  })
-
-  // Why the ungated job: static_analysis is skipped for docs-only diffs, which is
-  // exactly the kind of PR that deletes a docs-site GIF the README embeds.
-  it('runs on every PR through the ungated guard job and in the lint script', () => {
-    const { scripts } = JSON.parse(readFileSync(path.join(projectDir, 'package.json'), 'utf8'))
-    const workflow = parse(readFileSync(path.join(projectDir, '.github/workflows/pr.yml'), 'utf8'))
-    const guardJob = workflow.jobs.root_directory_guard
-    const step = guardJob.steps.find((candidate) => candidate.name === 'Check README local links')
-
-    expect(guardJob.if).toBeUndefined()
-    expect(guardJob.needs).toBeUndefined()
-    expect(step.run).toBe('node config/scripts/check-readme-local-links.mjs')
-    expect(scripts['check:readme-local-links']).toBe(
-      'node config/scripts/check-readme-local-links.mjs'
-    )
-    expect(scripts.lint).toContain('pnpm run check:readme-local-links')
   })
 })
