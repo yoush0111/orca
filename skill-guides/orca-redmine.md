@@ -41,11 +41,13 @@ When a decision is settled — design approved, direction changed, scope adjuste
 - 영향 범위: …
 ```
 
-Post it only after the user explicitly approves, through stdin so multiline and non-ASCII text survive every shell:
+Post it only after the user explicitly approves. Write the approved text to a UTF-8 file with your file-editing tool, then pass the path:
 
 ```bash
-ORCA redmine issue note <id> --body-file - --json
+ORCA redmine issue note <id> --body-file <path-to-utf8-file> --json
 ```
+
+Do not pipe non-ASCII text through Windows PowerShell 5.1 (`powershell.exe`): it re-encodes piped text and turns Korean into `?`. From POSIX shells, stdin (`--body-file -`) is also fine.
 
 SSH/remoting note: when running through an SSH-backed remote Orca CLI, body files are only supported via stdin (`--body-file -`), not arbitrary remote file paths.
 
@@ -55,5 +57,7 @@ Post each decision once. Do not post running commentary or unapproved drafts.
 
 - `Redmine is not connected.`: ask the user to connect Redmine in Orca Settings → Integrations, then retry.
 - `Redmine issue not found (404).`: confirm the issue number with the user.
+- `Redmine denied permission for this action (403).`: the user's Redmine role cannot do this; tell the user instead of retrying.
+- Unknown `redmine` command or method: this Orca build predates the Redmine CLI; ask the user to update Orca.
 - `Redmine rejected the request (422): …`: shorten or fix the note as the message says and retry once.
 - Any other failure: report the exact error and ask before retrying a write.
