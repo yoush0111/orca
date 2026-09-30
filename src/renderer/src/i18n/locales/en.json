@@ -3284,7 +3284,7 @@
             "missing": {
               "tui": {
                 "title": "This ZCode build has no terminal UI",
-                "description": "Orca's hooks installed correctly \u2014 the zcode on your PATH just cannot open a session. The ZCode desktop app bundles the agent runtime without its terminal UI. Install a zcode that ships the TUI, then run zcode outside Orca to confirm."
+                "description": "Orca's hooks installed correctly — the zcode on your PATH just cannot open a session. The ZCode desktop app bundles the agent runtime without its terminal UI. Install a zcode that ships the TUI, then run zcode outside Orca to confirm."
               }
             }
           },
@@ -17070,7 +17070,13 @@
                 "columnProject": "Project",
                 "columnAssignee": "Assignee",
                 "columnDone": "Done",
-                "mappedRepo": "Repo: {{value0}}"
+                "mappedRepo": "Repo: {{value0}}",
+                "openDetails": "Open details for #{{value0}}",
+                "detailsDescription": "Details of the selected Redmine issue.",
+                "fieldRepo": "Repository",
+                "fieldUpdated": "Updated",
+                "description": "Description",
+                "noDescription": "No description."
               }
             },
             "panel": {
