@@ -12244,6 +12244,18 @@
               "connect": "Redmine 연결",
               "singleConnection": "런타임당 Redmine 인스턴스 하나가 연결됩니다. 다시 연결하면 저장된 키가 교체됩니다."
             }
+          },
+          "agent": {
+            "skill": {
+              "title": "Claude Code 스킬 (orca-redmine)",
+              "description": "Claude가 Orca를 통해 Redmine 일감을 조회하고 승인된 결정사항 노트를 등록할 수 있게 합니다. 이 컴퓨터의 ~/.claude/skills에 설치됩니다.",
+              "installed": "설치됨",
+              "outdated": "업데이트 있음",
+              "missing": "설치 안 됨",
+              "install": "설치",
+              "update": "업데이트",
+              "needsConnection": "Redmine을 연결한 뒤에 스킬이 동작합니다."
+            }
           }
         }
       },

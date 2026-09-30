@@ -12243,6 +12243,18 @@
               "connect": "Conectar Redmine",
               "singleConnection": "Se conecta una instancia de Redmine por entorno de ejecución. Volver a conectar reemplaza la clave guardada."
             }
+          },
+          "agent": {
+            "skill": {
+              "title": "Skill de Claude Code (orca-redmine)",
+              "description": "Permite que Claude lea incidencias de Redmine y publique notas de decisiones aprobadas a través de Orca. Se instala en ~/.claude/skills en este equipo.",
+              "installed": "Instalada",
+              "outdated": "Actualización disponible",
+              "missing": "No instalada",
+              "install": "Instalar",
+              "update": "Actualizar",
+              "needsConnection": "La skill funciona después de conectar Redmine."
+            }
           }
         }
       },
