@@ -173,18 +173,19 @@ export function getLaunchableWorkItemDraftContent(args: {
   return args.url
 }
 
-// Why: Redmine starts auto-submit a lookup → brainstorm → implement flow; the agent fetches the
-// issue itself over the REST API with its own credentials, so only the identity goes in the prompt.
+// Why: Redmine starts auto-submit a skill-driven flow; Orca's CLI holds the credentials,
+// so only the issue identity goes into the prompt.
 function buildRedmineLaunchPrompt(
   item: { number: number; url: string; title?: string },
   note: string
 ): string {
   const issueLabel = `Redmine issue #${item.number}${item.title ? ` "${item.title}"` : ''}`
   const workflow = [
-    `Work on ${issueLabel}.`,
-    `1. Fetch the issue over the Redmine REST API: GET ${item.url || `<REDMINE_URL>/issues/${item.number}`}.json?include=journals,attachments with the X-Redmine-API-Key header (REDMINE_URL / REDMINE_API_KEY from env or ~/.redmine.json; never print the key). Summarize what it asks for.`,
-    '2. Brainstorm the requirements and design with me before writing any code: ask clarifying questions and propose an approach.',
-    '3. Once I approve the design, implement it.'
+    `Work on ${issueLabel} using the orca-redmine skill.`,
+    `1. Load the skill guide and fetch the issue with \`orca redmine issue show ${item.number} --json\`.`,
+    '2. Brainstorm the requirements and design with me before writing any code.',
+    '3. When a decision is settled, show me a decision-note draft and post it with `orca redmine issue note` only after I approve.',
+    '4. Once I approve the design, implement it.'
   ].join('\n')
   return [workflow, note].filter(Boolean).join('\n\n')
 }
