@@ -417,7 +417,12 @@ import {
   ProjectHostSetupUpdate,
   ProjectUpdate
 } from './project-runtime-params'
-import { RedmineConnect, RedmineIssueQuery } from './redmine-params'
+import {
+  RedmineConnect,
+  RedmineIssueId,
+  RedmineIssueNote,
+  RedmineIssueQuery
+} from './redmine-params'
 import {
   ProjectGroupCreate,
   ProjectGroupImportNested,
@@ -1050,6 +1055,8 @@ export const RPC_PARAMS_BY_METHOD = {
   'projectHostSetup.update': ProjectHostSetupUpdate,
   'redmine.connect': RedmineConnect,
   'redmine.disconnect': null,
+  'redmine.issueAddNote': RedmineIssueNote,
+  'redmine.issueShow': RedmineIssueId,
   'redmine.listIssues': RedmineIssueQuery,
   'redmine.listProjects': null,
   'redmine.listStatuses': null,

@@ -1,7 +1,9 @@
 import type { RedmineConnectArgs, RedmineIssueQuery } from '../../shared/redmine-types'
 import {
+  addIssueNote,
   connect,
   disconnect,
+  getIssue,
   getStatus,
   listIssues,
   listProjects,
@@ -37,5 +39,14 @@ export class RuntimeRedmineCommands {
 
   redmineListStatuses(): ReturnType<typeof listStatuses> {
     return listStatuses()
+  }
+
+  redmineIssueShow(id: number): ReturnType<typeof getIssue> {
+    return getIssue(id)
+  }
+
+  async redmineIssueAddNote(id: number, notes: string): Promise<{ ok: true; id: number }> {
+    await addIssueNote(id, notes)
+    return { ok: true, id }
   }
 }
