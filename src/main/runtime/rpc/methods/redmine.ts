@@ -1,5 +1,10 @@
 import { defineMethod } from '../core'
-import { RedmineConnect, RedmineIssueQuery } from '../../../../shared/rpc-contract/redmine-params'
+import {
+  RedmineConnect,
+  RedmineIssueId,
+  RedmineIssueNote,
+  RedmineIssueQuery
+} from '../../../../shared/rpc-contract/redmine-params'
 
 export const REDMINE_METHODS = [
   defineMethod({
@@ -37,5 +42,15 @@ export const REDMINE_METHODS = [
     name: 'redmine.listStatuses',
     params: null,
     handler: async (_params, { runtime }) => runtime.redmineListStatuses()
+  }),
+  defineMethod({
+    name: 'redmine.issueShow',
+    params: RedmineIssueId,
+    handler: async (params, { runtime }) => runtime.redmineIssueShow(params.id)
+  }),
+  defineMethod({
+    name: 'redmine.issueAddNote',
+    params: RedmineIssueNote,
+    handler: async (params, { runtime }) => runtime.redmineIssueAddNote(params.id, params.notes)
   })
 ]
