@@ -8,5 +8,7 @@ export const redmineApi: RedmineApi = {
   testConnection: () => ipcRenderer.invoke('redmine:testConnection'),
   listIssues: (args) => ipcRenderer.invoke('redmine:listIssues', args),
   listProjects: () => ipcRenderer.invoke('redmine:listProjects'),
-  listStatuses: () => ipcRenderer.invoke('redmine:listStatuses')
+  listStatuses: () => ipcRenderer.invoke('redmine:listStatuses'),
+  agentSkillStatus: () => ipcRenderer.invoke('redmine:agentSkillStatus'),
+  installAgentSkill: () => ipcRenderer.invoke('redmine:installAgentSkill')
 }
