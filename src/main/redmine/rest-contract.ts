@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import type {
   RedmineIssue,
+  RedmineIssueDetail,
   RedmineIssueQuery,
   RedmineNamedRef,
   RedmineProject,
@@ -26,6 +27,27 @@ const IssueSchema = z.object({
 })
 
 const IssuesResponseSchema = z.object({ issues: z.array(IssueSchema).nullish() })
+
+const JournalSchema = z.object({
+  id: z.number(),
+  user: NamedRefSchema.nullish(),
+  notes: z.string().nullish(),
+  created_on: z.string()
+})
+
+const AttachmentSchema = z.object({
+  filename: z.string(),
+  filesize: z.number().nullish(),
+  content_url: z.string()
+})
+
+const IssueDetailResponseSchema = z.object({
+  issue: IssueSchema.extend({
+    tracker: NamedRefSchema.nullish(),
+    journals: z.array(JournalSchema).nullish(),
+    attachments: z.array(AttachmentSchema).nullish()
+  })
+})
 
 const ProjectsResponseSchema = z.object({
   projects: z
@@ -91,9 +113,8 @@ function toNamedRef(
   return value ? { id: value.id, name: value.name ?? String(value.id) } : null
 }
 
-export function parseRedmineIssues(payload: unknown, baseUrl: string): RedmineIssue[] {
-  const parsed = IssuesResponseSchema.parse(payload)
-  return (parsed.issues ?? []).map((issue) => ({
+function toRedmineIssue(issue: z.infer<typeof IssueSchema>, baseUrl: string): RedmineIssue {
+  return {
     id: issue.id,
     subject: issue.subject,
     ...(issue.description ? { description: issue.description } : {}),
@@ -103,7 +124,38 @@ export function parseRedmineIssues(payload: unknown, baseUrl: string): RedmineIs
     assignedTo: toNamedRef(issue.assigned_to),
     ...(issue.updated_on ? { updatedAt: issue.updated_on } : {}),
     url: `${baseUrl}/issues/${issue.id}`
-  }))
+  }
+}
+
+export function parseRedmineIssues(payload: unknown, baseUrl: string): RedmineIssue[] {
+  const parsed = IssuesResponseSchema.parse(payload)
+  return (parsed.issues ?? []).map((issue) => toRedmineIssue(issue, baseUrl))
+}
+
+export function parseRedmineIssueDetail(payload: unknown, baseUrl: string): RedmineIssueDetail {
+  const { issue } = IssueDetailResponseSchema.parse(payload)
+  return {
+    ...toRedmineIssue(issue, baseUrl),
+    tracker: toNamedRef(issue.tracker),
+    // Why: journals with no notes are field-change history, not comments.
+    journals: (issue.journals ?? []).flatMap((journal) =>
+      journal.notes?.trim()
+        ? [
+            {
+              id: journal.id,
+              author: journal.user?.name ?? null,
+              createdAt: journal.created_on,
+              notes: journal.notes
+            }
+          ]
+        : []
+    ),
+    attachments: (issue.attachments ?? []).map((attachment) => ({
+      filename: attachment.filename,
+      filesize: attachment.filesize ?? 0,
+      url: attachment.content_url
+    }))
+  }
 }
 
 export function parseRedmineProjects(payload: unknown): RedmineProject[] {
