@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { LoaderCircle, Settings2 } from 'lucide-react'
+import { LoaderCircle, RefreshCw, Settings2 } from 'lucide-react'
 
 import { RedmineIcon } from '@/components/icons/RedmineIcon'
 import { TaskPageRedmineIssueList } from '@/components/task-page-redmine-issue-list'
@@ -220,6 +220,17 @@ export function TaskPageRedminePanel({
           <span className="text-[11px] text-muted-foreground">
             {issues.length} {translate('auto.components.task.page.redmine.panel.shown', 'shown')}
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7"
+            disabled={loading}
+            onClick={() => void loadIssues()}
+            aria-label={translate('auto.components.task.page.redmine.panel.refresh', 'Refresh')}
+            title={translate('auto.components.task.page.redmine.panel.refresh', 'Refresh')}
+          >
+            <RefreshCw className={loading ? 'size-3.5 animate-spin' : 'size-3.5'} />
+          </Button>
           <Button
             variant="ghost"
             size="icon"
