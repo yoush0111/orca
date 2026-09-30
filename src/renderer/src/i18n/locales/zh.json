@@ -17299,7 +17299,13 @@
                 "columnStatus": "状态",
                 "columnProject": "项目",
                 "columnAssignee": "指派给",
-                "columnDone": "完成度"
+                "columnDone": "完成度",
+                "openDetails": "打开 #{{value0}} 的详情",
+                "detailsDescription": "所选 Redmine 问题的详情。",
+                "fieldRepo": "仓库",
+                "fieldUpdated": "更新时间",
+                "description": "描述",
+                "noDescription": "暂无描述。"
               }
             },
             "panel": {
