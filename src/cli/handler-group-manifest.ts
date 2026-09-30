@@ -264,6 +264,11 @@ export const HANDLER_GROUPS: readonly HandlerGroup[] = [
     load: async () => (await import('./handlers/linear.js')).LINEAR_HANDLERS
   },
   {
+    name: 'redmine',
+    keys: ['redmine issue show', 'redmine issue note'],
+    load: async () => (await import('./handlers/redmine.js')).REDMINE_HANDLERS
+  },
+  {
     name: 'vm',
     keys: ['vm recipe doctor'],
     load: async () => (await import('./handlers/vm.js')).VM_HANDLERS
