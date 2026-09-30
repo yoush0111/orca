@@ -12097,6 +12097,18 @@
               "connect": "Redmine に接続",
               "singleConnection": "ランタイムごとに 1 つの Redmine インスタンスが接続されます。再接続すると保存済みのキーが置き換わります。"
             }
+          },
+          "agent": {
+            "skill": {
+              "title": "Claude Code スキル (orca-redmine)",
+              "description": "Claude が Orca 経由で Redmine チケットを参照し、承認済みの決定事項ノートを投稿できるようにします。このコンピューターの ~/.claude/skills にインストールされます。",
+              "installed": "インストール済み",
+              "outdated": "更新あり",
+              "missing": "未インストール",
+              "install": "インストール",
+              "update": "更新",
+              "needsConnection": "Redmine を接続するとスキルが動作します。"
+            }
           }
         }
       },

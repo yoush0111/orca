@@ -12375,6 +12375,18 @@
                 "add": "Add a project…"
               }
             }
+          },
+          "agent": {
+            "skill": {
+              "title": "Claude Code skill (orca-redmine)",
+              "description": "Lets Claude read Redmine issues and post approved decision notes through Orca. Installs into ~/.claude/skills on this computer.",
+              "installed": "Installed",
+              "outdated": "Update available",
+              "missing": "Not installed",
+              "install": "Install",
+              "update": "Update",
+              "needsConnection": "The skill works after Redmine is connected."
+            }
           }
         }
       },
