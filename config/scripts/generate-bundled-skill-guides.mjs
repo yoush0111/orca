@@ -23,6 +23,7 @@ const CANONICAL_GUIDE_NAMES = [
   'orca-linear',
   'orca-per-workspace-env',
   'orca-plugin-authoring',
+  'orca-redmine',
   'orchestration'
 ]
 
@@ -38,6 +39,7 @@ const GUIDE_ALIASES = {
   'orca-linear': [],
   'orca-per-workspace-env': [],
   'orca-plugin-authoring': [],
+  'orca-redmine': [],
   orchestration: []
 }
 
@@ -54,6 +56,7 @@ const STUB_TOPICS = [
   'orca-linear',
   'orca-per-workspace-env',
   'orca-plugin-authoring',
+  'orca-redmine',
   'orchestration'
 ]
 
