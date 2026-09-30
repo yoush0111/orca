@@ -12070,6 +12070,18 @@
               "connect": "连接 Redmine",
               "singleConnection": "每个运行时连接一个 Redmine 实例。再次连接会替换已保存的密钥。"
             }
+          },
+          "agent": {
+            "skill": {
+              "title": "Claude Code 技能 (orca-redmine)",
+              "description": "让 Claude 通过 Orca 读取 Redmine 问题并发布已批准的决策备注。安装到此电脑的 ~/.claude/skills。",
+              "installed": "已安装",
+              "outdated": "有可用更新",
+              "missing": "未安装",
+              "install": "安装",
+              "update": "更新",
+              "needsConnection": "连接 Redmine 后技能才能使用。"
+            }
           }
         }
       },

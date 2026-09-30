@@ -8,6 +8,10 @@ import {
   listStatuses,
   testConnection
 } from '../redmine/client'
+import {
+  getRedmineAgentSkillStatus,
+  installRedmineAgentSkill
+} from '../redmine/agent-skill-install'
 import type { RedmineConnectArgs, RedmineIssueQuery } from '../../shared/redmine-types'
 
 function normalizeQuery(value: unknown): RedmineIssueQuery {
@@ -46,4 +50,8 @@ export function registerRedmineHandlers(): void {
   ipcMain.handle('redmine:listProjects', async () => listProjects())
 
   ipcMain.handle('redmine:listStatuses', async () => listStatuses())
+
+  ipcMain.handle('redmine:agentSkillStatus', async () => getRedmineAgentSkillStatus())
+
+  ipcMain.handle('redmine:installAgentSkill', async () => installRedmineAgentSkill())
 }
