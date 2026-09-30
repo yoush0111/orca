@@ -1,6 +1,7 @@
 import { ArrowRight, ExternalLink } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import CommentMarkdown from '@/components/sidebar/CommentMarkdown'
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet'
 import { translate } from '@/i18n/i18n'
 import { formatUiRelativeTimeFromDate } from '@/i18n/relative-time-format'
@@ -78,11 +79,13 @@ function IssueDescription({ description }: { description?: string }): React.JSX.
       <h4 className="pb-2 text-[13px] font-medium text-foreground">
         {translate('auto.components.task.page.redmine.issue.list.description', 'Description')}
       </h4>
-      {/* Why plain text: Redmine bodies may be Textile, which markdown would mangle. */}
+      {/* Why sanitized raw HTML: Redmine bodies are often HTML (CKEditor) or Markdown. */}
       {text ? (
-        <p className="whitespace-pre-wrap break-words text-[13px] leading-relaxed text-foreground">
-          {text}
-        </p>
+        <CommentMarkdown
+          content={text}
+          variant="document"
+          className="text-[13px] leading-relaxed"
+        />
       ) : (
         <p className="text-[13px] text-muted-foreground">
           {translate(
