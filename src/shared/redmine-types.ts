@@ -83,3 +83,5 @@ export type RedmineIssueDetail = RedmineIssue & {
   journals: RedmineIssueJournal[]
   attachments: RedmineIssueAttachment[]
 }
+
+export type RedmineAgentSkillStatus = 'missing' | 'outdated' | 'installed'
