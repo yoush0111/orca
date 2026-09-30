@@ -22,7 +22,7 @@ import type { RedmineIssue } from '../../../shared/redmine-types'
 const issue: RedmineIssue = {
   id: 42,
   subject: 'Fix login',
-  description: 'h1. Steps\n\n* open app',
+  description: '<p><strong>Steps</strong> to reproduce</p>',
   doneRatio: 30,
   project: { id: 1, name: 'Web' },
   status: { id: 2, name: 'In Progress' },
@@ -54,7 +54,7 @@ describe('TaskPageRedmineIssueList', () => {
     renderList()
     await userEvent.click(screen.getByRole('button', { name: 'Open details for #42' }))
     expect(screen.getByRole('dialog')).toBeInTheDocument()
-    expect(screen.getByText('h1. Steps', { exact: false })).toBeInTheDocument()
+    expect(screen.getByText('Steps').tagName).toBe('STRONG')
   })
 
   it('opens the detail sheet with Enter on a focused row', async () => {
