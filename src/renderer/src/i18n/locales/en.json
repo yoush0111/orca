@@ -17204,7 +17204,8 @@
               "shown": "shown",
               "emptyTitle": "No Redmine issues found",
               "emptyBody": "No issues match the selected filters.",
-              "openSettings": "Redmine settings"
+              "openSettings": "Redmine settings",
+              "refresh": "Refresh"
             }
           }
         }
