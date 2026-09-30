@@ -1,4 +1,5 @@
 import type {
+  RedmineAgentSkillStatus,
   RedmineConnectArgs,
   RedmineConnectResult,
   RedmineConnectionStatus,
@@ -16,4 +17,6 @@ export type RedmineApi = {
   listIssues: (args?: RedmineIssueQuery) => Promise<RedmineIssue[]>
   listProjects: () => Promise<RedmineProject[]>
   listStatuses: () => Promise<RedmineNamedRef[]>
+  agentSkillStatus: () => Promise<RedmineAgentSkillStatus>
+  installAgentSkill: () => Promise<RedmineAgentSkillStatus>
 }
