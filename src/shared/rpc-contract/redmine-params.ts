@@ -14,3 +14,12 @@ export const RedmineIssueQuery = z
     limit: OptionalFiniteNumber
   })
   .optional()
+
+export const REDMINE_NOTE_MAX_CHARS = 65_000
+
+export const RedmineIssueId = z.object({ id: z.number().int().positive() })
+
+export const RedmineIssueNote = z.object({
+  id: z.number().int().positive(),
+  notes: z.string().trim().min(1, 'Note is required').max(REDMINE_NOTE_MAX_CHARS)
+})
