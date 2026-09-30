@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { ArrowRight, ExternalLink } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
@@ -9,6 +9,7 @@ import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
 import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
+import { clampDoneRatio, TaskPageRedmineIssueSheet } from './task-page-redmine-issue-sheet'
 import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
 import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
@@ -28,20 +29,18 @@ function isMacShortcutPlatform(): boolean {
 const ROW_GRID =
   'grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-3 md:grid-cols-[72px_minmax(0,1fr)_120px_140px_120px_56px_64px]'
 
-function clampDoneRatio(value: number): number {
-  return Math.min(100, Math.max(0, Math.round(value)))
-}
-
 function RedmineIssueRow({
   issue,
   repoName,
   onOpenExternal,
-  onStartWorkspace
+  onStartWorkspace,
+  onSelect
 }: {
   issue: RedmineIssue
   repoName: string | null
   onOpenExternal: (issue: RedmineIssue, event: React.MouseEvent) => void
   onStartWorkspace: (issue: RedmineIssue) => void
+  onSelect: (issue: RedmineIssue) => void
 }): React.JSX.Element {
   const doneRatio = clampDoneRatio(issue.doneRatio)
   const assignee =
@@ -50,9 +49,27 @@ function RedmineIssueRow({
 
   return (
     <div
+      role="button"
+      tabIndex={0}
+      aria-label={translate(
+        'auto.components.task.page.redmine.issue.list.openDetails',
+        'Open details for #{{value0}}',
+        { value0: issue.id }
+      )}
+      onClick={() => onSelect(issue)}
+      onKeyDown={(event) => {
+        // Why: ignore keys bubbling from the nested action buttons.
+        if (event.target !== event.currentTarget) {
+          return
+        }
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          onSelect(issue)
+        }
+      }}
       className={cn(
         ROW_GRID,
-        'group/row min-h-12 py-2 text-left transition hover:bg-accent focus-within:bg-accent'
+        'group/row min-h-12 cursor-pointer py-2 text-left transition outline-none hover:bg-accent focus-within:bg-accent focus-visible:ring-2 focus-visible:ring-ring/50'
       )}
     >
       <span className="block truncate font-mono text-[12px] text-muted-foreground max-md:!hidden">
@@ -106,7 +123,12 @@ function RedmineIssueRow({
         {doneRatio}%
       </span>
 
-      <div className="flex shrink-0 items-center justify-end gap-1 md:opacity-0 md:transition-opacity md:group-hover/row:opacity-100 md:group-focus-within/row:opacity-100">
+      <div
+        className="flex shrink-0 items-center justify-end gap-1"
+        // Why: action buttons act directly without also opening the sheet.
+        onClick={(event) => event.stopPropagation()}
+        onKeyDown={(event) => event.stopPropagation()}
+      >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -186,6 +208,9 @@ export function TaskPageRedmineIssueList({
     }
     return labels
   }, [issues, projectRepoMap, projects, repos])
+  const repoNameFor = (issue: RedmineIssue | null): string | null =>
+    (typeof issue?.project?.id === 'number' ? repoNameByProjectId.get(issue.project.id) : null) ??
+    null
   // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
   // if the panel feature itself is off, so the toggle only takes effect when
   // floatingTerminalEnabled is also on.
@@ -195,6 +220,7 @@ export function TaskPageRedmineIssueList({
       s.settings?.redmineLinksOpenInFloatingWorkspace !== false &&
       s.settings?.floatingTerminalEnabled === true
   )
+  const [selectedIssue, setSelectedIssue] = useState<RedmineIssue | null>(null)
   const targetWorktreeId = openInFloatingWorkspace
     ? FLOATING_TERMINAL_WORKTREE_ID
     : activeWorktreeId
@@ -246,16 +272,20 @@ export function TaskPageRedmineIssueList({
           <RedmineIssueRow
             key={issue.id}
             issue={issue}
-            repoName={
-              (typeof issue.project?.id === 'number'
-                ? repoNameByProjectId.get(issue.project.id)
-                : null) ?? null
-            }
+            repoName={repoNameFor(issue)}
             onOpenExternal={handleOpenExternal}
             onStartWorkspace={onStartWorkspace}
+            onSelect={setSelectedIssue}
           />
         ))}
       </div>
+      <TaskPageRedmineIssueSheet
+        issue={selectedIssue}
+        repoName={repoNameFor(selectedIssue)}
+        onClose={() => setSelectedIssue(null)}
+        onStartWorkspace={onStartWorkspace}
+        onOpenExternal={handleOpenExternal}
+      />
     </div>
   )
 }
