@@ -1,4 +1,5 @@
 import { net, session } from 'electron'
+import { z } from 'zod'
 import { ensureElectronProxyFromEnvironment } from '../network/proxy-settings'
 import { CredentialDecryptionError } from '../integration-credential-file'
 import type {
@@ -6,6 +7,7 @@ import type {
   RedmineConnectResult,
   RedmineConnectionStatus,
   RedmineIssue,
+  RedmineIssueDetail,
   RedmineIssueQuery,
   RedmineNamedRef,
   RedmineProject
@@ -13,6 +15,7 @@ import type {
 import {
   buildRedmineIssuesQuery,
   normalizeRedmineBaseUrl,
+  parseRedmineIssueDetail,
   parseRedmineIssues,
   parseRedmineProjects,
   parseRedmineStatuses,
@@ -39,7 +42,31 @@ class RedmineApiError extends Error {
   }
 }
 
-async function redmineGet(baseUrl: string, apiKey: string, path: string): Promise<unknown> {
+const RedmineErrorsSchema = z.object({ errors: z.array(z.string()) })
+
+type RedmineRequestInit = { method?: 'GET' | 'PUT'; body?: unknown }
+
+async function describeFailure(response: Response): Promise<string> {
+  if (response.status === 401 || response.status === 403) {
+    return 'Redmine rejected the API key.'
+  }
+  if (response.status === 404) {
+    return 'Redmine issue not found (404).'
+  }
+  if (response.status === 422) {
+    const parsed = RedmineErrorsSchema.safeParse(await response.json().catch(() => null))
+    const errors = parsed.success ? parsed.data.errors.join('; ') : ''
+    return `Redmine rejected the request (422)${errors ? `: ${errors}` : ''}`
+  }
+  return `Redmine request failed (${response.status}).`
+}
+
+async function redmineRequest(
+  baseUrl: string,
+  apiKey: string,
+  path: string,
+  init: RedmineRequestInit = {}
+): Promise<unknown> {
   const url = `${baseUrl}${path}`
   await ensureElectronProxyFromEnvironment({
     proxySession: session.defaultSession,
@@ -53,26 +80,28 @@ async function redmineGet(baseUrl: string, apiKey: string, path: string): Promis
     // Why: Electron's network stack follows Chromium proxy/session state,
     // avoiding stale keep-alive sockets after VPN path changes.
     const response = await net.fetch(url, {
+      method: init.method ?? 'GET',
       headers: {
         Accept: 'application/json',
         // Redmine's own header auth — never put the key in the query string,
         // where proxies and access logs would capture it.
-        'X-Redmine-API-Key': apiKey
+        'X-Redmine-API-Key': apiKey,
+        ...(init.body === undefined ? {} : { 'Content-Type': 'application/json; charset=utf-8' })
       },
+      ...(init.body === undefined ? {} : { body: JSON.stringify(init.body) }),
       signal: controller.signal
     })
     if (!response.ok) {
-      throw new RedmineApiError(
-        response.status === 401 || response.status === 403
-          ? 'Redmine rejected the API key.'
-          : `Redmine request failed (${response.status}).`,
-        response.status
-      )
+      throw new RedmineApiError(await describeFailure(response), response.status)
     }
-    return await response.json()
+    return response.status === 204 ? null : await response.json()
   } finally {
     clearTimeout(timeout)
   }
+}
+
+function redmineGet(baseUrl: string, apiKey: string, path: string): Promise<unknown> {
+  return redmineRequest(baseUrl, apiKey, path)
 }
 
 type ActiveClient = { baseUrl: string; apiKey: string }
@@ -204,4 +233,30 @@ export async function listStatuses(): Promise<RedmineNamedRef[]> {
   return parseRedmineStatuses(
     await redmineGet(client.baseUrl, client.apiKey, '/issue_statuses.json')
   )
+}
+
+function requireClient(): ActiveClient {
+  const client = getClient()
+  if (!client) {
+    throw new Error('Redmine is not connected.')
+  }
+  return client
+}
+
+export async function getIssue(id: number): Promise<RedmineIssueDetail> {
+  const client = requireClient()
+  const payload = await redmineGet(
+    client.baseUrl,
+    client.apiKey,
+    `/issues/${id}.json?include=journals,attachments`
+  )
+  return parseRedmineIssueDetail(payload, client.baseUrl)
+}
+
+export async function addIssueNote(id: number, notes: string): Promise<void> {
+  const client = requireClient()
+  await redmineRequest(client.baseUrl, client.apiKey, `/issues/${id}.json`, {
+    method: 'PUT',
+    body: { issue: { notes } }
+  })
 }
