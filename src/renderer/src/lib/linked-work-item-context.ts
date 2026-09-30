@@ -199,6 +199,25 @@ export function getLaunchableWorkItemDraftContent(args: {
   return args.url
 }
 
+// Why: Redmine starts auto-submit a read → brainstorm → implement flow so the agent begins
+// without a manual Enter; the issue body travels as contained untrusted context.
+function buildRedmineLaunchPrompt(
+  item: { number: number; url: string; title?: string; linkedContext?: LinkedWorkItemContext },
+  note: string
+): string {
+  const header = [`Redmine issue #${item.number}${item.title ? `: ${item.title}` : ''}`, item.url]
+  const contextBlock = buildContainedLinkedContextBlock(item.linkedContext)
+  const workflow = [
+    'Workflow:',
+    '1. Read the linked Redmine issue context and summarize what it asks for.',
+    '2. Brainstorm the requirements and design with me before writing any code: ask clarifying questions and propose an approach.',
+    '3. Once I approve the design, implement it.'
+  ].join('\n')
+  return [header.filter(Boolean).join('\n'), contextBlock, note, workflow]
+    .filter(Boolean)
+    .join('\n\n')
+}
+
 export function resolveQuickCreateLinkedWorkItemPrompt(
   linkedWorkItem:
     | (Pick<
@@ -216,6 +235,9 @@ export function resolveQuickCreateLinkedWorkItemPrompt(
   note: string
 ): { prompt: string; draftPrompt: string | null } {
   const trimmedNote = note.trim()
+  if (linkedWorkItem?.provider === 'redmine') {
+    return { prompt: buildRedmineLaunchPrompt(linkedWorkItem, trimmedNote), draftPrompt: null }
+  }
   const linearBlock = isLinearWorkItemReference(linkedWorkItem)
     ? buildLinearLaunchContextBlock({
         provider: linkedWorkItem?.provider,
