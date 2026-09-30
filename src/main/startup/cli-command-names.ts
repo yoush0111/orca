@@ -53,6 +53,7 @@ export const CLI_COMMAND_NAMES = [
   'ports',
   'profile',
   'project',
+  'redmine',
   'reference',
   'reload',
   'repo',
