@@ -31,7 +31,7 @@ vi.mock('./credential-store', () => ({
   clearConnection: vi.fn()
 }))
 
-import { addIssueNote, getIssue } from './client'
+import { addIssueNote, getIssue, listProjects } from './client'
 
 function jsonResponse(status: number, body: unknown): Response {
   return new Response(JSON.stringify(body), { status })
@@ -81,5 +81,22 @@ describe('redmine client issue detail and notes', () => {
     credentialState.record = null
     await expect(getIssue(5)).rejects.toThrow('Redmine is not connected.')
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('keeps the generic 404 message for non-issue endpoints', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(404, {}))
+    await expect(listProjects()).rejects.toThrow('Redmine request failed (404).')
+  })
+
+  it('reports 403 as a permission denial, not a rejected key', async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(403, {}))
+    await expect(addIssueNote(5, 'x')).rejects.toThrow(
+      'Redmine denied permission for this action (403).'
+    )
+  })
+
+  it('treats a 200 note response with an empty body as success', async () => {
+    fetchMock.mockResolvedValueOnce(new Response('', { status: 200 }))
+    await expect(addIssueNote(5, 'x')).resolves.toBeUndefined()
   })
 })
