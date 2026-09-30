@@ -17041,7 +17041,13 @@
                 "columnStatus": "ステータス",
                 "columnProject": "プロジェクト",
                 "columnAssignee": "担当者",
-                "columnDone": "進捗"
+                "columnDone": "進捗",
+                "openDetails": "#{{value0}} の詳細を開く",
+                "detailsDescription": "選択した Redmine チケットの詳細です。",
+                "fieldRepo": "リポジトリ",
+                "fieldUpdated": "更新日時",
+                "description": "説明",
+                "noDescription": "説明はありません。"
               }
             },
             "panel": {

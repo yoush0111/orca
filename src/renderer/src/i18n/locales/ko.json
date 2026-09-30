@@ -17042,7 +17042,13 @@
                 "columnStatus": "상태",
                 "columnProject": "프로젝트",
                 "columnAssignee": "담당자",
-                "columnDone": "진행률"
+                "columnDone": "진행률",
+                "openDetails": "#{{value0}} 상세 보기",
+                "detailsDescription": "선택한 Redmine 일감의 상세 정보입니다.",
+                "fieldRepo": "저장소",
+                "fieldUpdated": "수정일",
+                "description": "설명",
+                "noDescription": "설명이 없습니다."
               }
             },
             "panel": {

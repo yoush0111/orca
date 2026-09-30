@@ -17279,7 +17279,13 @@
                 "columnProject": "Project",
                 "columnAssignee": "Assignee",
                 "columnDone": "Done",
-                "mappedRepo": "Repo: {{value0}}"
+                "mappedRepo": "Repo: {{value0}}",
+                "openDetails": "Open details for #{{value0}}",
+                "detailsDescription": "Details of the selected Redmine issue.",
+                "fieldRepo": "Repository",
+                "fieldUpdated": "Updated",
+                "description": "Description",
+                "noDescription": "No description."
               }
             },
             "panel": {

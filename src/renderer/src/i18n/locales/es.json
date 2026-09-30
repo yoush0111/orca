@@ -17041,7 +17041,13 @@
                 "columnStatus": "Estado",
                 "columnProject": "Proyecto",
                 "columnAssignee": "Asignado a",
-                "columnDone": "Avance"
+                "columnDone": "Avance",
+                "openDetails": "Abrir detalles de #{{value0}}",
+                "detailsDescription": "Detalles de la incidencia de Redmine seleccionada.",
+                "fieldRepo": "Repositorio",
+                "fieldUpdated": "Actualizado",
+                "description": "Descripción",
+                "noDescription": "Sin descripción."
               }
             },
             "panel": {
