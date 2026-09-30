@@ -128,6 +128,24 @@
       ]
     },
     {
+      "name": "orca-redmine",
+      "sourcePath": "skills/orca-redmine",
+      "releaseRevision": 1,
+      "packageDigest": "cdeeaf83894621492d27849287e4229968e03e6e7feb19197e67f79904e08c65",
+      "gitTreeSha": "be2bdc6c656ea8a02e643a6e605a0797c52b4ca8",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "size": 2078,
+          "executable": false,
+          "classification": "text",
+          "exactSha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c",
+          "textNormalizedSha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c",
+          "identitySha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c"
+        }
+      ]
+    },
+    {
       "name": "orchestration",
       "sourcePath": "skills/orchestration",
       "releaseRevision": 29,
