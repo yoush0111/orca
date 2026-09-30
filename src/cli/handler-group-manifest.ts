@@ -239,6 +239,11 @@ export const HANDLER_GROUPS: readonly HandlerGroup[] = [
   },
   ...HOST_HANDLER_GROUPS,
   {
+    name: 'redmine',
+    keys: ['redmine issue show', 'redmine issue note'],
+    load: async () => (await import('./handlers/redmine.js')).REDMINE_HANDLERS
+  },
+  {
     name: 'skill-sharing',
     keys: ['skills installed', 'skills share'],
     load: async () => (await import('./handlers/skill-sharing.js')).SKILL_SHARING_HANDLERS
