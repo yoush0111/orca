@@ -16,6 +16,7 @@ import { ProviderHostScopeControl } from './ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 import { SettingsSwitchRow } from './SettingsFormControls'
 import { RedmineProjectRepoMapping } from './redmine-project-repo-mapping'
+import { RedmineAgentSkillRow } from './redmine-agent-skill-row'
 import { translate } from '@/i18n/i18n'
 
 type VerificationResult = { state: 'ok' | 'error'; error?: string }
@@ -218,6 +219,7 @@ export function RedmineIntegrationCard(): React.JSX.Element {
             </Button>
           </>
         ) : null}
+        <RedmineAgentSkillRow connected={connected} />
         {/* Outside the connected branch: the routing preference is worth finding
             before a connection exists, and it survives a disconnect. */}
         <SettingsSwitchRow
