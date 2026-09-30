@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   buildRedmineIssuesQuery,
   normalizeRedmineBaseUrl,
+  parseRedmineIssueDetail,
   parseRedmineIssues,
   parseRedmineProjects,
   parseRedmineViewer
@@ -121,5 +122,56 @@ describe('normalizeRedmineBaseUrl', () => {
 
   it('rejects a non-http scheme', () => {
     expect(() => normalizeRedmineBaseUrl('ftp://redmine.example.com')).toThrow()
+  })
+})
+
+describe('parseRedmineIssueDetail', () => {
+  it('keeps note journals and attachments, drops field-only journals', () => {
+    const detail = parseRedmineIssueDetail(
+      {
+        issue: {
+          id: 7,
+          subject: '로그인 수정',
+          description: '본문',
+          done_ratio: 20,
+          tracker: { id: 1, name: 'Bug' },
+          project: { id: 2, name: 'Web' },
+          status: { id: 3, name: 'New' },
+          journals: [
+            {
+              id: 10,
+              user: { id: 1, name: 'Kim' },
+              notes: '첫 댓글',
+              created_on: '2026-09-01T00:00:00Z'
+            },
+            { id: 11, user: { id: 1, name: 'Kim' }, notes: '', created_on: '2026-09-02T00:00:00Z' },
+            { id: 12, created_on: '2026-09-03T00:00:00Z' }
+          ],
+          attachments: [
+            {
+              filename: 'a.png',
+              filesize: 120,
+              content_url: 'https://rm.example/attachments/download/1/a.png'
+            }
+          ]
+        }
+      },
+      'https://rm.example'
+    )
+
+    expect(detail.id).toBe(7)
+    expect(detail.tracker).toEqual({ id: 1, name: 'Bug' })
+    expect(detail.journals).toEqual([
+      { id: 10, author: 'Kim', createdAt: '2026-09-01T00:00:00Z', notes: '첫 댓글' }
+    ])
+    expect(detail.attachments).toEqual([
+      { filename: 'a.png', filesize: 120, url: 'https://rm.example/attachments/download/1/a.png' }
+    ])
+    expect(detail.url).toBe('https://rm.example/issues/7')
+  })
+
+  it('defaults missing optional collections to empty arrays', () => {
+    const detail = parseRedmineIssueDetail({ issue: { id: 1, subject: 's' } }, 'https://rm.example')
+    expect(detail).toMatchObject({ tracker: null, journals: [], attachments: [], doneRatio: 0 })
   })
 })
