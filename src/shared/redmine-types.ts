@@ -64,3 +64,22 @@ export type RedmineIssueQuery = {
 export type RedmineConnectResult =
   | { ok: true; viewer: RedmineViewer }
   | { ok: false; error: string }
+
+export type RedmineIssueJournal = {
+  id: number
+  author: string | null
+  createdAt: string
+  notes: string
+}
+
+export type RedmineIssueAttachment = {
+  filename: string
+  filesize: number
+  url: string
+}
+
+export type RedmineIssueDetail = RedmineIssue & {
+  tracker: RedmineNamedRef | null
+  journals: RedmineIssueJournal[]
+  attachments: RedmineIssueAttachment[]
+}
