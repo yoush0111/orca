@@ -44,14 +44,20 @@ class RedmineApiError extends Error {
 
 const RedmineErrorsSchema = z.object({ errors: z.array(z.string()) })
 
-type RedmineRequestInit = { method?: 'GET' | 'PUT'; body?: unknown }
+type RedmineRequestInit = { method?: 'GET' | 'PUT'; body?: unknown; notFoundMessage?: string }
 
-async function describeFailure(response: Response): Promise<string> {
-  if (response.status === 401 || response.status === 403) {
+async function describeFailure(
+  response: Response,
+  notFoundMessage: string | undefined
+): Promise<string> {
+  if (response.status === 401) {
     return 'Redmine rejected the API key.'
   }
-  if (response.status === 404) {
-    return 'Redmine issue not found (404).'
+  if (response.status === 403) {
+    return 'Redmine denied permission for this action (403).'
+  }
+  if (response.status === 404 && notFoundMessage) {
+    return notFoundMessage
   }
   if (response.status === 422) {
     const parsed = RedmineErrorsSchema.safeParse(await response.json().catch(() => null))
@@ -92,9 +98,13 @@ async function redmineRequest(
       signal: controller.signal
     })
     if (!response.ok) {
-      throw new RedmineApiError(await describeFailure(response), response.status)
+      throw new RedmineApiError(
+        await describeFailure(response, init.notFoundMessage),
+        response.status
+      )
     }
-    return response.status === 204 ? null : await response.json()
+    // Why: a write's response body is irrelevant; parsing an empty 200 would report a landed note as failed.
+    return init.method === 'PUT' || response.status === 204 ? null : await response.json()
   } finally {
     clearTimeout(timeout)
   }
@@ -235,6 +245,8 @@ export async function listStatuses(): Promise<RedmineNamedRef[]> {
   )
 }
 
+const ISSUE_NOT_FOUND = 'Redmine issue not found (404).'
+
 function requireClient(): ActiveClient {
   const client = getClient()
   if (!client) {
@@ -245,10 +257,11 @@ function requireClient(): ActiveClient {
 
 export async function getIssue(id: number): Promise<RedmineIssueDetail> {
   const client = requireClient()
-  const payload = await redmineGet(
+  const payload = await redmineRequest(
     client.baseUrl,
     client.apiKey,
-    `/issues/${id}.json?include=journals,attachments`
+    `/issues/${id}.json?include=journals,attachments`,
+    { notFoundMessage: ISSUE_NOT_FOUND }
   )
   return parseRedmineIssueDetail(payload, client.baseUrl)
 }
@@ -257,6 +270,7 @@ export async function addIssueNote(id: number, notes: string): Promise<void> {
   const client = requireClient()
   await redmineRequest(client.baseUrl, client.apiKey, `/issues/${id}.json`, {
     method: 'PUT',
-    body: { issue: { notes } }
+    body: { issue: { notes } },
+    notFoundMessage: ISSUE_NOT_FOUND
   })
 }
