@@ -9,7 +9,7 @@ import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
 import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
 import { useAppStore } from '@/store'
 import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host'
-import { buildRedmineWorkspaceSource } from '../../../../shared/new-workspace/workspace-source'
+import { buildRedmineComposerLinkedWorkItem } from '@/lib/redmine-composer-linked-work-item'
 import { redmineWorkspaceSeedName } from '../../../../shared/redmine-workspace-name'
 import type { RedmineIssue } from '../../../../shared/redmine-types'
 
@@ -53,7 +53,7 @@ export function FloatingWorkspaceTasksView({
   const handleStartWorkspace = useCallback(
     (issue: RedmineIssue): void => {
       openModal('new-workspace-composer', {
-        linkedWorkItem: buildRedmineWorkspaceSource(issue),
+        linkedWorkItem: buildRedmineComposerLinkedWorkItem(issue),
         taskSourceContext: sourceContext,
         prefilledName: redmineWorkspaceSeedName(issue),
         telemetrySource: 'sidebar'
