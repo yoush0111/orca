@@ -310,7 +310,7 @@ describe('buildAgentPromptWithContext', () => {
 })
 
 describe('Redmine quick-create prompt', () => {
-  it('auto-submits a REST lookup → brainstorm workflow without the issue body', () => {
+  it('auto-submits a skill-driven lookup → brainstorm workflow without the issue body', () => {
     const result = resolveQuickCreateLinkedWorkItemPrompt(
       {
         provider: 'redmine',
@@ -322,12 +322,12 @@ describe('Redmine quick-create prompt', () => {
     )
 
     expect(result.draftPrompt).toBeNull()
-    expect(result.prompt).toContain('Work on Redmine issue #42 "Fix login".')
     expect(result.prompt).toContain(
-      'GET https://redmine.example/issues/42.json?include=journals,attachments'
+      'Work on Redmine issue #42 "Fix login" using the orca-redmine skill.'
     )
-    expect(result.prompt).toContain('X-Redmine-API-Key')
-    expect(result.prompt).toContain('Brainstorm the requirements and design')
+    expect(result.prompt).toContain('orca redmine issue show 42 --json')
+    expect(result.prompt).toContain('post it with `orca redmine issue note` only after I approve')
+    expect(result.prompt).not.toContain('X-Redmine-API-Key')
     expect(result.prompt.endsWith('focus on SSO')).toBe(true)
   })
 })
