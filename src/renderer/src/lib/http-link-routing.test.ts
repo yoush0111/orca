@@ -15,6 +15,7 @@ const toastErrorMock = vi.hoisted(() => vi.fn())
 vi.mock('sonner', () => ({ toast: { error: toastErrorMock } }))
 
 const openUrlMock = vi.fn()
+const dispatchEventMock = vi.fn()
 const registerLocalhostLabelMock = vi.fn()
 const setActiveWorktreeMock = vi.fn()
 const createBrowserTabMock = vi.fn()
@@ -61,6 +62,7 @@ beforeEach(() => {
   registerHttpLinkStoreAccessor(() => storeState)
   registerWorkspaceHttpLinkBrowserOpener(openRuntimeBrowserTabMock)
   vi.stubGlobal('window', {
+    dispatchEvent: dispatchEventMock,
     api: {
       shell: {
         openUrl: openUrlMock
@@ -115,6 +117,7 @@ describe('openHttpLink', () => {
     openHttpLink('https://example.com/', { worktreeId: FLOATING_TERMINAL_WORKTREE_ID })
 
     expect(setActiveWorktreeMock).not.toHaveBeenCalled()
+    expect(dispatchEventMock).toHaveBeenCalledTimes(1)
     expect(createBrowserTabMock).toHaveBeenCalledWith(
       FLOATING_TERMINAL_WORKTREE_ID,
       'https://example.com/',
