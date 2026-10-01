@@ -178,12 +178,43 @@ function RedmineIssueRow({
   )
 }
 
+export function useRedmineLinkOpener(): (url: string, event: React.MouseEvent) => void {
+  const activeWorktreeId = useAppStore((s) => s.activeWorktreeId)
+  // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
+  // if the panel feature itself is off, so the toggle only takes effect when
+  // floatingTerminalEnabled is also on.
+  // `!== false` because the setting is default-on and absent in older profiles.
+  const openInFloatingWorkspace = useAppStore(
+    (s) =>
+      s.settings?.redmineLinksOpenInFloatingWorkspace !== false &&
+      s.settings?.floatingTerminalEnabled === true
+  )
+  const targetWorktreeId = openInFloatingWorkspace
+    ? FLOATING_TERMINAL_WORKTREE_ID
+    : activeWorktreeId
+  // Why: route through Link Routing so the link can land in an Orca browser
+  // tab; Shift+Cmd/Ctrl stays the system-browser escape hatch.
+  return useCallback(
+    (url: string, event: React.MouseEvent): void => {
+      openHttpLink(
+        url,
+        resolveRedmineIssueOpenOptions(
+          event,
+          isMacShortcutPlatform(),
+          targetWorktreeId,
+          openInFloatingWorkspace
+        )
+      )
+    },
+    [targetWorktreeId, openInFloatingWorkspace]
+  )
+}
+
 export function TaskPageRedmineIssueList({
   issues,
   projects,
   onStartWorkspace
 }: TaskPageRedmineIssueListProps): React.JSX.Element {
-  const activeWorktreeId = useAppStore((s) => s.activeWorktreeId)
   const repos = useAppStore((s) => s.repos)
   const projectRepoMap = useAppStore((s) => s.settings?.redmineProjectRepoMap)
   const repoNameByProjectId = useMemo(() => {
@@ -211,34 +242,11 @@ export function TaskPageRedmineIssueList({
   const repoNameFor = (issue: RedmineIssue | null): string | null =>
     (typeof issue?.project?.id === 'number' ? repoNameByProjectId.get(issue.project.id) : null) ??
     null
-  // Why fall back to activeWorktreeId: a floating-workspace tab is invisible
-  // if the panel feature itself is off, so the toggle only takes effect when
-  // floatingTerminalEnabled is also on.
-  // `!== false` because the setting is default-on and absent in older profiles.
-  const openInFloatingWorkspace = useAppStore(
-    (s) =>
-      s.settings?.redmineLinksOpenInFloatingWorkspace !== false &&
-      s.settings?.floatingTerminalEnabled === true
-  )
   const [selectedIssue, setSelectedIssue] = useState<RedmineIssue | null>(null)
-  const targetWorktreeId = openInFloatingWorkspace
-    ? FLOATING_TERMINAL_WORKTREE_ID
-    : activeWorktreeId
-  // Why: route through Link Routing so the issue can land in an Orca browser
-  // tab; Shift+Cmd/Ctrl stays the system-browser escape hatch.
+  const openRedmineLink = useRedmineLinkOpener()
   const handleOpenExternal = useCallback(
-    (issue: RedmineIssue, event: React.MouseEvent): void => {
-      openHttpLink(
-        issue.url,
-        resolveRedmineIssueOpenOptions(
-          event,
-          isMacShortcutPlatform(),
-          targetWorktreeId,
-          openInFloatingWorkspace
-        )
-      )
-    },
-    [targetWorktreeId, openInFloatingWorkspace]
+    (issue: RedmineIssue, event: React.MouseEvent): void => openRedmineLink(issue.url, event),
+    [openRedmineLink]
   )
 
   return (
