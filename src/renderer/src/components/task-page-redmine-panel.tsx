@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { LoaderCircle, RefreshCw, Settings2 } from 'lucide-react'
+import { ExternalLink, LoaderCircle, RefreshCw, Settings2 } from 'lucide-react'
 
 import { RedmineIcon } from '@/components/icons/RedmineIcon'
-import { TaskPageRedmineIssueList } from '@/components/task-page-redmine-issue-list'
+import {
+  TaskPageRedmineIssueList,
+  useRedmineLinkOpener
+} from '@/components/task-page-redmine-issue-list'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -55,6 +58,8 @@ export function TaskPageRedminePanel({
   const statusCurrent = redmineStatusContextKey === getProviderRuntimeContextKey(settings)
   const statusReady = statusCurrent && redmineStatusChecked
   const connected = statusCurrent && redmineStatus.connected
+  const redmineBaseUrl = redmineStatus.connection?.baseUrl ?? null
+  const openRedmineLink = useRedmineLinkOpener()
 
   const [mineOnly, setMineOnly] = useState(true)
   const [projectId, setProjectId] = useState<string>(ALL_PROJECTS)
@@ -220,6 +225,27 @@ export function TaskPageRedminePanel({
           <span className="text-[11px] text-muted-foreground">
             {issues.length} {translate('auto.components.task.page.redmine.panel.shown', 'shown')}
           </span>
+          {redmineBaseUrl ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-7"
+              // Why /projects: Redmine has no global "new issue" page; project list is the entry point.
+              onClick={(event) =>
+                openRedmineLink(`${redmineBaseUrl.replace(/\/+$/, '')}/projects`, event)
+              }
+              aria-label={translate(
+                'auto.components.task.page.redmine.panel.openRedmine',
+                'Open Redmine'
+              )}
+              title={translate(
+                'auto.components.task.page.redmine.panel.openRedmine',
+                'Open Redmine'
+              )}
+            >
+              <ExternalLink className="size-3.5" />
+            </Button>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"
