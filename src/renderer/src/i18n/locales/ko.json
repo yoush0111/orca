@@ -12076,8 +12076,7 @@
           "title": "Cursor",
           "usageDescription": "Cursor는 요금 주기에 따라 초기화되는 두 가지 풀과, 소진 후에 발생하는 주문형 지출로 과금합니다.",
           "usageLabel": "사용량",
-          "usageTitle": "월간 플랜 사용량",
-          "openAutomationsDescription": "일정을 생성하고 최근 실행을 확인합니다."
+          "usageTitle": "월간 플랜 사용량"
         },
         "NotificationHostToggles": {
           "offCount": "{{count}}대 꺼짐",
