@@ -1,6 +1,6 @@
-import { net, session } from 'electron'
 import { z } from 'zod'
 import { ensureElectronProxyFromEnvironment } from '../network/proxy-settings'
+import { getMainHttpClient } from '../network/http-client'
 import { CredentialDecryptionError } from '../integration-credential-file'
 import type {
   RedmineConnectArgs,
@@ -74,8 +74,10 @@ async function redmineRequest(
   init: RedmineRequestInit = {}
 ): Promise<unknown> {
   const url = `${baseUrl}${path}`
+  const httpClient = getMainHttpClient()
+  const proxySession = httpClient.proxySession()
   await ensureElectronProxyFromEnvironment({
-    proxySession: session.defaultSession,
+    ...(proxySession ? { proxySession } : {}),
     probeUrl: url
   }).catch(() => {
     // Proxy discovery is best-effort; the request below reports the real failure.
@@ -83,9 +85,9 @@ async function redmineRequest(
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
   try {
-    // Why: Electron's network stack follows Chromium proxy/session state,
-    // avoiding stale keep-alive sockets after VPN path changes.
-    const response = await net.fetch(url, {
+    // Why the port: on the desktop this is Electron's net.fetch (Chromium proxy/session,
+    // no stale keep-alive sockets after VPN changes); a host without Chromium gets Node's fetch.
+    const response = await httpClient.fetch(url, {
       method: init.method ?? 'GET',
       headers: {
         Accept: 'application/json',
