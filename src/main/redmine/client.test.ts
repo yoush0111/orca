@@ -2,9 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const fetchMock = vi.fn()
 
-vi.mock('electron', () => ({
-  net: { fetch: (...args: unknown[]) => fetchMock(...args) },
-  session: { defaultSession: {} }
+vi.mock('../network/http-client', () => ({
+  getMainHttpClient: () => ({
+    fetch: (...args: unknown[]) => fetchMock(...args),
+    proxySession: () => null
+  })
 }))
 vi.mock('../network/proxy-settings', () => ({
   ensureElectronProxyFromEnvironment: vi.fn().mockResolvedValue(undefined)
