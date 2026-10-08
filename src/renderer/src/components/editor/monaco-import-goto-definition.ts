@@ -16,7 +16,7 @@ import { deriveMarkdownPreviewSourceRoot } from './markdown-preview-source-routi
 
 const IMPORT_GOTO_DEFINITION_SCHEME = 'orca-import-goto'
 
-function buildImportTargetUri(params: {
+export function buildImportTargetUri(params: {
   absolutePath: string
   relativePath: string
   worktreeId: string
@@ -101,9 +101,14 @@ async function revealSymbolDefinition(filePath: string, symbol: string): Promise
 }
 
 async function findSymbolLineInFile(filePath: string, symbol: string): Promise<number | null> {
+  const content = await readTextFile(filePath)
+  return content === null ? null : findExportedSymbolLine(content, symbol)
+}
+
+export async function readTextFile(filePath: string): Promise<string | null> {
   try {
     const file = await window.api.fs.readFile({ filePath })
-    return file.isBinary ? null : findExportedSymbolLine(file.content, symbol)
+    return file.isBinary ? null : file.content
   } catch {
     // Why: an unreadable target still opened fine — just skip the line jump.
     return null
@@ -136,7 +141,7 @@ type ResolvedContext = {
   worktreeRoot: string | null
 }
 
-function readContext(getContext: () => ImportGotoDefinitionContext): ResolvedContext | null {
+export function readContext(getContext: () => ImportGotoDefinitionContext): ResolvedContext | null {
   const { filePath, relativePath, worktreeId } = getContext()
   if (!worktreeId) {
     return null
@@ -267,7 +272,7 @@ async function resolveImportedDefinition(
   }
 }
 
-function wholeLineRange(line: number, endColumn: number): IRange {
+export function wholeLineRange(line: number, endColumn: number): IRange {
   return { startLineNumber: line, startColumn: 1, endLineNumber: line, endColumn }
 }
 
