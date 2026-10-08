@@ -41,3 +41,6 @@ export const RedmineWeeklyReportSave = z.object({
   markdown: z.string(),
   defaultDir: z.string().optional()
 })
+
+// Clipboard writes are local-only; the cap just bounds a pathological paste.
+export const RedmineWeeklyReportMarkdown = z.string().max(1_000_000)
