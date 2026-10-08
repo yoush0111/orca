@@ -32,7 +32,8 @@ const JournalSchema = z.object({
   id: z.number(),
   user: NamedRefSchema.nullish(),
   notes: z.string().nullish(),
-  created_on: z.string()
+  created_on: z.string(),
+  private_notes: z.boolean().nullish()
 })
 
 const AttachmentSchema = z.object({
@@ -48,6 +49,26 @@ const IssueDetailResponseSchema = z.object({
     attachments: z.array(AttachmentSchema).nullish()
   })
 })
+
+const ReportIssueSchema = IssueSchema.extend({
+  tracker: NamedRefSchema.nullish(),
+  custom_fields: z
+    .array(
+      z.object({ id: z.number(), value: z.union([z.string(), z.array(z.string())]).nullish() })
+    )
+    .nullish()
+})
+
+const ReportIssuesPageSchema = z.object({
+  issues: z.array(ReportIssueSchema).nullish(),
+  total_count: z.number().nullish()
+})
+
+const ReportIssueDetailSchema = z.object({
+  issue: ReportIssueSchema.extend({ journals: z.array(JournalSchema).nullish() })
+})
+
+const TrackersResponseSchema = z.object({ trackers: z.array(NamedRefSchema).nullish() })
 
 const ProjectsResponseSchema = z.object({
   projects: z
@@ -187,4 +208,31 @@ export function parseRedmineViewer(payload: unknown): RedmineViewer {
     displayName: displayName || user.login || String(user.id),
     email: user.mail ?? null
   }
+}
+
+export type RedmineReportIssue = z.infer<typeof ReportIssueSchema>
+export type RedmineReportIssueDetail = z.infer<typeof ReportIssueDetailSchema>['issue']
+
+export function parseRedmineReportIssuesPage(payload: unknown): {
+  issues: RedmineReportIssue[]
+  totalCount: number | null
+} {
+  const parsed = ReportIssuesPageSchema.parse(payload)
+  return { issues: parsed.issues ?? [], totalCount: parsed.total_count ?? null }
+}
+
+export function parseRedmineReportIssueDetail(payload: unknown): RedmineReportIssueDetail {
+  return ReportIssueDetailSchema.parse(payload).issue
+}
+
+export function parseRedmineTrackerNames(payload: unknown): string[] {
+  return (TrackersResponseSchema.parse(payload).trackers ?? []).flatMap((t) =>
+    t.name ? [t.name] : []
+  )
+}
+
+/** User-type custom fields arrive as a string, or an array when multi-select (spec T13). */
+export function redmineCustomFieldValues(issue: RedmineReportIssue, fieldId: number): string[] {
+  const value = issue.custom_fields?.find((field) => field.id === fieldId)?.value
+  return value === null || value === undefined ? [] : Array.isArray(value) ? value : [value]
 }
