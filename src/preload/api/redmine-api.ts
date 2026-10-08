@@ -6,7 +6,11 @@ import type {
   RedmineIssue,
   RedmineIssueQuery,
   RedmineNamedRef,
-  RedmineProject
+  RedmineProject,
+  RedmineWeeklyReportQuery,
+  RedmineWeeklyReportResult,
+  RedmineWeeklyReportSaveArgs,
+  RedmineWeeklyReportSaveResult
 } from '../../shared/redmine-types'
 
 export type RedmineApi = {
@@ -19,4 +23,6 @@ export type RedmineApi = {
   listStatuses: () => Promise<RedmineNamedRef[]>
   agentSkillStatus: () => Promise<RedmineAgentSkillStatus>
   installAgentSkill: () => Promise<RedmineAgentSkillStatus>
+  weeklyReport: (args: RedmineWeeklyReportQuery) => Promise<RedmineWeeklyReportResult>
+  saveWeeklyReport: (args: RedmineWeeklyReportSaveArgs) => Promise<RedmineWeeklyReportSaveResult>
 }
