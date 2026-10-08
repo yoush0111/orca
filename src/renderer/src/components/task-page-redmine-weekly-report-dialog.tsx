@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useId, useMemo, useState } from 'react'
 import { LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -17,6 +17,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { translate } from '@/i18n/i18n'
 import { redmineWeeklyReport, type RuntimeRedmineSettings } from '@/runtime/runtime-redmine-client'
 import { useAppStore } from '@/store'
+import type { RedmineWeeklyReportResult } from '../../../shared/redmine-types'
+import { renderWeeklyReport } from '../../../shared/redmine-weekly-report'
+import {
+  DEFAULT_WEEKLY_REPORT_FORMAT,
+  resolveWeeklyReportFormat,
+  type WeeklyReportFormat
+} from '../../../shared/redmine-weekly-report-format'
+import { TaskPageRedmineWeeklyReportFormatPanel } from './task-page-redmine-weekly-report-format-panel'
 import {
   defaultWeeklyReportRange,
   isValidWeeklyReportRange,
@@ -24,8 +32,6 @@ import {
   weeklyReportFileName,
   type WeeklyReportRange
 } from './task-page-redmine-weekly-report-range'
-
-type GeneratedReport = { markdown: string; issueCount: number; skippedIssueIds: number[] }
 
 type TaskPageRedmineWeeklyReportDialogProps = {
   open: boolean
@@ -52,20 +58,36 @@ function errorMessage(error: unknown, fallback: string): string {
   return error instanceof Error ? error.message : fallback
 }
 
-function ReportSummary({ report }: { report: GeneratedReport }): React.JSX.Element {
+function ReportSummary({
+  data,
+  edited,
+  onRevert
+}: {
+  data: RedmineWeeklyReportResult
+  edited: boolean
+  onRevert: () => void
+}): React.JSX.Element {
   return (
-    <p className="text-xs text-muted-foreground">
-      {translate(
-        'auto.components.task.page.redmine.weekly.report.issueCount',
-        '{{value0}} issues',
-        {
-          value0: report.issueCount
-        }
-      )}
-      {report.skippedIssueIds.length > 0
-        ? ` · ${translate('auto.components.task.page.redmine.weekly.report.skipped', 'Skipped {{value0}}', { value0: report.skippedIssueIds.map((id) => `#${id}`).join(', ') })}`
-        : null}
-    </p>
+    <div className="flex items-center justify-between gap-2">
+      <p className="text-xs text-muted-foreground">
+        {translate(
+          'auto.components.task.page.redmine.weekly.report.issueCount',
+          '{{value0}} issues',
+          { value0: data.issues.length }
+        )}
+        {data.skippedIssueIds.length > 0
+          ? ` · ${translate('auto.components.task.page.redmine.weekly.report.skipped', 'Skipped {{value0}}', { value0: data.skippedIssueIds.map((id) => `#${id}`).join(', ') })}`
+          : null}
+      </p>
+      {edited ? (
+        <Button variant="ghost" size="sm" onClick={onRevert}>
+          {translate(
+            'auto.components.task.page.redmine.weekly.report.revertEdits',
+            'Discard manual edits'
+          )}
+        </Button>
+      ) : null}
+    </div>
   )
 }
 
@@ -76,6 +98,7 @@ function WeeklyReportBody({
 }): React.JSX.Element {
   const developerFieldId = useAppStore((s) => s.settings?.redmineDeveloperFieldId)
   const reportDir = useAppStore((s) => s.settings?.redmineWeeklyReportDir)
+  const storedFormat = useAppStore((s) => s.settings?.redmineWeeklyReportFormat)
   const updateSettings = useAppStore((s) => s.updateSettings)
   const fromId = useId()
   const toId = useId()
@@ -84,18 +107,47 @@ function WeeklyReportBody({
   const [generating, setGenerating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [report, setReport] = useState<GeneratedReport | null>(null)
+  const [data, setData] = useState<RedmineWeeklyReportResult | null>(null)
+  // Local copy so typing in a template never waits on the settings round trip.
+  const [format, setFormat] = useState<WeeklyReportFormat>(() =>
+    resolveWeeklyReportFormat(storedFormat)
+  )
+  // Manual edits win over the rendered text until the format changes or they are discarded.
+  const [edited, setEdited] = useState<string | null>(null)
+  const [utcOffsetMinutes] = useState(() => -new Date().getTimezoneOffset())
 
+  const rendered = useMemo(
+    () =>
+      data
+        ? renderWeeklyReport(data.issues, {
+            baseUrl: data.baseUrl,
+            utcOffsetMinutes,
+            trackerNames: data.trackerNames,
+            viewerId: data.viewerId,
+            format
+          })
+        : '',
+    [data, format, utcOffsetMinutes]
+  )
+  const markdown = edited ?? rendered
   const rangeValid = isValidWeeklyReportRange(range)
-  const hasContent = Boolean(report?.markdown.trim())
+  const hasContent = Boolean(markdown.trim())
+
+  const changeFormat = (
+    next: WeeklyReportFormat,
+    persisted: WeeklyReportFormat | undefined
+  ): void => {
+    setFormat(next)
+    setEdited(null)
+    void updateSettings({ redmineWeeklyReportFormat: persisted })
+  }
 
   const generate = async (): Promise<void> => {
     setGenerating(true)
     setError(null)
     try {
-      setReport(
-        await redmineWeeklyReport(readSettings, toWeeklyReportQuery(range, developerFieldId))
-      )
+      setData(await redmineWeeklyReport(readSettings, toWeeklyReportQuery(range, developerFieldId)))
+      setEdited(null)
     } catch (generateError) {
       setError(
         errorMessage(
@@ -112,12 +164,12 @@ function WeeklyReportBody({
   }
 
   const copy = async (forSlack: boolean): Promise<void> => {
-    if (!report) {
+    if (!hasContent) {
       return
     }
     try {
       if (forSlack) {
-        await window.api.redmine.copyWeeklyReportForSlack(report.markdown)
+        await window.api.redmine.copyWeeklyReportForSlack(markdown)
         toast.success(
           translate(
             'auto.components.task.page.redmine.weekly.report.copiedForSlack',
@@ -126,7 +178,7 @@ function WeeklyReportBody({
         )
         return
       }
-      await window.api.ui.writeClipboardText(report.markdown)
+      await window.api.ui.writeClipboardText(markdown)
       toast.success(
         translate('auto.components.task.page.redmine.weekly.report.copied', 'Copied Markdown')
       )
@@ -144,7 +196,7 @@ function WeeklyReportBody({
   }
 
   const save = async (): Promise<void> => {
-    if (!report) {
+    if (!hasContent) {
       return
     }
     setSaving(true)
@@ -152,7 +204,7 @@ function WeeklyReportBody({
     try {
       const result = await window.api.redmine.saveWeeklyReport({
         fileName: weeklyReportFileName(range),
-        markdown: report.markdown,
+        markdown,
         ...(reportDir ? { defaultDir: reportDir } : {})
       })
       if (result.ok) {
@@ -238,7 +290,13 @@ function WeeklyReportBody({
       ) : null}
       {error ? <p className="text-xs text-destructive">{error}</p> : null}
 
-      {report === null ? (
+      <TaskPageRedmineWeeklyReportFormatPanel
+        format={format}
+        onChange={(next) => changeFormat(next, next)}
+        onReset={() => changeFormat(DEFAULT_WEEKLY_REPORT_FORMAT, undefined)}
+      />
+
+      {data === null ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           {generating
             ? translate(
@@ -250,7 +308,7 @@ function WeeklyReportBody({
                 'Choose a period and select Generate.'
               )}
         </p>
-      ) : report.issueCount === 0 ? (
+      ) : data.issues.length === 0 ? (
         <p className="py-10 text-center text-sm text-muted-foreground">
           {translate(
             'auto.components.task.page.redmine.weekly.report.empty',
@@ -262,14 +320,14 @@ function WeeklyReportBody({
           <Textarea
             variant="code"
             className="h-80 resize-none"
-            value={report.markdown}
-            onChange={(event) => setReport({ ...report, markdown: event.target.value })}
+            value={markdown}
+            onChange={(event) => setEdited(event.target.value)}
             aria-label={translate(
               'auto.components.task.page.redmine.weekly.report.preview',
               'Weekly report Markdown'
             )}
           />
-          <ReportSummary report={report} />
+          <ReportSummary data={data} edited={edited !== null} onRevert={() => setEdited(null)} />
         </>
       )}
 

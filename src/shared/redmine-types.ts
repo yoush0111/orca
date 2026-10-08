@@ -1,5 +1,7 @@
 // Redmine REST shapes Orca actually renders. The launcher this port follows
 // only ever needed issues/projects/statuses, so the surface stays that narrow.
+import type { WeeklyReportIssue } from './redmine-weekly-report'
+import type { WeeklyReportFormat } from './redmine-weekly-report-format'
 
 export type RedmineNamedRef = {
   id: number
@@ -91,15 +93,16 @@ export type RedmineWeeklyReportQuery = {
   since: string
   /** UTC ISO, exclusive. */
   until: string
-  /** Viewer's offset for date labels; a remote runtime's own timezone is irrelevant. */
-  utcOffsetMinutes: number
   /** "Developer" user custom field; passed per request because a remote host cannot read client settings. */
   developerFieldId?: number
 }
 
+/** Raw report data; the client renders it with the user's format. */
 export type RedmineWeeklyReportResult = {
-  markdown: string
-  issueCount: number
+  issues: WeeklyReportIssue[]
+  baseUrl: string
+  viewerId: number
+  trackerNames: string[]
   /** Issues skipped on 403/404; the report still renders. */
   skippedIssueIds: number[]
 }
@@ -125,6 +128,8 @@ export type RedmineSettings = {
   redmineDeveloperFieldId?: number
   /** Last folder a weekly report was saved to; the next save dialog opens there. */
   redmineWeeklyReportDir?: string
+  /** Partial overrides of DEFAULT_WEEKLY_REPORT_FORMAT; read through resolveWeeklyReportFormat. */
+  redmineWeeklyReportFormat?: Partial<WeeklyReportFormat>
   /** Same one-shot guard as the Jira flag, for the later Redmine provider. */
   visibleTaskProvidersDefaultedForRedmine: boolean
 }
