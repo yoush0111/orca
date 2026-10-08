@@ -12,5 +12,7 @@ export const redmineApi: RedmineApi = {
   agentSkillStatus: () => ipcRenderer.invoke('redmine:agentSkillStatus'),
   installAgentSkill: () => ipcRenderer.invoke('redmine:installAgentSkill'),
   weeklyReport: (args) => ipcRenderer.invoke('redmine:weeklyReport', args),
-  saveWeeklyReport: (args) => ipcRenderer.invoke('redmine:saveWeeklyReport', args)
+  saveWeeklyReport: (args) => ipcRenderer.invoke('redmine:saveWeeklyReport', args),
+  copyWeeklyReportForSlack: (markdown) =>
+    ipcRenderer.invoke('redmine:copyWeeklyReportForSlack', markdown)
 }
