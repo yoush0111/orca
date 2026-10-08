@@ -3,7 +3,8 @@ import {
   RedmineConnect,
   RedmineIssueId,
   RedmineIssueNote,
-  RedmineIssueQuery
+  RedmineIssueQuery,
+  RedmineWeeklyReportQuery
 } from '../../../../shared/rpc-contract/redmine-params'
 
 export const REDMINE_METHODS = [
@@ -52,5 +53,10 @@ export const REDMINE_METHODS = [
     name: 'redmine.issueAddNote',
     params: RedmineIssueNote,
     handler: async (params, { runtime }) => runtime.redmineIssueAddNote(params.id, params.notes)
+  }),
+  defineMethod({
+    name: 'redmine.weeklyReport',
+    params: RedmineWeeklyReportQuery,
+    handler: async (params, { runtime }) => runtime.redmineWeeklyReport(params)
   })
 ]
