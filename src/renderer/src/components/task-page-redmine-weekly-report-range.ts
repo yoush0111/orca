@@ -31,7 +31,6 @@ export function toWeeklyReportQuery(
   return {
     since: since.toISOString(),
     until: until.toISOString(),
-    utcOffsetMinutes: -since.getTimezoneOffset(),
     ...(developerFieldId ? { developerFieldId } : {})
   }
 }
