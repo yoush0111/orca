@@ -1,6 +1,6 @@
 const DECLARATION_KEYWORDS = 'function|const|let|var|class|type|interface|enum'
 
-function escapeForRegExp(value: string): string {
+export function escapeForRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
