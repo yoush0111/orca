@@ -3,11 +3,11 @@ import {
   persistFloatingTerminalPanelTasksView,
   readPersistedFloatingTerminalPanelViewState
 } from './floating-terminal-panel-view-state'
-import type { FloatingTerminalPanelItems } from './use-floating-terminal-panel-items'
+import type { useFloatingWorkspaceChromeModel } from './use-floating-workspace-chrome-model'
 
 export function useFloatingTerminalPanelTasksView({
   activeTab
-}: Pick<FloatingTerminalPanelItems, 'activeTab'>) {
+}: Pick<ReturnType<typeof useFloatingWorkspaceChromeModel>, 'activeTab'>) {
   const [tasksViewOpen, setTasksViewOpen] = useState(
     () => readPersistedFloatingTerminalPanelViewState()?.tasksView === true
   )
