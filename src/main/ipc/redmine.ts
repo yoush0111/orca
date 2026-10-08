@@ -1,4 +1,4 @@
-import { app, BrowserWindow, dialog, ipcMain } from 'electron'
+import { app, BrowserWindow, clipboard, dialog, ipcMain } from 'electron'
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import {
@@ -15,7 +15,9 @@ import {
   installRedmineAgentSkill
 } from '../redmine/agent-skill-install'
 import { buildWeeklyReport } from '../redmine/weekly-report'
+import { weeklyReportMarkdownToHtml } from '../../shared/redmine-weekly-report'
 import {
+  RedmineWeeklyReportMarkdown,
   RedmineWeeklyReportQuery,
   RedmineWeeklyReportSave
 } from '../../shared/rpc-contract/redmine-params'
@@ -108,6 +110,12 @@ export function registerRedmineHandlers(): void {
   ipcMain.handle('redmine:saveWeeklyReport', async (event, args?: unknown) =>
     saveWeeklyReport(BrowserWindow.fromWebContents(event.sender), args)
   )
+
+  // HTML + plain text: Slack keeps nested lists and links from the HTML flavor.
+  ipcMain.handle('redmine:copyWeeklyReportForSlack', async (_event, markdown?: unknown) => {
+    const text = RedmineWeeklyReportMarkdown.parse(markdown)
+    clipboard.write({ html: weeklyReportMarkdownToHtml(text), text })
+  })
 
   ipcMain.handle('redmine:agentSkillStatus', async () => getRedmineAgentSkillStatus())
 

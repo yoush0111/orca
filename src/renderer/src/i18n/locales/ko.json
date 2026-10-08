@@ -17101,7 +17101,9 @@
                 "empty": "선택한 기간에 해당 일감이 없습니다.",
                 "preview": "주간보고 마크다운",
                 "copy": "마크다운 복사",
-                "save": "저장…"
+                "save": "저장…",
+                "copyForSlack": "Slack용 복사",
+                "copiedForSlack": "Slack용으로 복사했습니다. 메시지 입력창에 붙여넣으세요."
               }
             }
           }
