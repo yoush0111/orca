@@ -25,4 +25,5 @@ export type RedmineApi = {
   installAgentSkill: () => Promise<RedmineAgentSkillStatus>
   weeklyReport: (args: RedmineWeeklyReportQuery) => Promise<RedmineWeeklyReportResult>
   saveWeeklyReport: (args: RedmineWeeklyReportSaveArgs) => Promise<RedmineWeeklyReportSaveResult>
+  copyWeeklyReportForSlack: (markdown: string) => Promise<void>
 }
