@@ -28,7 +28,6 @@ describe('weekly report range', () => {
     expect(query).toEqual({
       since: new Date(2026, 9, 1).toISOString(),
       until: new Date(2026, 9, 9).toISOString(),
-      utcOffsetMinutes: -new Date(2026, 9, 1).getTimezoneOffset(),
       developerFieldId: 31
     })
     expect(
