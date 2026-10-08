@@ -5,7 +5,6 @@ import type {
 import { mapWithConcurrency } from '../../shared/map-with-concurrency'
 import {
   DEFAULT_REDMINE_TRACKER_NAMES,
-  renderWeeklyReport,
   type WeeklyReportIssue
 } from '../../shared/redmine-weekly-report'
 import { RedmineApiError, redmineGet, requireClient, type ActiveClient } from './client'
@@ -91,16 +90,23 @@ async function fetchTrackerNames(client: ActiveClient): Promise<string[]> {
 }
 
 function toReportIssue(detail: RedmineReportIssueDetail, range: Range): WeeklyReportIssue {
+  // Private notes are kept and flagged; the client's format decides whether they appear.
   const notes = (detail.journals ?? [])
-    // Private notes stay out: the report is shared to a team channel.
-    .filter((j) => j.notes?.trim() && !j.private_notes && inRange(j.created_on, range))
+    .filter((j) => j.notes?.trim() && inRange(j.created_on, range))
     .sort((a, b) => Date.parse(a.created_on) - Date.parse(b.created_on))
-    .map((j) => j.notes ?? '')
+    .map((j) => ({
+      text: j.notes ?? '',
+      createdOn: j.created_on,
+      authorId: j.user?.id ?? null,
+      authorName: j.user?.name ?? null,
+      isPrivate: j.private_notes === true
+    }))
   return {
     id: detail.id,
     subject: detail.subject,
     project: detail.project?.name ?? String(detail.project?.id ?? ''),
     tracker: detail.tracker?.name ?? null,
+    status: detail.status?.name ?? null,
     doneRatio: detail.done_ratio ?? null,
     updatedOn: detail.updated_on ?? '',
     notes
@@ -110,7 +116,8 @@ function toReportIssue(detail: RedmineReportIssueDetail, range: Range): WeeklyRe
 async function collectIssues(
   client: ActiveClient,
   query: RedmineWeeklyReportQuery,
-  range: Range
+  range: Range,
+  viewerId: number
 ): Promise<RedmineReportIssue[]> {
   const base = {
     status_id: '*',
@@ -122,9 +129,7 @@ async function collectIssues(
   const fieldId = query.developerFieldId
   let developer: RedmineReportIssue[] = []
   if (fieldId) {
-    const me = String(
-      parseRedmineViewer(await redmineGet(client.baseUrl, client.apiKey, '/users/current.json')).id
-    )
+    const me = String(viewerId)
     // Re-check client side: Redmine ignores cf filters on fields not marked "used as a filter".
     developer = (await fetchAllIssues(client, { ...base, [`cf_${fieldId}`]: me })).filter((i) =>
       redmineCustomFieldValues(i, fieldId).includes(me)
@@ -140,20 +145,20 @@ export async function buildWeeklyReport(
 ): Promise<RedmineWeeklyReportResult> {
   const client = requireClient()
   const range = { since: Date.parse(query.since), until: Date.parse(query.until) }
-  const issues = await collectIssues(client, query, range)
+  const viewerId = parseRedmineViewer(
+    await redmineGet(client.baseUrl, client.apiKey, '/users/current.json')
+  ).id
+  const issues = await collectIssues(client, query, range, viewerId)
   const [details, fetchedTrackers] = await Promise.all([
     mapWithConcurrency(issues, DETAIL_CONCURRENCY, (i) => fetchDetail(client, i.id)),
     issues.length > 0 ? fetchTrackerNames(client) : Promise.resolve([])
   ])
-  const skippedIssueIds = issues.filter((_, index) => !details[index]).map((i) => i.id)
-  const reportIssues = details.flatMap((d) => (d ? [toReportIssue(d, range)] : []))
+  // Rendering happens on the client so format edits re-render without refetching.
   return {
-    markdown: renderWeeklyReport(reportIssues, {
-      baseUrl: client.baseUrl,
-      utcOffsetMinutes: query.utcOffsetMinutes,
-      trackerNames: [...new Set([...DEFAULT_REDMINE_TRACKER_NAMES, ...fetchedTrackers])]
-    }),
-    issueCount: reportIssues.length,
-    skippedIssueIds
+    issues: details.flatMap((d) => (d ? [toReportIssue(d, range)] : [])),
+    baseUrl: client.baseUrl,
+    viewerId,
+    trackerNames: [...new Set([...DEFAULT_REDMINE_TRACKER_NAMES, ...fetchedTrackers])],
+    skippedIssueIds: issues.filter((_, index) => !details[index]).map((i) => i.id)
   }
 }
