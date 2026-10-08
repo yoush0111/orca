@@ -48,8 +48,10 @@ export type { WorktreeVisibilityDefaults } from './repo-types'
 /** MiniMax account region used to select the quota endpoint. */
 export type MiniMaxEndpoint = 'overseas' | 'cn'
 
-export type GlobalSettings = NativeChatGlobalSettings &
-  RedmineSettings & {
+// Why an alias: a two-way intersection head makes the formatter reindent the whole literal.
+type GlobalSettingsExtensions = NativeChatGlobalSettings & RedmineSettings
+
+export type GlobalSettings = GlobalSettingsExtensions & {
   workspaceDir: string
   /** Host-owned defaults used when a repository has no explicit visibility override. */
   worktreeVisibilityDefaults?: WorktreeVisibilityDefaults
