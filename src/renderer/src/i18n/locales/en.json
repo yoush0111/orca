@@ -12467,7 +12467,9 @@
               "singleConnection": "One Redmine instance is connected per runtime. Connecting again replaces the stored key.",
               "floatingLabel": "Open issue links in the Floating Workspace",
               "floatingDescription": "Redmine issue links open as a browser tab in the Floating Workspace instead of the active worktree.",
-              "floatingDisabled": "Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect."
+              "floatingDisabled": "Enable the Floating Workspace (Settings → Floating Workspace) for this to take effect.",
+              "developerFieldLabel": "Developer custom field ID",
+              "developerFieldDescription": "Weekly reports also include issues where this user field names you. Leave empty to use only the assignee."
             }
           },
           "project": {
@@ -17316,7 +17318,32 @@
               "emptyBody": "No issues match the selected filters.",
               "openSettings": "Redmine settings",
               "refresh": "Refresh",
-              "openRedmine": "Open Redmine"
+              "openRedmine": "Open Redmine",
+              "weeklyReport": "Weekly report"
+            },
+            "weekly": {
+              "report": {
+                "issueCount": "{{value0}} issues",
+                "skipped": "Skipped {{value0}}",
+                "generateFailed": "Could not build the weekly report.",
+                "copied": "Copied Markdown",
+                "copyFailed": "Could not copy the report.",
+                "saved": "Saved {{value0}}",
+                "saveFailed": "Could not save the report.",
+                "title": "Weekly report",
+                "description": "Issues assigned to you that were updated in the selected period, grouped by project and tracker.",
+                "from": "Start date",
+                "to": "End date",
+                "last7Days": "Last 7 days",
+                "generate": "Generate",
+                "invalidRange": "Choose a start date on or before the end date.",
+                "generating": "Building the report…",
+                "hint": "Choose a period and select Generate.",
+                "empty": "No issues match the selected period.",
+                "preview": "Weekly report Markdown",
+                "copy": "Copy Markdown",
+                "save": "Save…"
+              }
             }
           }
         }
@@ -17738,6 +17765,9 @@
       },
       "gitlabIpcTimeout": {
         "timedOut": "Timed out talking to GitLab."
+      },
+      "runtimeRedmineClient": {
+        "weeklyReportUnsupported": "The connected host does not support weekly reports. Update the host."
       }
     },
     "ssh": {

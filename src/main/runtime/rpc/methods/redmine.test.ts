@@ -12,7 +12,10 @@ function makeDispatcher() {
   const runtime = {
     getRuntimeId: () => 'test-runtime',
     redmineIssueShow: vi.fn().mockResolvedValue({ id: 3 }),
-    redmineIssueAddNote: vi.fn().mockResolvedValue({ ok: true, id: 3 })
+    redmineIssueAddNote: vi.fn().mockResolvedValue({ ok: true, id: 3 }),
+    redmineWeeklyReport: vi
+      .fn()
+      .mockResolvedValue({ markdown: '', issueCount: 0, skippedIssueIds: [] })
   }
   const dispatcher = new RpcDispatcher({
     // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: test double implements only the methods these RPCs call.
@@ -42,5 +45,26 @@ describe('redmine agent RPC methods', () => {
     ).toBe(false)
     expect(runtime.redmineIssueShow).not.toHaveBeenCalled()
     expect(runtime.redmineIssueAddNote).not.toHaveBeenCalled()
+  })
+
+  it('validates the weeklyReport range before calling the runtime', async () => {
+    const { runtime, dispatcher } = makeDispatcher()
+    const query = {
+      since: '2026-09-30T15:00:00.000Z',
+      until: '2026-10-08T15:00:00.000Z',
+      utcOffsetMinutes: 540,
+      developerFieldId: 31
+    }
+
+    expect((await dispatcher.dispatch(makeRequest('redmine.weeklyReport', query))).ok).toBe(true)
+    expect(runtime.redmineWeeklyReport).toHaveBeenCalledWith(query)
+
+    const reversed = { ...query, since: query.until, until: query.since }
+    expect((await dispatcher.dispatch(makeRequest('redmine.weeklyReport', reversed))).ok).toBe(
+      false
+    )
+    const badIso = { ...query, since: '2026-10-01' }
+    expect((await dispatcher.dispatch(makeRequest('redmine.weeklyReport', badIso))).ok).toBe(false)
+    expect(runtime.redmineWeeklyReport).toHaveBeenCalledTimes(1)
   })
 })

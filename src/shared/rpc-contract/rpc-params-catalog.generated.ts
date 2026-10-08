@@ -430,7 +430,8 @@ import {
   RedmineConnect,
   RedmineIssueId,
   RedmineIssueNote,
-  RedmineIssueQuery
+  RedmineIssueQuery,
+  RedmineWeeklyReportQuery
 } from './redmine-params'
 import {
   ProjectGroupCreate,
@@ -1087,6 +1088,7 @@ export const RPC_PARAMS_BY_METHOD = {
   'redmine.listStatuses': null,
   'redmine.status': null,
   'redmine.testConnection': null,
+  'redmine.weeklyReport': RedmineWeeklyReportQuery,
   'repo.add': RepoPath,
   'repo.baseRefDefault': RepoSelector,
   'repo.clone': RepoClone,
