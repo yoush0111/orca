@@ -19,7 +19,7 @@ const ALIAS_PREFIX = '@/'
 // handled; add a tsconfig-paths reader if more aliases show up.
 const ALIAS_TARGET_DIR = 'src/renderer/src/'
 
-function dirnameOfFilePath(filePath: string): string {
+export function dirnameOfFilePath(filePath: string): string {
   return filePath.replace(/[\\/][^\\/]*$/, '') || filePath
 }
 
@@ -52,7 +52,19 @@ export async function resolveImportSpecifierTarget(
   worktreeRoot: string | null,
   pathExists: (path: string) => Promise<boolean>
 ): Promise<ResolvedImportTarget | null> {
-  for (const candidate of importSpecifierCandidates(specifier, filePath, worktreeRoot)) {
+  return findFirstExistingTarget(
+    importSpecifierCandidates(specifier, filePath, worktreeRoot),
+    worktreeRoot,
+    pathExists
+  )
+}
+
+export async function findFirstExistingTarget(
+  candidates: string[],
+  worktreeRoot: string | null,
+  pathExists: (path: string) => Promise<boolean>
+): Promise<ResolvedImportTarget | null> {
+  for (const candidate of candidates) {
     if (await pathExists(candidate)) {
       const relativePath =
         (worktreeRoot && relativePathInsideRoot(worktreeRoot, candidate)) || candidate
