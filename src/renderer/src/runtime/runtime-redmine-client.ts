@@ -10,8 +10,11 @@ import type {
   RedmineIssue,
   RedmineIssueQuery,
   RedmineNamedRef,
-  RedmineProject
+  RedmineProject,
+  RedmineWeeklyReportQuery,
+  RedmineWeeklyReportResult
 } from '../../../shared/redmine-types'
+import { translate } from '@/i18n/i18n'
 import { callRuntimeRpc, getActiveRuntimeTarget, RuntimeRpcCallError } from './runtime-rpc-client'
 
 export type RuntimeRedmineSettings =
@@ -121,4 +124,30 @@ export async function redmineListStatuses(
         timeoutMs: 30_000
       })
     : window.api.redmine.listStatuses()
+}
+
+export async function redmineWeeklyReport(
+  settings: RuntimeRedmineSettings,
+  query: RedmineWeeklyReportQuery
+): Promise<RedmineWeeklyReportResult> {
+  const target = getRedmineRuntimeTarget(settings)
+  if (target.kind !== 'environment') {
+    return window.api.redmine.weeklyReport(query)
+  }
+  try {
+    // One request per issue fans out on the host, so allow far more than a list read.
+    return await callRuntimeRpc<RedmineWeeklyReportResult>(target, 'redmine.weeklyReport', query, {
+      timeoutMs: 120_000
+    })
+  } catch (error) {
+    if (isMethodNotFound(error)) {
+      throw new Error(
+        translate(
+          'auto.runtime.runtimeRedmineClient.weeklyReportUnsupported',
+          'The connected host does not support weekly reports. Update the host.'
+        )
+      )
+    }
+    throw error
+  }
 }
