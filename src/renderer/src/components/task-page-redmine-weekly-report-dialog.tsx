@@ -111,11 +111,21 @@ function WeeklyReportBody({
     }
   }
 
-  const copy = async (): Promise<void> => {
+  const copy = async (forSlack: boolean): Promise<void> => {
     if (!report) {
       return
     }
     try {
+      if (forSlack) {
+        await window.api.redmine.copyWeeklyReportForSlack(report.markdown)
+        toast.success(
+          translate(
+            'auto.components.task.page.redmine.weekly.report.copiedForSlack',
+            'Copied for Slack. Paste it into a message.'
+          )
+        )
+        return
+      }
       await window.api.ui.writeClipboardText(report.markdown)
       toast.success(
         translate('auto.components.task.page.redmine.weekly.report.copied', 'Copied Markdown')
@@ -264,8 +274,14 @@ function WeeklyReportBody({
       )}
 
       <DialogFooter>
-        <Button variant="outline" disabled={!hasContent} onClick={() => void copy()}>
+        <Button variant="outline" disabled={!hasContent} onClick={() => void copy(false)}>
           {translate('auto.components.task.page.redmine.weekly.report.copy', 'Copy Markdown')}
+        </Button>
+        <Button variant="outline" disabled={!hasContent} onClick={() => void copy(true)}>
+          {translate(
+            'auto.components.task.page.redmine.weekly.report.copyForSlack',
+            'Copy for Slack'
+          )}
         </Button>
         <Button disabled={!hasContent || saving} onClick={() => void save()}>
           {translate('auto.components.task.page.redmine.weekly.report.save', 'Save…')}
