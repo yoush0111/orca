@@ -14,7 +14,7 @@ import { useIntegrationSubordinateRowClass } from './integration-card-presentati
 import { getProviderAccountScope } from './provider-account-scope'
 import { ProviderHostScopeControl } from './ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
-import { SettingsSwitchRow } from './SettingsFormControls'
+import { NumberField, SettingsSwitchRow } from './SettingsFormControls'
 import { RedmineProjectRepoMapping } from './redmine-project-repo-mapping'
 import { RedmineAgentSkillRow } from './redmine-agent-skill-row'
 import { translate } from '@/i18n/i18n'
@@ -247,6 +247,24 @@ export function RedmineIntegrationCard(): React.JSX.Element {
             })
           }
         />
+        {connected ? (
+          <NumberField
+            label={translate(
+              'auto.components.settings.redmine.integration.card.developerFieldLabel',
+              'Developer custom field ID'
+            )}
+            description={translate(
+              'auto.components.settings.redmine.integration.card.developerFieldDescription',
+              'Weekly reports also include issues where this user field names you. Leave empty to use only the assignee.'
+            )}
+            value={settings?.redmineDeveloperFieldId}
+            min={1}
+            integer
+            placeholder="31"
+            onChange={(value) => void updateSettings({ redmineDeveloperFieldId: value })}
+            onClear={() => void updateSettings({ redmineDeveloperFieldId: undefined })}
+          />
+        ) : null}
         {connected ? <RedmineProjectRepoMapping /> : null}
       </IntegrationCardDetails>
 
