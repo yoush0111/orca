@@ -5,7 +5,9 @@ import {
   parseRedmineIssueDetail,
   parseRedmineIssues,
   parseRedmineProjects,
-  parseRedmineViewer
+  parseRedmineReportIssuesPage,
+  parseRedmineViewer,
+  redmineCustomFieldValues
 } from './rest-contract'
 
 describe('buildRedmineIssuesQuery', () => {
@@ -173,5 +175,23 @@ describe('parseRedmineIssueDetail', () => {
   it('defaults missing optional collections to empty arrays', () => {
     const detail = parseRedmineIssueDetail({ issue: { id: 1, subject: 's' } }, 'https://rm.example')
     expect(detail).toMatchObject({ tracker: null, journals: [], attachments: [], doneRatio: 0 })
+  })
+})
+
+describe('parseRedmineReportIssuesPage', () => {
+  it('normalizes string and multi-select custom field values and a missing total', () => {
+    const page = parseRedmineReportIssuesPage({
+      issues: [
+        { id: 1, subject: 'a', custom_fields: [{ id: 31, value: '10' }] },
+        { id: 2, subject: 'b', custom_fields: [{ id: 31, value: ['10', '12'] }] },
+        { id: 3, subject: 'c', custom_fields: [{ id: 31, value: null }] }
+      ]
+    })
+    expect(page.totalCount).toBeNull()
+    expect(page.issues.map((issue) => redmineCustomFieldValues(issue, 31))).toEqual([
+      ['10'],
+      ['10', '12'],
+      []
+    ])
   })
 })
