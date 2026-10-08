@@ -10,6 +10,11 @@ import {
 } from './floating-terminal-panel-render-probe'
 import { FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY } from './floating-terminal-panel-view-state'
 
+vi.mock('zustand/react/shallow', () => ({
+  // Why: zustand resolves the real react (unmocked in node_modules); the memo wrapper is inert here.
+  useShallow: (selector: unknown) => selector
+}))
+
 vi.mock('react', async () => {
   const actual = await vi.importActual<typeof import('react')>('react') // eslint-disable-line @typescript-eslint/consistent-type-imports -- vi.importActual requires inline import()
   const { createReactHookOverrides } = await import('./floating-terminal-panel-test-module-mocks')
@@ -193,7 +198,7 @@ describe('FloatingTerminalPanel tasks view', () => {
     expect(findAllByTypeName(next, 'FloatingWorkspaceTasksView')).toHaveLength(1)
     // Why: unmounting terminal panes would detach the PTY and reflow the xterm
     // buffer, so the tasks view must sit on top of them, not replace them.
-    expect(findAllByTypeName(next, 'TerminalPane').length).toBeGreaterThan(0)
+    expect(findAllByTypeName(next, 'WorkspacePaneOverlayLayers')).toHaveLength(1)
   })
 
   it('closes the tasks view again when the toggle is pressed a second time', async () => {
