@@ -17103,7 +17103,24 @@
                 "copy": "마크다운 복사",
                 "save": "저장…",
                 "copyForSlack": "Slack용 복사",
-                "copiedForSlack": "Slack용으로 복사했습니다. 메시지 입력창에 붙여넣으세요."
+                "copiedForSlack": "Slack용으로 복사했습니다. 메시지 입력창에 붙여넣으세요.",
+                "revertEdits": "직접 편집한 내용 되돌리기",
+                "format": {
+                  "projectTemplate": "프로젝트 줄",
+                  "trackerTemplate": "유형 줄",
+                  "issueTemplate": "일감 줄",
+                  "commentTemplate": "코멘트 줄",
+                  "stripTrackerTags": "제목 앞의 분류 태그([오류] 등) 제거",
+                  "includeComments": "코멘트 포함",
+                  "includeOthersComments": "다른 사람 코멘트 포함",
+                  "includePrivateNotes": "비공개 메모 포함",
+                  "toggle": "포맷 설정",
+                  "hint": "바꾸면 미리보기에 바로 반영되고 다음에도 유지됩니다. 탭은 \\t로 입력하세요.",
+                  "dateFormat": "날짜 형식",
+                  "trackerOrder": "유형 순서 (쉼표로 구분)",
+                  "commentMaxChars": "코멘트 최대 길이",
+                  "reset": "기본값으로 되돌리기"
+                }
               }
             }
           }

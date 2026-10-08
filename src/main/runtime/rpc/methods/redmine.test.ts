@@ -52,7 +52,6 @@ describe('redmine agent RPC methods', () => {
     const query = {
       since: '2026-09-30T15:00:00.000Z',
       until: '2026-10-08T15:00:00.000Z',
-      utcOffsetMinutes: 540,
       developerFieldId: 31
     }
 

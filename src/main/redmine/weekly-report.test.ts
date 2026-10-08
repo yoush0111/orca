@@ -31,8 +31,7 @@ import { buildWeeklyReport } from './weekly-report'
 
 const QUERY = {
   since: '2026-09-30T15:00:00.000Z',
-  until: '2026-10-08T15:00:00.000Z',
-  utcOffsetMinutes: 540
+  until: '2026-10-08T15:00:00.000Z'
 }
 
 type ListIssue = {
@@ -118,7 +117,7 @@ describe('buildWeeklyReport', () => {
     const details = Object.fromEntries([...first, listIssue(101)].map((i) => [i.id, detail(i.id)]))
     installRoutes({ assigned: [first, [listIssue(101)]], details })
     const result = await buildWeeklyReport(QUERY)
-    expect(result.issueCount).toBe(101)
+    expect(result.issues).toHaveLength(101)
   })
 
   it('dedupes assignee/developer hits and re-checks the developer field (T1, T2, T13)', async () => {
@@ -133,10 +132,7 @@ describe('buildWeeklyReport', () => {
       details: { 1: detail(1), 2: detail(2), 3: detail(3) }
     })
     const result = await buildWeeklyReport({ ...QUERY, developerFieldId: 31 })
-    expect(result.issueCount).toBe(2)
-    expect(result.markdown.match(/\[#1\]/g)).toHaveLength(1)
-    expect(result.markdown).toContain('[#2]')
-    expect(result.markdown).not.toContain('[#3]')
+    expect(result.issues.map((issue) => issue.id).sort()).toEqual([1, 2])
   })
 
   it('skips the developer query when no field id is configured', async () => {
@@ -145,7 +141,7 @@ describe('buildWeeklyReport', () => {
     expect(requestedUrls().some((u) => u.searchParams.has('cf_31'))).toBe(false)
   })
 
-  it('filters issue and comment ranges on [since, until) and drops private notes (T3)', async () => {
+  it('filters issue and comment ranges on [since, until) and flags private notes (T3)', async () => {
     installRoutes({
       assigned: [
         [
@@ -169,17 +165,19 @@ describe('buildWeeklyReport', () => {
       }
     })
     const result = await buildWeeklyReport(QUERY)
-    expect(result.issueCount).toBe(1)
-    expect(result.markdown).toContain('[#2]')
-    expect(result.markdown).toContain('\t- 첫째\n\t- 둘째')
-    expect(result.markdown).not.toContain('기간 전')
-    expect(result.markdown).not.toContain('비공개')
+    expect(result.viewerId).toBe(10)
+    expect(result.issues.map((issue) => issue.id)).toEqual([2])
+    expect(result.issues[0].notes.map((note) => [note.text, note.isPrivate])).toEqual([
+      ['비공개', true],
+      ['첫째', false],
+      ['둘째', false]
+    ])
   })
 
   it('skips issues whose detail read is forbidden and keeps the rest', async () => {
     installRoutes({ assigned: [[listIssue(1), listIssue(2)]], details: { 1: detail(1) } })
     const result = await buildWeeklyReport(QUERY)
-    expect(result.issueCount).toBe(1)
+    expect(result.issues).toHaveLength(1)
     expect(result.skippedIssueIds).toEqual([2])
   })
 })

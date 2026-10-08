@@ -17344,7 +17344,24 @@
                 "copy": "Copy Markdown",
                 "save": "Save…",
                 "copyForSlack": "Copy for Slack",
-                "copiedForSlack": "Copied for Slack. Paste it into a message."
+                "copiedForSlack": "Copied for Slack. Paste it into a message.",
+                "revertEdits": "Discard manual edits",
+                "format": {
+                  "projectTemplate": "Project line",
+                  "trackerTemplate": "Tracker line",
+                  "issueTemplate": "Issue line",
+                  "commentTemplate": "Comment line",
+                  "stripTrackerTags": "Remove tracker tags like [Bug] from subjects",
+                  "includeComments": "Include comments",
+                  "includeOthersComments": "Include other people's comments",
+                  "includePrivateNotes": "Include private notes",
+                  "toggle": "Format settings",
+                  "hint": "Changes apply to the preview right away and are remembered. Type \\t for a tab.",
+                  "dateFormat": "Date format",
+                  "trackerOrder": "Tracker order (comma separated)",
+                  "commentMaxChars": "Comment max length",
+                  "reset": "Restore defaults"
+                }
               }
             }
           }
