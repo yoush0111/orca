@@ -17606,7 +17606,9 @@
                 "empty": "No issues match the selected period.",
                 "preview": "Weekly report Markdown",
                 "copy": "Copy Markdown",
-                "save": "Save…"
+                "save": "Save…",
+                "copyForSlack": "Copy for Slack",
+                "copiedForSlack": "Copied for Slack. Paste it into a message."
               }
             }
           }
