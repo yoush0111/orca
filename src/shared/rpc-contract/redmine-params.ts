@@ -23,3 +23,21 @@ export const RedmineIssueNote = z.object({
   id: z.number().int().positive(),
   notes: z.string().trim().min(1, 'Note is required').max(REDMINE_NOTE_MAX_CHARS)
 })
+
+export const RedmineWeeklyReportQuery = z
+  .object({
+    since: z.iso.datetime(),
+    until: z.iso.datetime(),
+    // UTC-14:00..+14:00 covers every real zone.
+    utcOffsetMinutes: z.number().int().min(-840).max(840),
+    developerFieldId: z.number().int().positive().optional()
+  })
+  .refine((query) => Date.parse(query.since) < Date.parse(query.until), {
+    message: 'Start date must be before end date'
+  })
+
+export const RedmineWeeklyReportSave = z.object({
+  fileName: z.string(),
+  markdown: z.string(),
+  defaultDir: z.string().optional()
+})
