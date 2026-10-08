@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { ExternalLink, LoaderCircle, RefreshCw, Settings2 } from 'lucide-react'
+import { ExternalLink, FileText, LoaderCircle, RefreshCw, Settings2 } from 'lucide-react'
 
 import { RedmineIcon } from '@/components/icons/RedmineIcon'
 import {
   TaskPageRedmineIssueList,
   useRedmineLinkOpener
 } from '@/components/task-page-redmine-issue-list'
+import { TaskPageRedmineWeeklyReportDialog } from '@/components/task-page-redmine-weekly-report-dialog'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -69,6 +70,7 @@ export function TaskPageRedminePanel({
   const [statuses, setStatuses] = useState<RedmineNamedRef[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [weeklyReportOpen, setWeeklyReportOpen] = useState(false)
 
   const readSettings = useMemo(() => sourceContext ?? settings, [sourceContext, settings])
 
@@ -225,6 +227,22 @@ export function TaskPageRedminePanel({
           <span className="text-[11px] text-muted-foreground">
             {issues.length} {translate('auto.components.task.page.redmine.panel.shown', 'shown')}
           </span>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-7"
+            onClick={() => setWeeklyReportOpen(true)}
+            aria-label={translate(
+              'auto.components.task.page.redmine.panel.weeklyReport',
+              'Weekly report'
+            )}
+            title={translate(
+              'auto.components.task.page.redmine.panel.weeklyReport',
+              'Weekly report'
+            )}
+          >
+            <FileText className="size-3.5" />
+          </Button>
           {redmineBaseUrl ? (
             <Button
               variant="ghost"
@@ -332,6 +350,11 @@ export function TaskPageRedminePanel({
           />
         ) : null}
       </div>
+      <TaskPageRedmineWeeklyReportDialog
+        open={weeklyReportOpen}
+        onOpenChange={setWeeklyReportOpen}
+        readSettings={readSettings}
+      />
     </div>
   )
 }

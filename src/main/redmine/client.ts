@@ -32,7 +32,7 @@ import {
 
 const REQUEST_TIMEOUT_MS = 20_000
 
-class RedmineApiError extends Error {
+export class RedmineApiError extends Error {
   status: number | null
 
   constructor(message: string, status: number | null = null) {
@@ -112,11 +112,11 @@ async function redmineRequest(
   }
 }
 
-function redmineGet(baseUrl: string, apiKey: string, path: string): Promise<unknown> {
+export function redmineGet(baseUrl: string, apiKey: string, path: string): Promise<unknown> {
   return redmineRequest(baseUrl, apiKey, path)
 }
 
-type ActiveClient = { baseUrl: string; apiKey: string }
+export type ActiveClient = { baseUrl: string; apiKey: string }
 
 /** Throws CredentialDecryptionError so the renderer can surface the decrypt banner. */
 function getClient(): ActiveClient | null {
@@ -249,7 +249,7 @@ export async function listStatuses(): Promise<RedmineNamedRef[]> {
 
 const ISSUE_NOT_FOUND = 'Redmine issue not found (404).'
 
-function requireClient(): ActiveClient {
+export function requireClient(): ActiveClient {
   const client = getClient()
   if (!client) {
     throw new Error('Redmine is not connected.')
