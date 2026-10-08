@@ -15,7 +15,7 @@ import {
   installRedmineAgentSkill
 } from '../redmine/agent-skill-install'
 import { buildWeeklyReport } from '../redmine/weekly-report'
-import { weeklyReportMarkdownToHtml } from '../../shared/redmine-weekly-report'
+import { weeklyReportMarkdownToHtml } from '../../shared/redmine-weekly-report-html'
 import {
   RedmineWeeklyReportMarkdown,
   RedmineWeeklyReportQuery,
