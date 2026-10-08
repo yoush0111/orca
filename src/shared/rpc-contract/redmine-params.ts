@@ -28,8 +28,6 @@ export const RedmineWeeklyReportQuery = z
   .object({
     since: z.iso.datetime(),
     until: z.iso.datetime(),
-    // UTC-14:00..+14:00 covers every real zone.
-    utcOffsetMinutes: z.number().int().min(-840).max(840),
     developerFieldId: z.number().int().positive().optional()
   })
   .refine((query) => Date.parse(query.since) < Date.parse(query.until), {
