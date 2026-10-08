@@ -12468,7 +12468,9 @@
               "statusNotConnected": "연결되지 않음",
               "replace": "연결 교체",
               "connect": "Redmine 연결",
-              "singleConnection": "런타임당 Redmine 인스턴스 하나가 연결됩니다. 다시 연결하면 저장된 키가 교체됩니다."
+              "singleConnection": "런타임당 Redmine 인스턴스 하나가 연결됩니다. 다시 연결하면 저장된 키가 교체됩니다.",
+              "developerFieldLabel": "담당개발자 커스텀 필드 ID",
+              "developerFieldDescription": "주간보고에 이 사용자 필드에 내가 지정된 일감도 포함합니다. 비워 두면 담당자 기준으로만 조회합니다."
             }
           },
           "agent": {
@@ -17333,7 +17335,32 @@
               "statusAll": "모든 상태",
               "shown": "개 표시됨",
               "emptyTitle": "Redmine 일감이 없습니다",
-              "emptyBody": "선택한 필터에 맞는 일감이 없습니다."
+              "emptyBody": "선택한 필터에 맞는 일감이 없습니다.",
+              "weeklyReport": "주간보고"
+            },
+            "weekly": {
+              "report": {
+                "issueCount": "일감 {{value0}}건",
+                "skipped": "건너뜀 {{value0}}",
+                "generateFailed": "주간보고를 생성하지 못했습니다.",
+                "copied": "마크다운을 복사했습니다",
+                "copyFailed": "주간보고를 복사하지 못했습니다.",
+                "saved": "{{value0}}에 저장했습니다",
+                "saveFailed": "주간보고를 저장하지 못했습니다.",
+                "title": "주간보고",
+                "description": "선택한 기간에 수정된 내 담당 일감을 프로젝트·유형별로 정리합니다.",
+                "from": "시작일",
+                "to": "종료일",
+                "last7Days": "지난 7일",
+                "generate": "생성",
+                "invalidRange": "시작일은 종료일과 같거나 앞서야 합니다.",
+                "generating": "주간보고를 생성하는 중…",
+                "hint": "기간을 고른 뒤 생성을 누르세요.",
+                "empty": "선택한 기간에 해당 일감이 없습니다.",
+                "preview": "주간보고 마크다운",
+                "copy": "마크다운 복사",
+                "save": "저장…"
+              }
             }
           }
         }
@@ -17823,6 +17850,9 @@
       },
       "gitlabIpcTimeout": {
         "timedOut": "GitLab과의 대화 시간이 초과되었습니다."
+      },
+      "runtimeRedmineClient": {
+        "weeklyReportUnsupported": "연결된 호스트가 주간보고를 지원하지 않습니다. 호스트를 업데이트하세요."
       }
     },
     "ssh": {

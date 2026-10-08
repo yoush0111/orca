@@ -85,3 +85,46 @@ export type RedmineIssueDetail = RedmineIssue & {
 }
 
 export type RedmineAgentSkillStatus = 'missing' | 'outdated' | 'installed'
+
+export type RedmineWeeklyReportQuery = {
+  /** UTC ISO, inclusive. */
+  since: string
+  /** UTC ISO, exclusive. */
+  until: string
+  /** Viewer's offset for date labels; a remote runtime's own timezone is irrelevant. */
+  utcOffsetMinutes: number
+  /** "Developer" user custom field; passed per request because a remote host cannot read client settings. */
+  developerFieldId?: number
+}
+
+export type RedmineWeeklyReportResult = {
+  markdown: string
+  issueCount: number
+  /** Issues skipped on 403/404; the report still renders. */
+  skippedIssueIds: number[]
+}
+
+export type RedmineWeeklyReportSaveArgs = {
+  fileName: string
+  markdown: string
+  defaultDir?: string
+}
+
+export type RedmineWeeklyReportSaveResult =
+  | { ok: true; filePath: string; directory: string }
+  | { ok: false; canceled: true }
+  | { ok: false; canceled?: false; error: string }
+
+// Lives here, not in global-settings-types.ts, which is at its line budget.
+export type RedmineSettings = {
+  /** Default-on: Redmine issue links open as a Floating Workspace browser tab instead of a tab in the active worktree. Requires floatingTerminalEnabled. Readers treat absent as on. */
+  redmineLinksOpenInFloatingWorkspace?: boolean
+  /** Redmine project id -> repo id for the composer's repo default; unmapped projects keep the active-repo fallback. */
+  redmineProjectRepoMap?: Record<string, string>
+  /** Redmine "developer" user custom field id for the weekly report; unset skips that query. */
+  redmineDeveloperFieldId?: number
+  /** Last folder a weekly report was saved to; the next save dialog opens there. */
+  redmineWeeklyReportDir?: string
+  /** Same one-shot guard as the Jira flag, for the later Redmine provider. */
+  visibleTaskProvidersDefaultedForRedmine: boolean
+}
