@@ -1,4 +1,8 @@
-import type { RedmineConnectArgs, RedmineIssueQuery } from '../../shared/redmine-types'
+import type {
+  RedmineConnectArgs,
+  RedmineIssueQuery,
+  RedmineWeeklyReportQuery
+} from '../../shared/redmine-types'
 import {
   addIssueNote,
   connect,
@@ -10,6 +14,7 @@ import {
   listStatuses,
   testConnection
 } from '../redmine/client'
+import { buildWeeklyReport } from '../redmine/weekly-report'
 
 export class RuntimeRedmineCommands {
   redmineConnect(args: RedmineConnectArgs): ReturnType<typeof connect> {
@@ -43,6 +48,10 @@ export class RuntimeRedmineCommands {
 
   redmineIssueShow(id: number): ReturnType<typeof getIssue> {
     return getIssue(id)
+  }
+
+  redmineWeeklyReport(query: RedmineWeeklyReportQuery): ReturnType<typeof buildWeeklyReport> {
+    return buildWeeklyReport(query)
   }
 
   async redmineIssueAddNote(id: number, notes: string): Promise<{ ok: true; id: number }> {
