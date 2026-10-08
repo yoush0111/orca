@@ -498,7 +498,8 @@ import {
   RedmineConnect,
   RedmineIssueId,
   RedmineIssueNote,
-  RedmineIssueQuery
+  RedmineIssueQuery,
+  RedmineWeeklyReportQuery
 } from './redmine-params'
 import { ReferenceFind, ReferenceList } from './reference-params'
 import {
@@ -1287,6 +1288,7 @@ export const RPC_PARAMS_BY_METHOD = {
   'redmine.listStatuses': null,
   'redmine.status': null,
   'redmine.testConnection': null,
+  'redmine.weeklyReport': RedmineWeeklyReportQuery,
   'reference.find': ReferenceFind,
   'reference.list': ReferenceList,
   'repo.add': RepoPath,

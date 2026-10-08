@@ -8,6 +8,7 @@ import type { VoiceSettings } from './speech-types'
 import type { AiVaultSearchSettings } from './ai-vault-search-settings'
 import type { GitLabProjectSettings } from './gitlab-types'
 import type { TaskProvider } from './task-providers'
+import type { RedmineSettings } from './redmine-types'
 import type { KeybindingOverrides, TerminalShortcutPolicy } from './keybindings'
 import type { AppIconId } from './app-icon'
 import type { SourceControlAiSettings } from './source-control-ai-types'
@@ -50,7 +51,7 @@ export type { WorktreeVisibilityDefaults } from './repo-types'
 /** MiniMax account region used to select the quota endpoint. */
 export type MiniMaxEndpoint = 'overseas' | 'cn'
 
-export type GlobalSettings = GlobalSettingsBase & {
+export type GlobalSettings = GlobalSettingsBase & RedmineSettings & {
   workspaceDir: string
   /** Host-owned defaults used when a repository has no explicit visibility override. */
   worktreeVisibilityDefaults?: WorktreeVisibilityDefaults
@@ -211,10 +212,6 @@ export type GlobalSettings = GlobalSettingsBase & {
   electronHttp1CompatibilityMode?: boolean
   /** Opt-in in-app browsing (isolated guest surface); default keeps links opening in the system browser. */
   openLinksInApp: boolean
-  /** Default-on: Redmine issue links open as a Floating Workspace browser tab instead of a tab in the active worktree. Requires floatingTerminalEnabled. Readers treat absent as on. */
-  redmineLinksOpenInFloatingWorkspace?: boolean
-  /** Redmine project id -> repo id for the composer's repo default; unmapped projects keep the active-repo fallback. */
-  redmineProjectRepoMap?: Record<string, string>
   /** Worktree-scoped localhost hostnames to distinguish tabs; opt-in since a non-localhost host can break apps binding cookies/sessions to localhost. */
   localhostWorktreeLabelsEnabled?: boolean
   /** Tracks the one-time first-use prompt for terminal link routing (avoid silently changing where links open). */
@@ -398,8 +395,6 @@ export type GlobalSettings = GlobalSettingsBase & {
   visibleTaskProviders: TaskProvider[]
   /** Why: one-shot guard to make Jira visible for existing profiles once, without re-adding after a later opt-out. */
   visibleTaskProvidersDefaultedForJira: boolean
-  /** Same one-shot guard as the Jira flag, for the later Redmine provider. */
-  visibleTaskProvidersDefaultedForRedmine: boolean
   /** Persisted repo selection (cross-repo tasks view). null = sticky-all (includes future-added repos);
    *  string[] = frozen curated subset (ineligible ids dropped on load; empty after drop is treated as null). */
   defaultRepoSelection: string[] | null
