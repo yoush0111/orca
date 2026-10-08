@@ -14,6 +14,7 @@ import {
   createImportGotoDefinitionDefinitionProvider,
   createImportGotoDefinitionLinkProvider
 } from '../monaco-import-goto-definition'
+import { createJavaGotoDefinitionDefinitionProvider } from '../monaco-java-goto-definition'
 import { clampMonacoAutoHeight } from './monaco-auto-height'
 import { installMonacoE2EProbe } from './monaco-e2e-probe'
 import { matchesPendingEditorFocusRequest } from '../commands/pending-editor-focus-request'
@@ -126,6 +127,10 @@ export function useMonacoEditorMount(params: MonacoEditorMountParams): OnMount {
         editorInstance,
         importGotoDefinitionContext
       )
+      const javaGotoDefinitionDefinitionProvider = createJavaGotoDefinitionDefinitionProvider(
+        editorInstance,
+        importGotoDefinitionContext
+      )
       ensureMarkdownDocCompletionProvider(monaco)
       updateMarkdownCompletionDocuments()
 
@@ -224,6 +229,7 @@ export function useMonacoEditorMount(params: MonacoEditorMountParams): OnMount {
         disposeInputBindings()
         importGotoDefinitionLinkProvider.dispose()
         importGotoDefinitionDefinitionProvider.dispose()
+        javaGotoDefinitionDefinitionProvider.dispose()
         autoHeightSub?.dispose()
         if (autoHeightFrame !== null) {
           window.cancelAnimationFrame(autoHeightFrame)
