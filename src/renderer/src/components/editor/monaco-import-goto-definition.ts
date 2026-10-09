@@ -43,7 +43,9 @@ function openImportTarget(resource: monaco.Uri): boolean {
   }
   const params = new URLSearchParams(resource.query)
   const worktreeId = params.get('worktreeId')
-  if (!worktreeId) {
+  // Why no absolute-path fallback: an absolute relative path marks the tab user-named.
+  const relativePath = params.get('relativePath')
+  if (!worktreeId || !relativePath) {
     return false
   }
   const filePath = resource.path
@@ -51,7 +53,7 @@ function openImportTarget(resource: monaco.Uri): boolean {
   store.openFile(
     {
       filePath,
-      relativePath: params.get('relativePath') ?? filePath,
+      relativePath,
       worktreeId,
       language: detectLanguage(filePath),
       mode: 'edit'
