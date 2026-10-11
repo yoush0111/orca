@@ -95,7 +95,11 @@ export function WorkspaceAttachmentSearch({
     gitlabSourceContext: contexts.gitlab,
     jiraSourceContext: contexts.jira
   })
-  const toAttachment = controller.resolveRow
+  const toAttachment = (row: RowEntry): WorkspaceAttachment | null => {
+    const item = controller.resolveRow(row)
+    // Redmine rows never come from this search; WorkspaceAttachment has no redmine provider.
+    return item && item.provider !== 'redmine' ? { ...item, provider: item.provider } : null
+  }
   const linked = (row: RowEntry): boolean => {
     const item = toAttachment(row)
     return item ? isWorkspaceAttachmentLinked(props.items, item) : false
