@@ -1,8 +1,6 @@
 import type { GlobalSettings } from '../../../shared/global-settings-types'
-import {
-  getTaskSourceRuntimeSettings,
-  type TaskSourceContext
-} from '../../../shared/task-source-context'
+import type { TaskSourceContext } from '../../../shared/task-source-context'
+import type { RuntimeClientTarget } from '../../../shared/runtime-client-target'
 import type {
   RedmineConnectArgs,
   RedmineConnectResult,
@@ -15,7 +13,9 @@ import type {
   RedmineWeeklyReportResult
 } from '../../../shared/redmine-types'
 import { translate } from '@/i18n/i18n'
-import { callRuntimeRpc, getActiveRuntimeTarget, RuntimeRpcCallError } from './runtime-rpc-client'
+import { defaultScopeHost, rowLessSourceTarget } from '@/lib/default-creation-host'
+import { callRuntimeRpc } from './runtime-rpc-client'
+import { RuntimeRpcCallError } from './runtime-rpc-result'
 
 export type RuntimeRedmineSettings =
   | Pick<GlobalSettings, 'activeRuntimeEnvironmentId'>
@@ -28,13 +28,8 @@ export const DISCONNECTED_REDMINE_STATUS: RedmineConnectionStatus = {
   connection: null
 }
 
-function getRedmineRuntimeTarget(
-  settings: RuntimeRedmineSettings
-): ReturnType<typeof getActiveRuntimeTarget> {
-  const isTaskSource = settings !== null && settings !== undefined && 'kind' in settings
-  return getActiveRuntimeTarget(
-    isTaskSource ? getTaskSourceRuntimeSettings(settings as TaskSourceContext) : settings
-  )
+function getRedmineRuntimeTarget(settings: RuntimeRedmineSettings): RuntimeClientTarget {
+  return settings && 'kind' in settings ? rowLessSourceTarget(settings) : defaultScopeHost(settings)
 }
 
 // Why: a remote runtime older than Redmine support answers `method_not_found`.
