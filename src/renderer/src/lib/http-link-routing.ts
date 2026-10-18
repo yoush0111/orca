@@ -1,7 +1,6 @@
 import { translate } from '@/i18n/i18n'
 import { isFloatingWorkspaceId } from '../../../shared/floating-workspace-worktree'
 import { OPEN_FLOATING_TERMINAL_EVENT } from './floating-terminal'
-import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 import {
   parseLoopbackUrlWithPort,
   type LocalhostWorktreeLabelRoute
