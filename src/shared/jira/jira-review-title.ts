@@ -4,7 +4,10 @@ import { getWorkspaceAttachments } from '../workspace-attachments'
 import type { WorkspaceAttachmentMetadata } from '../workspace-attachment-legacy'
 import type { WorkspaceAttachment } from '../worktree/types'
 
-function attachmentJiraIssueKey(item: WorkspaceAttachment): string | null {
+// Why: also takes the linked item, whose provider union includes the fork-only 'redmine'.
+function attachmentJiraIssueKey(
+  item: Omit<WorkspaceAttachment, 'provider'> & { provider: string }
+): string | null {
   if (item.provider !== 'jira' || item.type !== 'issue') {
     return null
   }
