@@ -91,10 +91,50 @@ vi.mock('@/components/terminal/useTerminalSaveDialog', async () => {
   ).createTerminalSaveDialogModule()
 })
 
-vi.mock('@/runtime/web-runtime-session', async () => {
+vi.mock('@/runtime/web-runtime-session-tab-lifecycle', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
-  ).createWebRuntimeSessionModule()
+  ).createWebRuntimeTabLifecycleModule()
+})
+
+vi.mock('@/runtime/web-runtime-browser-creation', async () => {
+  return (
+    await import('./floating-terminal-panel-test-module-mocks')
+  ).createWebRuntimeBrowserCreationModule()
+})
+
+vi.mock('@/runtime/web-runtime-terminal-creation', async () => {
+  return (
+    await import('./floating-terminal-panel-test-module-mocks')
+  ).createWebRuntimeTerminalCreationModule()
+})
+
+vi.mock('@/runtime/web-runtime-session-environment', async () => {
+  return (
+    await import('./floating-terminal-panel-test-module-mocks')
+  ).createWebRuntimeSessionEnvironmentModule()
+})
+
+vi.mock('@/lib/workspace-browser-tab-close', () => ({
+  closeWorkspaceBrowserTab: vi.fn(() => ({ closesLocally: true, localCloseReason: 'user' }))
+}))
+
+vi.mock('@/components/tab-group/WorkspaceTabDragLayer', async () => {
+  return (
+    await import('./floating-terminal-panel-component-stubs')
+  ).createWorkspaceTabDragLayerModule()
+})
+
+vi.mock('@/components/tab-group/TabGroupSplitNodeTree', async () => {
+  return (
+    await import('./floating-terminal-panel-component-stubs')
+  ).createTabGroupSplitNodeTreeModule()
+})
+
+vi.mock('@/components/WorkspacePaneOverlayLayers', async () => {
+  return (
+    await import('./floating-terminal-panel-component-stubs')
+  ).createWorkspacePaneOverlayLayersModule()
 })
 
 vi.mock('@/lib/connection-context', async () => {
