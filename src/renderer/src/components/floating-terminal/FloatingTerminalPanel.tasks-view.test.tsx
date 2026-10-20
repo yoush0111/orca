@@ -183,6 +183,10 @@ vi.mock('./FloatingTerminalToggleButton', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createToggleButtonModule()
 })
 
+// Why: the panel runs as a plain function here, so the real confirmation dialog's useContext has no dispatcher.
+vi.mock('@/components/use-bulk-tab-close-confirmation', () => ({
+  useBulkTabCloseConfirmation: () => () => {}
+}))
 vi.mock('./FloatingTerminalWindowControls', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createWindowControlsModule()
 })
