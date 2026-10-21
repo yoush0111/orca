@@ -6518,7 +6518,9 @@
           "92154beb7e": "New workspace",
           "addProject": "Add project",
           "expandAllProjects": "Expand all projects",
-          "collapseAllProjects": "Collapse all projects"
+          "collapseAllProjects": "Collapse all projects",
+          "collapseAll": "Collapse all projects",
+          "expandAll": "Expand all projects"
         },
         "SidebarNav": {
           "80611a8b10": "Search",
