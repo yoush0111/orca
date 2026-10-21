@@ -94,6 +94,7 @@ export type UISlicePreferences = {
   collapsedGroups: Set<string>
   toggleCollapsedGroup: (key: string) => void
   setCollapsedGroups: (keys: Set<string>) => void
+  setGroupsCollapsed: (keys: readonly string[], collapsed: boolean) => void
   worktreeCardProperties: WorktreeCardProperty[]
   _worktreeCardModeDefaulted: boolean
   setWorktreeCardMode: (mode: WorktreeCardMode) => void
