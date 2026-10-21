@@ -6023,7 +6023,9 @@
           "5c9c7c16aa": "Add a project to create workspaces",
           "a30e34eb5c": "Close workspace board",
           "views": "Sidebar view",
-          "addProject": "Add project"
+          "addProject": "Add project",
+          "collapseAll": "Collapse all projects",
+          "expandAll": "Expand all projects"
         },
         "SidebarNav": {
           "80611a8b10": "Search",
