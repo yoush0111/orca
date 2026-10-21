@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { ChevronsDownUp, ChevronsUpDown, FolderPlus, Plus } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
@@ -9,16 +9,28 @@ import { openWorkspaceCreationComposerWithTourHandoff } from '../contextual-tour
 import SidebarWorkspaceOptionsMenu from './SidebarWorkspaceOptionsMenu'
 import { getSidebarHeaderCollapseKeys } from './collapse-all-sidebar-groups'
 
-function SetAllProjectsCollapsedButton({ collapsed }: { collapsed: boolean }): React.JSX.Element {
-  const label = collapsed
-    ? translate('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
-    : translate('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
-  const Icon = collapsed ? ChevronsDownUp : ChevronsUpDown
+function areAllHeadersCollapsed(keys: readonly string[], collapsedGroups: Set<string>): boolean {
+  return keys.length > 0 && keys.every((key) => collapsedGroups.has(key))
+}
+
+function ToggleAllProjectsCollapsedButton(): React.JSX.Element {
+  const collapsedGroups = useAppStore((s) => s.collapsedGroups)
+  // ponytail: recomputed only on collapse changes, so a project added meanwhile can show a stale icon until the next toggle; the click itself always reads fresh state.
+  const allCollapsed = useMemo(
+    () =>
+      areAllHeadersCollapsed(getSidebarHeaderCollapseKeys(useAppStore.getState()), collapsedGroups),
+    [collapsedGroups]
+  )
+  const label = allCollapsed
+    ? translate('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
+    : translate('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
+  const Icon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
 
   const handleClick = useCallback(() => {
     const state = useAppStore.getState()
-    state.setGroupsCollapsed(getSidebarHeaderCollapseKeys(state), collapsed)
-  }, [collapsed])
+    const keys = getSidebarHeaderCollapseKeys(state)
+    state.setGroupsCollapsed(keys, !areAllHeadersCollapsed(keys, state.collapsedGroups))
+  }, [])
 
   return (
     <Tooltip>
@@ -129,12 +141,7 @@ export function SidebarHeaderActions({
           onMenuOpenChange={onWorkspaceBoardMenuOpenChange}
         />
       )}
-      {agentsViewActive ? null : (
-        <>
-          <SetAllProjectsCollapsedButton collapsed={false} />
-          <SetAllProjectsCollapsedButton collapsed />
-        </>
-      )}
+      {agentsViewActive ? null : <ToggleAllProjectsCollapsedButton />}
       <AddProjectButton preserveWorkspaceBoardOpen />
       <NewWorkspaceButton preserveWorkspaceBoardOpen />
     </div>
