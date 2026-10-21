@@ -48,6 +48,10 @@ vi.mock('@/components/dashboard/useAgentBucketCounts', () => ({
   useAgentBucketCounts: () => mocks.bucketCounts
 }))
 
+vi.mock('./collapse-all-sidebar-groups', () => ({
+  getSidebarHeaderCollapseKeys: () => []
+}))
+
 vi.mock('./SidebarWorkspaceOptionsMenu', () => ({
   default: () => <button aria-label="Workspace options" type="button" />
 }))
