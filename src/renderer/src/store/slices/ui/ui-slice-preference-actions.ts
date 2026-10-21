@@ -174,6 +174,19 @@ export function createUiPreferenceActions(set: UISliceSet, get: UISliceGet): Par
       set({ collapsedGroups: keys })
       window.api.ui.set({ collapsedGroups: [...keys] }).catch(console.error)
     },
+    setGroupsCollapsed: (keys, collapsed) =>
+      set((s) => {
+        const next = new Set(s.collapsedGroups)
+        for (const key of keys) {
+          if (collapsed) {
+            next.add(key)
+          } else {
+            next.delete(key)
+          }
+        }
+        window.api.ui.set({ collapsedGroups: [...next] }).catch(console.error)
+        return { collapsedGroups: next }
+      }),
 
     worktreeCardProperties: [...DEFAULT_WORKTREE_CARD_PROPERTIES],
     _worktreeCardModeDefaulted: true,
