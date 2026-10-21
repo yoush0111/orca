@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react'
-import { FolderPlus, Plus } from 'lucide-react'
+import { ChevronsDownUp, ChevronsUpDown, FolderPlus, Plus } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -7,6 +7,39 @@ import { formatOptionalPrimaryShortcutLabel } from '@/hooks/useShortcutLabel'
 import { translate } from '@/i18n/i18n'
 import { openWorkspaceCreationComposerWithTourHandoff } from '../contextual-tours/workspace-creation-tour-handoff'
 import SidebarWorkspaceOptionsMenu from './SidebarWorkspaceOptionsMenu'
+import { getSidebarHeaderCollapseKeys } from './collapse-all-sidebar-groups'
+
+function SetAllProjectsCollapsedButton({ collapsed }: { collapsed: boolean }): React.JSX.Element {
+  const label = collapsed
+    ? translate('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
+    : translate('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
+  const Icon = collapsed ? ChevronsDownUp : ChevronsUpDown
+
+  const handleClick = useCallback(() => {
+    const state = useAppStore.getState()
+    state.setGroupsCollapsed(getSidebarHeaderCollapseKeys(state), collapsed)
+  }, [collapsed])
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          variant="ghost"
+          size="icon-xs"
+          type="button"
+          className="text-muted-foreground"
+          aria-label={label}
+          onClick={handleClick}
+        >
+          <Icon className="size-3.5" strokeWidth={2.25} />
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" sideOffset={6}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
 
 function AddProjectButton({
   preserveWorkspaceBoardOpen
@@ -95,6 +128,12 @@ export function SidebarHeaderActions({
           preserveWorkspaceBoardOpen
           onMenuOpenChange={onWorkspaceBoardMenuOpenChange}
         />
+      )}
+      {agentsViewActive ? null : (
+        <>
+          <SetAllProjectsCollapsedButton collapsed={false} />
+          <SetAllProjectsCollapsedButton collapsed />
+        </>
       )}
       <AddProjectButton preserveWorkspaceBoardOpen />
       <NewWorkspaceButton preserveWorkspaceBoardOpen />
