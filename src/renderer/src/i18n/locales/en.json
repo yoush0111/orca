@@ -5663,7 +5663,9 @@
         },
         "SidebarHeader": {
           "92154beb7e": "New workspace",
-          "addProject": "Add project"
+          "addProject": "Add project",
+          "collapseAll": "Collapse all projects",
+          "expandAll": "Expand all projects"
         },
         "SidebarNav": {
           "80611a8b10": "Search",

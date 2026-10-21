@@ -5249,7 +5249,9 @@
         },
         "SidebarHeader": {
           "92154beb7e": "새로운 워크스페이스",
-          "addProject": "프로젝트 추가"
+          "addProject": "프로젝트 추가",
+          "collapseAll": "모든 프로젝트 접기",
+          "expandAll": "모든 프로젝트 펼치기"
         },
         "SidebarNav": {
           "80611a8b10": "검색",
