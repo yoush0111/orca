@@ -1,3 +1,8 @@
+> [!WARNING]
+> **이 저장소는 공식 Orca가 아닌 개인 커스텀 버전입니다.** 공식 저장소는 [stablyai/orca](https://github.com/stablyai/orca)이며, 이 포크의 빌드·변경 사항은 공식 프로젝트와 무관하고 지원되지 않습니다.
+>
+> **This is an unofficial, personal fork of Orca.** The official repository is [stablyai/orca](https://github.com/stablyai/orca). Builds and changes here are not affiliated with or supported by the Orca project.
+
 <h1 align="center">
   <a href="https://onOrca.dev"><img src="resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
 </h1>
