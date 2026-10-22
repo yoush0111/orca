@@ -109,6 +109,9 @@ docs/**
 !docs/audits/closed-editor-model-lifetime/**
 !docs/assets/
 !docs/assets/**
+# Fork release notes; release.yml publishes them.
+!docs/release-notes/
+!docs/release-notes/**
 !docs/audits/
 !docs/audits/plugin-uninstall-log-retirement/
 !docs/audits/plugin-uninstall-log-retirement/**
