@@ -24,7 +24,7 @@ jobs:
     runs-on: ${{ matrix.runner }}
     env:
       ORCA_FORK_PUBLISH_OWNER: yoush0111
-      ORCA_FORK_PUBLISH_REPO: orca-releases
+      ORCA_FORK_PUBLISH_REPO: orca
       ORCA_LOCAL_BUILD_VERSION: ${{ inputs.version }}
     steps:
       - uses: actions/checkout@v4
