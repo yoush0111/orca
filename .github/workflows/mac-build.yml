@@ -28,6 +28,10 @@ jobs:
       ORCA_LOCAL_BUILD_VERSION: ${{ inputs.version }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # 빌드가 git describe로 upstream 릴리즈 태그를 찾는데 포크에는 v1.4.* 태그가 없다.
+      - run: git fetch --no-tags https://github.com/stablyai/orca.git 'refs/tags/v1.4.*:refs/tags/v1.4.*'
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
