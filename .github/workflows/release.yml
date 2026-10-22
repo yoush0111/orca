@@ -32,9 +32,12 @@ jobs:
       - name: 버전 형식·패치 노트·태그 중복 확인
         env:
           GH_TOKEN: ${{ github.token }}
+          PUBLISH: ${{ inputs.publish }}
         run: |
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "semver가 아니다: $VERSION"; exit 1; }
-          [[ -s "docs/release-notes/$VERSION.md" ]] || { echo "패치 노트 docs/release-notes/$VERSION.md 가 없다"; exit 1; }
+          if [[ "$PUBLISH" == "true" && ! -s "docs/release-notes/$VERSION.md" ]]; then
+            echo "패치 노트 docs/release-notes/$VERSION.md 가 없다"; exit 1
+          fi
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$VERSION" >/dev/null 2>&1; then
             echo "태그 v$VERSION 이 이미 있다"; exit 1
           fi
@@ -82,11 +85,17 @@ jobs:
 
   mac:
     needs: check
-    # x64·arm64를 한 대에서 빌드해야 latest-mac.yml 하나에 두 아키텍처가 함께 담긴다.
-    runs-on: macos-15
+    # 설정이 mac 타깃을 x64·arm64로 고정해 두어 각 runner에서 타깃:아키텍처를 명시해 덮어쓴다.
+    # 네이티브 머신에서 빌드해야 터미널 호스트 부팅 검증이 Rosetta 없이 통과한다.
+    strategy:
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-15
+          - arch: x64
+            runner: macos-15-intel
+    runs-on: ${{ matrix.runner }}
     steps:
-      # x64 슬라이스의 터미널 호스트 부팅 검증에 필요하다.
-      - run: softwareupdate --install-rosetta --agree-to-license || true
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -96,34 +105,34 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm install:release
+      - run: pnpm install --frozen-lockfile
       - run: pnpm --dir mobile install --frozen-lockfile
       - run: pnpm run build:desktop
       - run: pnpm run build:computer-macos
       - run: pnpm run build:keyboard-layout-macos
       - run: pnpm run build:notification-status-macos
       - run: pnpm run ensure:electron-runtime
-      - run: pnpm exec electron-builder --config config/electron-builder.config.cjs --mac --publish never
+      - run: pnpm exec electron-builder --config config/electron-builder.config.cjs --mac dmg:${{ matrix.arch }} zip:${{ matrix.arch }} --publish never
       - name: 업데이트 피드 검증
         run: |
           feed="$(find dist -name app-update.yml -path '*Orca.app/Contents/Resources/*' | head -1)"
           [[ -n "$feed" ]] || { echo "app-update.yml이 없다"; exit 1; }
           grep -q '^owner: *yoush0111 *$' "$feed" || { echo "피드 owner가 yoush0111이 아니다"; cat "$feed"; exit 1; }
           grep -q '^repo: *orca *$' "$feed" || { echo "피드 repo가 orca가 아니다"; cat "$feed"; exit 1; }
-          grep -q 'arm64' dist/latest-mac.yml && grep -q 'x64' dist/latest-mac.yml || { echo "latest-mac.yml에 두 아키텍처가 다 없다"; cat dist/latest-mac.yml; exit 1; }
+          # 아키텍처별 피드는 release 단계에서 latest-mac.yml 하나로 합친다.
+          mv dist/latest-mac.yml "dist/latest-mac-${{ matrix.arch }}.yml"
       - uses: actions/upload-artifact@v4
         with:
-          name: orca-mac-${{ inputs.version }}
+          name: orca-mac-${{ matrix.arch }}-${{ inputs.version }}
           path: |
             dist/*.dmg
             dist/*-mac.zip
             dist/*.blockmap
-            dist/latest-mac.yml
+            dist/latest-mac-*.yml
           if-no-files-found: error
 
   release:
     needs: [windows, mac]
-    if: inputs.publish
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -135,8 +144,24 @@ jobs:
         with:
           path: assets
           merge-multiple: true
+      # electron-updater(mac)는 files 목록에서 자기 아키텍처의 zip을 고른다.
+      - name: latest-mac.yml 합치기
+        run: |
+          pip install -q pyyaml
+          python3 - <<'PY'
+          import yaml
+          arm = yaml.safe_load(open('assets/latest-mac-arm64.yml'))
+          x64 = yaml.safe_load(open('assets/latest-mac-x64.yml'))
+          assert arm['version'] == x64['version'], (arm['version'], x64['version'])
+          arm['files'] = x64['files'] + arm['files']
+          yaml.safe_dump(arm, open('assets/latest-mac.yml', 'w'), sort_keys=False)
+          PY
+          rm assets/latest-mac-*.yml
+          cat assets/latest-mac.yml
+          ls -la assets
       # latest.yml·latest-mac.yml이 같은 정식 릴리즈에 있어야 두 플랫폼의 자동 업데이트가 성립한다 (prerelease는 건너뛴다).
       - name: 릴리즈 생성
+        if: inputs.publish
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
