@@ -1,0 +1,144 @@
+name: release
+
+# Windows·macOS 사내 배포본을 빌드해 yoush0111/orca 릴리즈로 올린다.
+# 서명·공증 없는 빌드다: Windows는 SmartScreen, macOS는 Gatekeeper 경고가 뜬다.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '릴리즈 버전 (예: 1.0.34-personal) — 직전 버전보다 낮추지 말 것'
+        required: true
+      notes:
+        description: '릴리즈 노트 (비우면 기본 문구)'
+        required: false
+      publish:
+        description: '릴리즈까지 올린다 (끄면 빌드만 하고 artifact로 남긴다)'
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+env:
+  VERSION: ${{ inputs.version }}
+  ORCA_FORK_PUBLISH_OWNER: yoush0111
+  ORCA_FORK_PUBLISH_REPO: orca
+  ORCA_LOCAL_BUILD_VERSION: ${{ inputs.version }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 버전 형식과 태그 중복 확인
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "semver가 아니다: $VERSION"; exit 1; }
+          if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$VERSION" >/dev/null 2>&1; then
+            echo "태그 v$VERSION 이 이미 있다"; exit 1
+          fi
+
+  windows:
+    needs: check
+    runs-on: windows-latest
+    env:
+      # Windows 260자 경로 제한 우회
+      ORCA_REUSE_PREPARED_NATIVE_RUNTIME: '1'
+    steps:
+      - run: git config --global core.longpaths true
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      # 빌드가 git describe로 upstream 릴리즈 태그를 찾는데 포크에는 v1.4.* 태그가 없다.
+      - run: git fetch --no-tags https://github.com/stablyai/orca.git 'refs/tags/v1.4.*:refs/tags/v1.4.*'
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --dir mobile install --frozen-lockfile
+      - run: pnpm run build:desktop
+      - run: pnpm run ensure:electron-runtime
+      - run: pnpm exec electron-builder --config config/electron-builder.config.cjs --win --publish never
+      - name: 업데이트 피드 검증
+        shell: pwsh
+        run: |
+          $feed = Get-Content 'dist\win-unpacked\resources\app-update.yml' -Raw
+          if ($feed -notmatch '(?m)^owner:\s*yoush0111\s*$') { throw "피드 owner가 yoush0111이 아니다`n$feed" }
+          if ($feed -notmatch '(?m)^repo:\s*orca\s*$') { throw "피드 repo가 orca가 아니다`n$feed" }
+          if ($feed -match 'publisherName') { throw "publisherName이 남아 있다 — 미서명 빌드가 다음 업데이트를 거부한다`n$feed" }
+          $asarMB = [Math]::Round((Get-Item 'dist\win-unpacked\resources\app.asar').Length / 1MB)
+          if ($asarMB -gt 250) { throw "app.asar가 ${asarMB}MB로 비정상이다 (정상 ~127MB)" }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orca-windows-${{ inputs.version }}
+          path: |
+            dist/orca-windows-setup.exe
+            dist/orca-windows-setup.exe.blockmap
+            dist/latest.yml
+          if-no-files-found: error
+
+  mac:
+    needs: check
+    # x64·arm64를 한 대에서 빌드해야 latest-mac.yml 하나에 두 아키텍처가 함께 담긴다.
+    runs-on: macos-15
+    steps:
+      # x64 슬라이스의 터미널 호스트 부팅 검증에 필요하다.
+      - run: softwareupdate --install-rosetta --agree-to-license || true
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - run: git fetch --no-tags https://github.com/stablyai/orca.git 'refs/tags/v1.4.*:refs/tags/v1.4.*'
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install:release
+      - run: pnpm --dir mobile install --frozen-lockfile
+      - run: pnpm run build:desktop
+      - run: pnpm run build:computer-macos
+      - run: pnpm run build:keyboard-layout-macos
+      - run: pnpm run build:notification-status-macos
+      - run: pnpm run ensure:electron-runtime
+      - run: pnpm exec electron-builder --config config/electron-builder.config.cjs --mac --publish never
+      - name: 업데이트 피드 검증
+        run: |
+          feed="$(find dist -name app-update.yml -path '*Orca.app/Contents/Resources/*' | head -1)"
+          [[ -n "$feed" ]] || { echo "app-update.yml이 없다"; exit 1; }
+          grep -q '^owner: *yoush0111 *$' "$feed" || { echo "피드 owner가 yoush0111이 아니다"; cat "$feed"; exit 1; }
+          grep -q '^repo: *orca *$' "$feed" || { echo "피드 repo가 orca가 아니다"; cat "$feed"; exit 1; }
+          grep -q 'arm64' dist/latest-mac.yml && grep -q 'x64' dist/latest-mac.yml || { echo "latest-mac.yml에 두 아키텍처가 다 없다"; cat dist/latest-mac.yml; exit 1; }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: orca-mac-${{ inputs.version }}
+          path: |
+            dist/*.dmg
+            dist/*-mac.zip
+            dist/*.blockmap
+            dist/latest-mac.yml
+          if-no-files-found: error
+
+  release:
+    needs: [windows, mac]
+    if: inputs.publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+          merge-multiple: true
+      # latest.yml·latest-mac.yml이 같은 정식 릴리즈에 있어야 두 플랫폼의 자동 업데이트가 성립한다 (prerelease는 건너뛴다).
+      - name: 릴리즈 생성
+        env:
+          GH_TOKEN: ${{ github.token }}
+          NOTES: ${{ inputs.notes }}
+        run: |
+          gh release create "v$VERSION" assets/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "Orca $VERSION (사내 빌드)" \
+            --notes "${NOTES:-upstream Orca + Redmine 작업 소스. 설치 후 자동 업데이트는 yoush0111/orca 릴리즈를 따른다.}"
