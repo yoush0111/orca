@@ -75,7 +75,7 @@ for repo in "$RELEASE_REPO" ${LEGACY_RELEASE_REPO:+"$LEGACY_RELEASE_REPO"}; do
   else
     gh release create "v$VERSION" "${ASSETS[@]}" \
       --repo "$FORK_OWNER/$repo" \
-      --title "Orca $VERSION (사내 빌드)" \
+      --title "Orca $VERSION" \
       --notes "upstream Orca + Redmine 작업 소스. 설치 후 자동 업데이트는 $FORK_OWNER/$RELEASE_REPO 릴리즈를 따른다."
   fi
 done
