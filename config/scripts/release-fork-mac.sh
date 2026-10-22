@@ -13,8 +13,8 @@ set -euo pipefail
 VERSION="${1:-}"
 FORK_OWNER="${ORCA_FORK_OWNER:-yoush0111}"
 RELEASE_REPO="${ORCA_RELEASE_REPO:-orca}"
-# 피드가 orca-releases로 박힌 기존 설치본을 새 피드로 넘기기 위한 이중 업로드. 전원 업데이트 후 빈 값으로 끈다.
-LEGACY_RELEASE_REPO="${ORCA_LEGACY_RELEASE_REPO-orca-releases}"
+# 1.0.33-personal만 ORCA_LEGACY_RELEASE_REPO=orca-releases 로 실행: 피드가 orca-releases로 박힌 구버전을 orca 피드로 넘긴다.
+LEGACY_RELEASE_REPO="${ORCA_LEGACY_RELEASE_REPO:-}"
 ARCH_ARGS=("--x64" "--arm64")
 
 if [[ -z "$VERSION" ]]; then
