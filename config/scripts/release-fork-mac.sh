@@ -12,7 +12,9 @@ set -euo pipefail
 
 VERSION="${1:-}"
 FORK_OWNER="${ORCA_FORK_OWNER:-yoush0111}"
-RELEASE_REPO="${ORCA_RELEASE_REPO:-orca-releases}"
+RELEASE_REPO="${ORCA_RELEASE_REPO:-orca}"
+# 피드가 orca-releases로 박힌 기존 설치본을 새 피드로 넘기기 위한 이중 업로드. 전원 업데이트 후 빈 값으로 끈다.
+LEGACY_RELEASE_REPO="${ORCA_LEGACY_RELEASE_REPO-orca-releases}"
 ARCH_ARGS=("--x64" "--arm64")
 
 if [[ -z "$VERSION" ]]; then
@@ -42,7 +44,7 @@ rm -rf dist dist-release
 
 echo "== 3/5 빌드 =="
 export ORCA_FORK_PUBLISH_OWNER="$FORK_OWNER"   # 업데이트 피드를 포크로
-export ORCA_FORK_PUBLISH_REPO="$RELEASE_REPO"  # 소스(orca)는 private, 릴리즈는 분리
+export ORCA_FORK_PUBLISH_REPO="$RELEASE_REPO"  # 업데이트 피드 저장소
 export ORCA_LOCAL_BUILD_VERSION="$VERSION"     # package.json은 건드리지 않음
 export ORCA_BUILD_COMMIT="$(git rev-parse --short=12 HEAD)"
 
@@ -58,7 +60,7 @@ echo "== 4/5 산출물 검증 =="
 FEED="$(find dist -name app-update.yml -path '*Orca.app/Contents/Resources/*' | head -1)"
 [[ -n "$FEED" ]] || { echo "app-update.yml을 찾지 못했다 — 패키징이 실패했는지 확인할 것." >&2; exit 1; }
 grep -q "owner: *$FORK_OWNER" "$FEED" || { echo "업데이트 피드가 $FORK_OWNER 가 아니다. 공식 Orca로 덮어써진다.:"; cat "$FEED"; exit 1; }
-grep -q "repo: *$RELEASE_REPO" "$FEED" || { echo "업데이트 피드가 $RELEASE_REPO 가 아니다 (소스 repo는 private).:"; cat "$FEED"; exit 1; }
+grep -q "^repo: *$RELEASE_REPO *$" "$FEED" || { echo "업데이트 피드가 $RELEASE_REPO 가 아니다.:"; cat "$FEED"; exit 1; }
 [[ -f dist/latest-mac.yml ]] || { echo "latest-mac.yml이 없다 — zip 타깃이 빠지면 자동 업데이트가 성립하지 않는다." >&2; exit 1; }
 echo "  피드 $FORK_OWNER/$RELEASE_REPO — OK"
 
@@ -67,13 +69,15 @@ echo "== 5/5 GitHub 릴리즈 업로드 =="
 ASSETS=(dist/latest-mac.yml)
 while IFS= read -r asset; do ASSETS+=("$asset"); done < <(find dist -maxdepth 1 \( -name '*.dmg' -o -name '*-mac.zip' -o -name '*.blockmap' \))
 
-if gh release view "v$VERSION" --repo "$FORK_OWNER/$RELEASE_REPO" >/dev/null 2>&1; then
-  gh release upload "v$VERSION" "${ASSETS[@]}" --repo "$FORK_OWNER/$RELEASE_REPO" --clobber
-else
-  gh release create "v$VERSION" "${ASSETS[@]}" \
-    --repo "$FORK_OWNER/$RELEASE_REPO" \
-    --title "Orca $VERSION (사내 빌드)" \
-    --notes "upstream Orca + Redmine 작업 소스. 설치 후 자동 업데이트는 $FORK_OWNER/$RELEASE_REPO 릴리즈를 따른다."
-fi
+for repo in "$RELEASE_REPO" ${LEGACY_RELEASE_REPO:+"$LEGACY_RELEASE_REPO"}; do
+  if gh release view "v$VERSION" --repo "$FORK_OWNER/$repo" >/dev/null 2>&1; then
+    gh release upload "v$VERSION" "${ASSETS[@]}" --repo "$FORK_OWNER/$repo" --clobber
+  else
+    gh release create "v$VERSION" "${ASSETS[@]}" \
+      --repo "$FORK_OWNER/$repo" \
+      --title "Orca $VERSION (사내 빌드)" \
+      --notes "upstream Orca + Redmine 작업 소스. 설치 후 자동 업데이트는 $FORK_OWNER/$RELEASE_REPO 릴리즈를 따른다."
+  fi
+done
 echo "완료. Mac 팀원은 dmg를 받아 설치한 뒤 최초 1회 격리 속성을 지운다:"
 echo "  xattr -dr com.apple.quarantine /Applications/Orca.app"
