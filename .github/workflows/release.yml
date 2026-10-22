@@ -6,11 +6,8 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: '릴리즈 버전 (예: 1.0.34-personal) — 직전 버전보다 낮추지 말 것'
+        description: '릴리즈 버전 (예: 1.0.34-personal) — 직전 버전보다 낮추지 말 것. 패치 노트는 docs/release-notes/<버전>.md'
         required: true
-      notes:
-        description: '릴리즈 노트 (비우면 기본 문구)'
-        required: false
       publish:
         description: '릴리즈까지 올린다 (끄면 빌드만 하고 artifact로 남긴다)'
         type: boolean
@@ -29,11 +26,15 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - name: 버전 형식과 태그 중복 확인
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: docs/release-notes
+      - name: 버전 형식·패치 노트·태그 중복 확인
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]] || { echo "semver가 아니다: $VERSION"; exit 1; }
+          [[ -s "docs/release-notes/$VERSION.md" ]] || { echo "패치 노트 docs/release-notes/$VERSION.md 가 없다"; exit 1; }
           if gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/v$VERSION" >/dev/null 2>&1; then
             echo "태그 v$VERSION 이 이미 있다"; exit 1
           fi
@@ -127,6 +128,9 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v5
+        with:
+          sparse-checkout: docs/release-notes
       - uses: actions/download-artifact@v4
         with:
           path: assets
@@ -135,10 +139,9 @@ jobs:
       - name: 릴리즈 생성
         env:
           GH_TOKEN: ${{ github.token }}
-          NOTES: ${{ inputs.notes }}
         run: |
           gh release create "v$VERSION" assets/* \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
-            --title "Orca $VERSION (사내 빌드)" \
-            --notes "${NOTES:-upstream Orca + Redmine 작업 소스. 설치 후 자동 업데이트는 yoush0111/orca 릴리즈를 따른다.}"
+            --title "Orca $VERSION" \
+            --notes-file "docs/release-notes/$VERSION.md"
