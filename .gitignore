@@ -90,6 +90,9 @@ docs/**
 !docs/site/**
 !docs/assets/
 !docs/assets/**
+# Fork release notes; release.yml publishes them.
+!docs/release-notes/
+!docs/release-notes/**
 !docs/readme/
 !docs/readme/**
 !docs/bug-reproductions/
