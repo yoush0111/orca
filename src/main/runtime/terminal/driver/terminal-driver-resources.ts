@@ -168,6 +168,7 @@ export abstract class OrcaRuntimeWithTerminalDrivers extends OrcaRuntimeWithFitO
       getSettings: () => this.requireStore().getSettings(),
       getAgentEnvironment: () => this.accounts.getCommitMessageAgentEnvironment()
     },
+    redmineHost: { getRepos: () => this.requireStore().getRepos() },
     browserHost: {
       getAgentBrowserBridge: () => this.agentBrowserBridge,
       resolveWorktreeSelector: (selector) =>
