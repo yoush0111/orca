@@ -230,3 +230,62 @@ describe('summarizeRedmineNote', () => {
     )
   })
 })
+
+describe('renderWeeklyReport with journal changes and commits', () => {
+  const at = (day: number): string => `2026-10-0${day}T00:00:00Z`
+  const sample = issue({
+    id: 5969,
+    notes: [{ text: 'API 응답 포맷 변경 반영', createdOn: at(3) }],
+    changes: [
+      { field: 'progress', from: '30', to: '50', createdOn: at(2) },
+      { field: 'status', from: '신규', to: '진행중', createdOn: at(2) },
+      { field: 'progress', from: '50', to: '80', createdOn: at(4) },
+      { field: 'status', from: '진행중', to: '신규', createdOn: at(5) }
+    ],
+    commits: [
+      {
+        hash: 'abcdef1234',
+        subject: 'feat(api): API 응답 포맷 변경 반영 #5969',
+        committedOn: at(3),
+        repo: 'orca'
+      },
+      { hash: 'bbbbbbb999', subject: 'fix: 알림 시각 계산 수정', committedOn: at(4), repo: 'orca' },
+      { hash: 'ccccccc999', subject: 'fix: 알림 시각 계산 수정', committedOn: at(5), repo: 'orca' }
+    ]
+  })
+
+  it('collapses changes per field, orders by time, and drops commits repeating a comment', () => {
+    const lines = renderWeeklyReport([sample], options)
+      .split('\n')
+      .filter((l) => l.startsWith('\t'))
+    // Status went 신규→진행중→신규, so it nets out to no change.
+    expect(lines).toEqual([
+      '\t- API 응답 포맷 변경 반영',
+      '\t- 진행률 30→80%',
+      '\t- 알림 시각 계산 수정'
+    ])
+  })
+
+  it('honors the toggles and the commit template', () => {
+    const out = renderWeeklyReport([sample], {
+      ...options,
+      format: {
+        ...DEFAULT_WEEKLY_REPORT_FORMAT,
+        includeChanges: false,
+        includeComments: false,
+        commitTemplate: '\t- {subject} ({hash})'
+      }
+    })
+    expect(out).toContain('\t- API 응답 포맷 변경 반영 (abcdef1)')
+    expect(out).not.toContain('진행률')
+    const noCommits = renderWeeklyReport([sample], {
+      ...options,
+      format: { ...DEFAULT_WEEKLY_REPORT_FORMAT, includeCommits: false }
+    })
+    expect(noCommits).not.toContain('알림 시각')
+  })
+
+  it('renders issues from hosts that send neither field', () => {
+    expect(renderWeeklyReport([issue({ id: 1 })], options)).toContain('[#1]')
+  })
+})
