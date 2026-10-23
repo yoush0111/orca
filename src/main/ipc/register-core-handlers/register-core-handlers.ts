@@ -197,7 +197,7 @@ export function registerCoreHandlers(
   registerLinearHandlers()
   registerJiraHandlers()
   registerJiraIssueSummaryGenerationHandlers(store, commitMessageAgentEnv)
-  registerRedmineHandlers()
+  registerRedmineHandlers(store)
   registerBitbucketHandlers()
   registerFeedbackHandlers()
   if (crashReports) {
