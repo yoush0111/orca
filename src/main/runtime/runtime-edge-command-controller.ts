@@ -140,7 +140,7 @@ function bindNamedMethods<T extends object>(
 
 export class RuntimeEdgeCommandController {
   private readonly jira: RuntimeJiraCommands
-  private readonly redmine = new RuntimeRedmineCommands()
+  private readonly redmine: RuntimeRedmineCommands
   private readonly browser: RuntimeBrowserCommands
   private readonly screencasts: RuntimeBrowserScreencastController
   private readonly emulator: RuntimeEmulatorCommands
@@ -149,11 +149,13 @@ export class RuntimeEdgeCommandController {
   constructor(args: {
     browserHost: RuntimeBrowserCommandHost
     jiraHost: ConstructorParameters<typeof RuntimeJiraCommands>[0]
+    redmineHost: ConstructorParameters<typeof RuntimeRedmineCommands>[0]
     screencast: Omit<ScreencastDependencies, 'getCommands'>
     emulatorHost: EmulatorHost
     getBrowserCommands?: () => RuntimeBrowserCommands
   }) {
     this.jira = new RuntimeJiraCommands(args.jiraHost)
+    this.redmine = new RuntimeRedmineCommands(args.redmineHost)
     this.browser = createRuntimeBrowserCommands(args.browserHost)
     this.screencasts = new RuntimeBrowserScreencastController({
       ...args.screencast,
