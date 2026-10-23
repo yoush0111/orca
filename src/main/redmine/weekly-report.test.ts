@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const fetchMock = vi.fn()
+const commitsMock = vi.fn()
 
 vi.mock('../network/http-client', () => ({
   getMainHttpClient: () => ({
@@ -25,6 +26,11 @@ vi.mock('./credential-store', () => ({
   getCredentialError: () => null,
   saveConnection: vi.fn(),
   clearConnection: vi.fn()
+}))
+
+vi.mock('./weekly-report-git', () => ({
+  weeklyReportGitRepos: (repos: unknown[]) => repos,
+  collectWeeklyReportCommits: (...args: unknown[]) => commitsMock(...args)
 }))
 
 import { buildWeeklyReport } from './weekly-report'
@@ -78,6 +84,14 @@ function installRoutes(routes: Routes): void {
     if (parsed.pathname === '/trackers.json') {
       return json(200, { trackers: [{ id: 1, name: '신규기능' }] })
     }
+    if (parsed.pathname === '/issue_statuses.json') {
+      return json(200, {
+        issue_statuses: [
+          { id: 2, name: '진행중' },
+          { id: 3, name: '해결' }
+        ]
+      })
+    }
     if (parsed.pathname === '/issues.json') {
       if (parsed.searchParams.has('cf_31')) {
         const issues = routes.developer ?? []
@@ -101,6 +115,8 @@ function requestedUrls(): URL[] {
 describe('buildWeeklyReport', () => {
   beforeEach(() => {
     fetchMock.mockReset()
+    commitsMock.mockReset()
+    commitsMock.mockResolvedValue({ byIssue: new Map(), repoCount: 0 })
   })
 
   it('queries all statuses with a second-precision updated_on range (T4)', async () => {
@@ -179,5 +195,60 @@ describe('buildWeeklyReport', () => {
     const result = await buildWeeklyReport(QUERY)
     expect(result.issues).toHaveLength(1)
     expect(result.skippedIssueIds).toEqual([2])
+  })
+
+  it('maps in-range status and progress details, naming statuses', async () => {
+    const journal = (id: number, created_on: string, details: unknown[]) => ({
+      id,
+      notes: '',
+      created_on,
+      details
+    })
+    installRoutes({
+      assigned: [[listIssue(1)]],
+      details: {
+        1: detail(1, [
+          journal(1, '2026-09-29T00:00:00Z', [
+            { property: 'attr', name: 'done_ratio', old_value: '0', new_value: '10' }
+          ]),
+          journal(2, '2026-10-02T00:00:00Z', [
+            { property: 'attr', name: 'status_id', old_value: '2', new_value: '9' },
+            { property: 'attr', name: 'done_ratio', old_value: '30', new_value: '80' },
+            { property: 'attr', name: 'assigned_to_id', old_value: '1', new_value: '2' },
+            { property: 'cf', name: 'status_id', old_value: '1', new_value: '2' }
+          ])
+        ])
+      }
+    })
+    const result = await buildWeeklyReport(QUERY)
+    expect(result.issues[0].changes).toEqual([
+      { field: 'status', from: '진행중', to: '9', createdOn: '2026-10-02T00:00:00Z' },
+      { field: 'progress', from: '30', to: '80', createdOn: '2026-10-02T00:00:00Z' }
+    ])
+  })
+
+  it('adds issues reached only through commits and skips unreadable ones', async () => {
+    const commit = {
+      hash: 'abc',
+      subject: 'feat: x',
+      committedOn: '2026-10-05T00:00:00Z',
+      repo: 'orca'
+    }
+    commitsMock.mockResolvedValue({
+      byIssue: new Map([
+        [1, [commit]],
+        [7, [commit]],
+        [8, [commit]]
+      ]),
+      repoCount: 2
+    })
+    installRoutes({ assigned: [[listIssue(1)]], details: { 1: detail(1), 7: detail(7) } })
+    const result = await buildWeeklyReport(QUERY, [])
+    expect(result.issues.map((i) => [i.id, i.commits?.length])).toEqual([
+      [1, 1],
+      [7, 1]
+    ])
+    expect(result.skippedIssueIds).toEqual([8])
+    expect(result.gitRepoCount).toBe(2)
   })
 })
