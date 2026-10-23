@@ -5,6 +5,11 @@ import {
   formatWeeklyReportDate,
   type WeeklyReportFormat
 } from './redmine-weekly-report-format'
+import {
+  cleanCommitSubject,
+  normalizeReportSentence,
+  type WeeklyReportCommit
+} from './redmine-weekly-report-commits'
 
 export type WeeklyReportNote = {
   text: string
@@ -13,6 +18,15 @@ export type WeeklyReportNote = {
   authorId: number | null
   authorName: string | null
   isPrivate: boolean
+}
+
+/** A status or progress edit from a journal's details. Status values are display names. */
+export type WeeklyReportChange = {
+  field: 'status' | 'progress'
+  from: string | null
+  to: string | null
+  /** UTC ISO. */
+  createdOn: string
 }
 
 export type WeeklyReportIssue = {
@@ -26,6 +40,11 @@ export type WeeklyReportIssue = {
   updatedOn: string
   /** Non-empty notes inside the report range, in created_on order. */
   notes: WeeklyReportNote[]
+  // Optional: hosts that predate journal details or git matching omit them.
+  /** In-range status/progress changes, in created_on order. */
+  changes?: WeeklyReportChange[]
+  /** The viewer's commits in range matched to this issue, oldest first. */
+  commits?: WeeklyReportCommit[]
 }
 
 export type WeeklyReportTrackerGroup = { tracker: string; issues: WeeklyReportIssue[] }
@@ -139,6 +158,90 @@ function isNoteIncluded(
   return format.includeOthersComments || note.authorId === viewerId
 }
 
+type DateFormatter = (iso: string) => string
+
+function describeChange({ field, from, to }: WeeklyReportChange): string {
+  return field === 'status'
+    ? `상태 ${from ?? '?'}→${to ?? '?'}`
+    : `진행률 ${from ?? '0'}→${to ?? '0'}%`
+}
+
+/** Several edits of one field in the period read as first value → last value. */
+function collapseChanges(changes: readonly WeeklyReportChange[]): WeeklyReportChange[] {
+  const byField = new Map<WeeklyReportChange['field'], WeeklyReportChange>()
+  for (const change of changes) {
+    const first = byField.get(change.field)
+    byField.set(change.field, first ? { ...change, from: first.from } : change)
+  }
+  return [...byField.values()].filter((c) => c.from !== c.to)
+}
+
+/** Comment and change lines in time order, plus the comment summaries for commit dedupe. */
+function renderRedmineLines(
+  issue: WeeklyReportIssue,
+  options: WeeklyReportRenderOptions,
+  format: WeeklyReportFormat,
+  date: DateFormatter
+): { lines: string[]; summaries: string[] } {
+  const entries: { at: string; text: string; author: string }[] = []
+  const summaries: string[] = []
+  for (const note of issue.notes) {
+    const comment = isNoteIncluded(note, format, options.viewerId)
+      ? summarizeRedmineNote(note.text, format.commentMaxChars)
+      : ''
+    if (comment) {
+      summaries.push(comment)
+      entries.push({ at: note.createdOn, text: comment, author: note.authorName ?? '' })
+    }
+  }
+  if (format.includeChanges) {
+    for (const change of collapseChanges(issue.changes ?? [])) {
+      entries.push({ at: change.createdOn, text: describeChange(change), author: '' })
+    }
+  }
+  entries.sort((a, b) => Date.parse(a.at) - Date.parse(b.at))
+  const lines = entries.map((entry) =>
+    fillWeeklyReportTemplate(format.commentTemplate, {
+      comment: entry.text,
+      author: entry.author,
+      date: date(entry.at)
+    })
+  )
+  return { lines, summaries }
+}
+
+function renderCommitLines(
+  issue: WeeklyReportIssue,
+  format: WeeklyReportFormat,
+  summaries: readonly string[],
+  date: DateFormatter
+): string[] {
+  if (!format.includeCommits) {
+    return []
+  }
+  const seen = new Set(summaries.map(normalizeReportSentence))
+  // A summary cut at commentMaxChars still matches a commit subject that starts with it.
+  const truncated = summaries.filter((s) => s.endsWith('…')).map(normalizeReportSentence)
+  const lines: string[] = []
+  for (const commit of issue.commits ?? []) {
+    const subject = cleanCommitSubject(commit.subject, issue.id)
+    const key = normalizeReportSentence(subject)
+    if (!key || seen.has(key) || truncated.some((prefix) => key.startsWith(prefix))) {
+      continue
+    }
+    seen.add(key)
+    lines.push(
+      fillWeeklyReportTemplate(format.commitTemplate, {
+        subject,
+        hash: commit.hash.slice(0, 7),
+        repo: commit.repo,
+        date: date(commit.committedOn)
+      })
+    )
+  }
+  return lines
+}
+
 function renderIssue(
   issue: WeeklyReportIssue,
   options: WeeklyReportRenderOptions,
@@ -146,7 +249,8 @@ function renderIssue(
 ): string {
   const date = (iso: string): string =>
     formatWeeklyReportDate(iso, options.utcOffsetMinutes, format.dateFormat)
-  const lines = [
+  const redmine = renderRedmineLines(issue, options, format, date)
+  return [
     fillWeeklyReportTemplate(format.issueTemplate, {
       subject: format.stripTrackerTags
         ? cleanRedmineSubject(issue.subject, options.trackerNames)
@@ -158,23 +262,10 @@ function renderIssue(
       status: issue.status ?? '',
       tracker: issue.tracker ?? NO_TRACKER,
       project: issue.project
-    })
-  ]
-  for (const note of issue.notes) {
-    const comment = isNoteIncluded(note, format, options.viewerId)
-      ? summarizeRedmineNote(note.text, format.commentMaxChars)
-      : ''
-    if (comment) {
-      lines.push(
-        fillWeeklyReportTemplate(format.commentTemplate, {
-          comment,
-          author: note.authorName ?? '',
-          date: date(note.createdOn)
-        })
-      )
-    }
-  }
-  return lines.join('\n')
+    }),
+    ...redmine.lines,
+    ...renderCommitLines(issue, format, redmine.summaries, date)
+  ].join('\n')
 }
 
 /** Body only — no title or preamble. Empty string when there are no issues. */
