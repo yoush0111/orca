@@ -5,12 +5,15 @@ import type {
 import { mapWithConcurrency } from '../../shared/map-with-concurrency'
 import {
   DEFAULT_REDMINE_TRACKER_NAMES,
+  type WeeklyReportChange,
   type WeeklyReportIssue
 } from '../../shared/redmine-weekly-report'
+import type { WeeklyReportCommit } from '../../shared/redmine-weekly-report-commits'
 import { RedmineApiError, redmineGet, requireClient, type ActiveClient } from './client'
 import {
   parseRedmineReportIssueDetail,
   parseRedmineReportIssuesPage,
+  parseRedmineStatuses,
   parseRedmineTrackerNames,
   parseRedmineViewer,
   redmineCustomFieldValues,
@@ -18,6 +21,11 @@ import {
   type RedmineReportIssue,
   type RedmineReportIssueDetail
 } from './rest-contract'
+import {
+  collectWeeklyReportCommits,
+  weeklyReportGitRepos,
+  type WeeklyReportRepo
+} from './weekly-report-git'
 
 const DETAIL_CONCURRENCY = 6
 
@@ -89,11 +97,57 @@ async function fetchTrackerNames(client: ActiveClient): Promise<string[]> {
   }
 }
 
-function toReportIssue(detail: RedmineReportIssueDetail, range: Range): WeeklyReportIssue {
-  // Private notes are kept and flagged; the client's format decides whether they appear.
-  const notes = (detail.journals ?? [])
-    .filter((j) => j.notes?.trim() && inRange(j.created_on, range))
+/** Status id → name; empty on failure, and changes then show the raw id. */
+async function fetchStatusNames(client: ActiveClient): Promise<Map<string, string>> {
+  try {
+    const statuses = parseRedmineStatuses(
+      await redmineGet(client.baseUrl, client.apiKey, '/issue_statuses.json')
+    )
+    return new Map(statuses.map((s) => [String(s.id), s.name]))
+  } catch (error) {
+    console.warn('[redmine] status list unavailable for weekly report', {
+      error: error instanceof Error ? error.message : String(error)
+    })
+    return new Map()
+  }
+}
+
+type Journal = NonNullable<RedmineReportIssueDetail['journals']>[number]
+
+function toChanges(
+  journal: Journal,
+  statusNames: ReadonlyMap<string, string>
+): WeeklyReportChange[] {
+  const status = (id: string | null | undefined): string | null =>
+    id ? (statusNames.get(id) ?? id) : null
+  return (journal.details ?? []).flatMap((d): WeeklyReportChange[] => {
+    if (d.property !== 'attr') {
+      return []
+    }
+    if (d.name === 'status_id') {
+      const change = { from: status(d.old_value), to: status(d.new_value) }
+      return [{ field: 'status', ...change, createdOn: journal.created_on }]
+    }
+    if (d.name === 'done_ratio') {
+      const change = { from: d.old_value ?? null, to: d.new_value ?? null }
+      return [{ field: 'progress', ...change, createdOn: journal.created_on }]
+    }
+    return []
+  })
+}
+
+function toReportIssue(
+  detail: RedmineReportIssueDetail,
+  range: Range,
+  statusNames: ReadonlyMap<string, string>,
+  commits: WeeklyReportCommit[] | undefined
+): WeeklyReportIssue {
+  const journals = (detail.journals ?? [])
+    .filter((j) => inRange(j.created_on, range))
     .sort((a, b) => Date.parse(a.created_on) - Date.parse(b.created_on))
+  // Private notes are kept and flagged; the client's format decides whether they appear.
+  const notes = journals
+    .filter((j) => j.notes?.trim())
     .map((j) => ({
       text: j.notes ?? '',
       createdOn: j.created_on,
@@ -109,7 +163,9 @@ function toReportIssue(detail: RedmineReportIssueDetail, range: Range): WeeklyRe
     status: detail.status?.name ?? null,
     doneRatio: detail.done_ratio ?? null,
     updatedOn: detail.updated_on ?? '',
-    notes
+    notes,
+    changes: journals.flatMap((j) => toChanges(j, statusNames)),
+    commits: commits ?? []
   }
 }
 
@@ -141,24 +197,33 @@ async function collectIssues(
 }
 
 export async function buildWeeklyReport(
-  query: RedmineWeeklyReportQuery
+  query: RedmineWeeklyReportQuery,
+  repos: readonly WeeklyReportRepo[] = []
 ): Promise<RedmineWeeklyReportResult> {
   const client = requireClient()
   const range = { since: Date.parse(query.since), until: Date.parse(query.until) }
+  const gitScan = collectWeeklyReportCommits(weeklyReportGitRepos(repos), query)
   const viewerId = parseRedmineViewer(
     await redmineGet(client.baseUrl, client.apiKey, '/users/current.json')
   ).id
-  const issues = await collectIssues(client, query, range, viewerId)
-  const [details, fetchedTrackers] = await Promise.all([
-    mapWithConcurrency(issues, DETAIL_CONCURRENCY, (i) => fetchDetail(client, i.id)),
-    issues.length > 0 ? fetchTrackerNames(client) : Promise.resolve([])
+  const [issues, git] = await Promise.all([collectIssues(client, query, range, viewerId), gitScan])
+  // Issues only reached through commits are the work Redmine itself does not show.
+  const listed = new Set(issues.map((i) => i.id))
+  const ids = [...listed, ...[...git.byIssue.keys()].filter((id) => !listed.has(id))]
+  const [details, fetchedTrackers, statusNames] = await Promise.all([
+    mapWithConcurrency(ids, DETAIL_CONCURRENCY, (id) => fetchDetail(client, id)),
+    ids.length > 0 ? fetchTrackerNames(client) : Promise.resolve([]),
+    ids.length > 0 ? fetchStatusNames(client) : Promise.resolve(new Map<string, string>())
   ])
   // Rendering happens on the client so format edits re-render without refetching.
   return {
-    issues: details.flatMap((d) => (d ? [toReportIssue(d, range)] : [])),
+    issues: details.flatMap((d) =>
+      d ? [toReportIssue(d, range, statusNames, git.byIssue.get(d.id))] : []
+    ),
     baseUrl: client.baseUrl,
     viewerId,
     trackerNames: [...new Set([...DEFAULT_REDMINE_TRACKER_NAMES, ...fetchedTrackers])],
-    skippedIssueIds: issues.filter((_, index) => !details[index]).map((i) => i.id)
+    skippedIssueIds: ids.filter((_, index) => !details[index]),
+    gitRepoCount: git.repoCount
   }
 }
