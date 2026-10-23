@@ -33,7 +33,19 @@ const JournalSchema = z.object({
   user: NamedRefSchema.nullish(),
   notes: z.string().nullish(),
   created_on: z.string(),
-  private_notes: z.boolean().nullish()
+  private_notes: z.boolean().nullish(),
+  // Field-change history; only the weekly report reads it, so a shape surprise drops it alone.
+  details: z
+    .array(
+      z.object({
+        property: z.string(),
+        name: z.string(),
+        old_value: z.string().nullish(),
+        new_value: z.string().nullish()
+      })
+    )
+    .nullish()
+    .catch(null)
 })
 
 const AttachmentSchema = z.object({
