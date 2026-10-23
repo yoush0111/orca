@@ -105,6 +105,8 @@ export type RedmineWeeklyReportResult = {
   trackerNames: string[]
   /** Issues skipped on 403/404; the report still renders. */
   skippedIssueIds: number[]
+  /** Git repos scanned for the viewer's commits. Absent from hosts that predate git matching. */
+  gitRepoCount?: number
 }
 
 export type RedmineWeeklyReportSaveArgs = {
