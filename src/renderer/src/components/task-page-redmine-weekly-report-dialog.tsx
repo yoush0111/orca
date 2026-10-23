@@ -78,6 +78,9 @@ function ReportSummary({
         {data.skippedIssueIds.length > 0
           ? ` · ${translate('auto.components.task.page.redmine.weekly.report.skipped', 'Skipped {{value0}}', { value0: data.skippedIssueIds.map((id) => `#${id}`).join(', ') })}`
           : null}
+        {data.gitRepoCount !== undefined
+          ? ` · ${translate('auto.components.task.page.redmine.weekly.report.gitRepoCount', 'Scanned {{value0}} git repos', { value0: data.gitRepoCount })}`
+          : null}
       </p>
       {edited ? (
         <Button variant="ghost" size="sm" onClick={onRevert}>
