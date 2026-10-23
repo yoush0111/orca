@@ -15,8 +15,11 @@ import {
   testConnection
 } from '../redmine/client'
 import { buildWeeklyReport } from '../redmine/weekly-report'
+import type { WeeklyReportRepo } from '../redmine/weekly-report-git'
 
 export class RuntimeRedmineCommands {
+  constructor(private readonly host: { getRepos(): readonly WeeklyReportRepo[] }) {}
+
   redmineConnect(args: RedmineConnectArgs): ReturnType<typeof connect> {
     return connect(args)
   }
@@ -51,7 +54,7 @@ export class RuntimeRedmineCommands {
   }
 
   redmineWeeklyReport(query: RedmineWeeklyReportQuery): ReturnType<typeof buildWeeklyReport> {
-    return buildWeeklyReport(query)
+    return buildWeeklyReport(query, this.host.getRepos())
   }
 
   async redmineIssueAddNote(id: number, notes: string): Promise<{ ok: true; id: number }> {
