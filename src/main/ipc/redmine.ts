@@ -15,6 +15,7 @@ import {
   installRedmineAgentSkill
 } from '../redmine/agent-skill-install'
 import { buildWeeklyReport } from '../redmine/weekly-report'
+import type { WeeklyReportRepo } from '../redmine/weekly-report-git'
 import { weeklyReportMarkdownToHtml } from '../../shared/redmine-weekly-report-html'
 import {
   RedmineWeeklyReportMarkdown,
@@ -74,7 +75,7 @@ async function saveWeeklyReport(
   }
 }
 
-export function registerRedmineHandlers(): void {
+export function registerRedmineHandlers(store: { getRepos(): readonly WeeklyReportRepo[] }): void {
   ipcMain.handle('redmine:connect', async (_event, args: RedmineConnectArgs) => {
     if (typeof args?.baseUrl !== 'string' || typeof args?.apiKey !== 'string') {
       return { ok: false, error: 'Base URL and API key are required.' }
@@ -103,7 +104,7 @@ export function registerRedmineHandlers(): void {
     if (!parsed.success) {
       throw new Error(parsed.error.issues[0]?.message ?? 'Invalid weekly report range.')
     }
-    return buildWeeklyReport(parsed.data)
+    return buildWeeklyReport(parsed.data, store.getRepos())
   })
 
   // Always local: the report file belongs on the user's machine even with a remote runtime.
