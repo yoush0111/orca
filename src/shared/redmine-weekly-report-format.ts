@@ -10,6 +10,7 @@ export type WeeklyReportFormat = {
   trackerTemplate: string
   issueTemplate: string
   commentTemplate: string
+  commitTemplate: string
   dateFormat: WeeklyReportDateFormat
   /** Trackers listed here come first in this order; others follow alphabetically, then 기타. */
   trackerOrder: string[]
@@ -18,6 +19,10 @@ export type WeeklyReportFormat = {
   includeComments: boolean
   includeOthersComments: boolean
   includePrivateNotes: boolean
+  /** Status and progress changes from journal details. */
+  includeChanges: boolean
+  /** The viewer's own commits matched to an issue by `#id` or branch name. */
+  includeCommits: boolean
 }
 
 export const DEFAULT_WEEKLY_REPORT_FORMAT: WeeklyReportFormat = {
@@ -26,20 +31,24 @@ export const DEFAULT_WEEKLY_REPORT_FORMAT: WeeklyReportFormat = {
   issueTemplate: '- {subject} ([#{id}]({url})) ({date} {progress}%)',
   // Tab, not spaces: Obsidian renders it as a nested <ul> that pastes into Slack intact.
   commentTemplate: '\t- {comment}',
+  commitTemplate: '\t- {subject}',
   dateFormat: 'YY.MM.DD',
   trackerOrder: ['신규기능', '기능개선', '오류', '지원'],
   stripTrackerTags: true,
   commentMaxChars: 80,
   includeComments: true,
   includeOthersComments: true,
-  includePrivateNotes: false
+  includePrivateNotes: false,
+  includeChanges: true,
+  includeCommits: true
 }
 
 export const WEEKLY_REPORT_PLACEHOLDERS = {
   project: ['project'],
   tracker: ['tracker'],
   issue: ['subject', 'id', 'url', 'date', 'progress', 'status', 'tracker', 'project'],
-  comment: ['comment', 'author', 'date']
+  comment: ['comment', 'author', 'date'],
+  commit: ['subject', 'hash', 'repo', 'date']
 } as const
 
 const D = DEFAULT_WEEKLY_REPORT_FORMAT
@@ -50,13 +59,16 @@ const StoredFormatSchema = z.object({
   trackerTemplate: z.string().catch(D.trackerTemplate),
   issueTemplate: z.string().catch(D.issueTemplate),
   commentTemplate: z.string().catch(D.commentTemplate),
+  commitTemplate: z.string().catch(D.commitTemplate),
   dateFormat: z.enum(WEEKLY_REPORT_DATE_FORMATS).catch(D.dateFormat),
   trackerOrder: z.array(z.string()).catch(D.trackerOrder),
   stripTrackerTags: z.boolean().catch(D.stripTrackerTags),
   commentMaxChars: z.number().int().min(10).max(1000).catch(D.commentMaxChars),
   includeComments: z.boolean().catch(D.includeComments),
   includeOthersComments: z.boolean().catch(D.includeOthersComments),
-  includePrivateNotes: z.boolean().catch(D.includePrivateNotes)
+  includePrivateNotes: z.boolean().catch(D.includePrivateNotes),
+  includeChanges: z.boolean().catch(D.includeChanges),
+  includeCommits: z.boolean().catch(D.includeCommits)
 })
 
 export function resolveWeeklyReportFormat(stored: unknown): WeeklyReportFormat {
