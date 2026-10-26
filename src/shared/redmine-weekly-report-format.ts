@@ -11,6 +11,10 @@ export type WeeklyReportFormat = {
   issueTemplate: string
   commentTemplate: string
   commitTemplate: string
+  /** Bullet lines from a commit message body, under their commit line. */
+  commitBodyTemplate: string
+  /** Work items and 이슈/개선 rows from the description template. */
+  descriptionTemplate: string
   dateFormat: WeeklyReportDateFormat
   /** Trackers listed here come first in this order; others follow alphabetically, then 기타. */
   trackerOrder: string[]
@@ -23,6 +27,8 @@ export type WeeklyReportFormat = {
   includeChanges: boolean
   /** The viewer's own commits matched to an issue by `#id` or branch name. */
   includeCommits: boolean
+  includeCommitBody: boolean
+  includeDescription: boolean
 }
 
 export const DEFAULT_WEEKLY_REPORT_FORMAT: WeeklyReportFormat = {
@@ -32,6 +38,8 @@ export const DEFAULT_WEEKLY_REPORT_FORMAT: WeeklyReportFormat = {
   // Tab, not spaces: Obsidian renders it as a nested <ul> that pastes into Slack intact.
   commentTemplate: '\t- {comment}',
   commitTemplate: '\t- {subject}',
+  commitBodyTemplate: '\t\t- {line}',
+  descriptionTemplate: '\t- {line}',
   dateFormat: 'YY.MM.DD',
   trackerOrder: ['신규기능', '기능개선', '오류', '지원'],
   stripTrackerTags: true,
@@ -40,7 +48,9 @@ export const DEFAULT_WEEKLY_REPORT_FORMAT: WeeklyReportFormat = {
   includeOthersComments: true,
   includePrivateNotes: false,
   includeChanges: true,
-  includeCommits: true
+  includeCommits: true,
+  includeCommitBody: true,
+  includeDescription: true
 }
 
 export const WEEKLY_REPORT_PLACEHOLDERS = {
@@ -48,7 +58,8 @@ export const WEEKLY_REPORT_PLACEHOLDERS = {
   tracker: ['tracker'],
   issue: ['subject', 'id', 'url', 'date', 'progress', 'status', 'tracker', 'project'],
   comment: ['comment', 'author', 'date'],
-  commit: ['subject', 'hash', 'repo', 'date']
+  commit: ['subject', 'hash', 'repo', 'date'],
+  line: ['line']
 } as const
 
 const D = DEFAULT_WEEKLY_REPORT_FORMAT
@@ -60,6 +71,8 @@ const StoredFormatSchema = z.object({
   issueTemplate: z.string().catch(D.issueTemplate),
   commentTemplate: z.string().catch(D.commentTemplate),
   commitTemplate: z.string().catch(D.commitTemplate),
+  commitBodyTemplate: z.string().catch(D.commitBodyTemplate),
+  descriptionTemplate: z.string().catch(D.descriptionTemplate),
   dateFormat: z.enum(WEEKLY_REPORT_DATE_FORMATS).catch(D.dateFormat),
   trackerOrder: z.array(z.string()).catch(D.trackerOrder),
   stripTrackerTags: z.boolean().catch(D.stripTrackerTags),
@@ -68,7 +81,9 @@ const StoredFormatSchema = z.object({
   includeOthersComments: z.boolean().catch(D.includeOthersComments),
   includePrivateNotes: z.boolean().catch(D.includePrivateNotes),
   includeChanges: z.boolean().catch(D.includeChanges),
-  includeCommits: z.boolean().catch(D.includeCommits)
+  includeCommits: z.boolean().catch(D.includeCommits),
+  includeCommitBody: z.boolean().catch(D.includeCommitBody),
+  includeDescription: z.boolean().catch(D.includeDescription)
 })
 
 export function resolveWeeklyReportFormat(stored: unknown): WeeklyReportFormat {

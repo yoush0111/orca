@@ -45,6 +45,8 @@ export type WeeklyReportIssue = {
   changes?: WeeklyReportChange[]
   /** The viewer's commits in range matched to this issue, oldest first. */
   commits?: WeeklyReportCommit[]
+  /** Work items and 이슈/개선 rows parsed from the description template. */
+  descriptionLines?: string[]
 }
 
 export type WeeklyReportTrackerGroup = { tracker: string; issues: WeeklyReportIssue[] }
@@ -210,6 +212,10 @@ function renderRedmineLines(
   return { lines, summaries }
 }
 
+function descriptionLines(issue: WeeklyReportIssue, format: WeeklyReportFormat): string[] {
+  return format.includeDescription ? (issue.descriptionLines ?? []) : []
+}
+
 function renderCommitLines(
   issue: WeeklyReportIssue,
   format: WeeklyReportFormat,
@@ -219,7 +225,9 @@ function renderCommitLines(
   if (!format.includeCommits) {
     return []
   }
-  const seen = new Set(summaries.map(normalizeReportSentence))
+  const seen = new Set(
+    [...summaries, ...descriptionLines(issue, format)].map(normalizeReportSentence)
+  )
   // A summary cut at commentMaxChars still matches a commit subject that starts with it.
   const truncated = summaries.filter((s) => s.endsWith('…')).map(normalizeReportSentence)
   const lines: string[] = []
@@ -238,6 +246,10 @@ function renderCommitLines(
         date: date(commit.committedOn)
       })
     )
+    const body = format.includeCommitBody ? (commit.body ?? []) : []
+    for (const line of body.filter((l) => !seen.has(normalizeReportSentence(l)))) {
+      lines.push(fillWeeklyReportTemplate(format.commitBodyTemplate, { line }))
+    }
   }
   return lines
 }
@@ -263,6 +275,9 @@ function renderIssue(
       tracker: issue.tracker ?? NO_TRACKER,
       project: issue.project
     }),
+    ...descriptionLines(issue, format).map((line) =>
+      fillWeeklyReportTemplate(format.descriptionTemplate, { line })
+    ),
     ...redmine.lines,
     ...renderCommitLines(issue, format, redmine.summaries, date)
   ].join('\n')
