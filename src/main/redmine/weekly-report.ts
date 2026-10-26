@@ -9,6 +9,10 @@ import {
   type WeeklyReportIssue
 } from '../../shared/redmine-weekly-report'
 import type { WeeklyReportCommit } from '../../shared/redmine-weekly-report-commits'
+import {
+  extractWeeklyReportDescription,
+  type WeeklyReportDescription
+} from '../../shared/redmine-weekly-report-description'
 import { RedmineApiError, redmineGet, requireClient, type ActiveClient } from './client'
 import {
   parseRedmineReportIssueDetail,
@@ -140,7 +144,8 @@ function toReportIssue(
   detail: RedmineReportIssueDetail,
   range: Range,
   statusNames: ReadonlyMap<string, string>,
-  commits: WeeklyReportCommit[] | undefined
+  commits: WeeklyReportCommit[] | undefined,
+  description: WeeklyReportDescription
 ): WeeklyReportIssue {
   const journals = (detail.journals ?? [])
     .filter((j) => inRange(j.created_on, range))
@@ -165,7 +170,8 @@ function toReportIssue(
     updatedOn: detail.updated_on ?? '',
     notes,
     changes: journals.flatMap((j) => toChanges(j, statusNames)),
-    commits: commits ?? []
+    commits: commits ?? [],
+    descriptionLines: description.lines
   }
 }
 
@@ -196,29 +202,53 @@ async function collectIssues(
   return [...unique.values()].filter((i) => inRange(i.updated_on, range))
 }
 
+function fetchDetails(
+  client: ActiveClient,
+  ids: readonly number[]
+): Promise<(RedmineReportIssueDetail | null)[]> {
+  return mapWithConcurrency(ids, DETAIL_CONCURRENCY, (id) => fetchDetail(client, id))
+}
+
 export async function buildWeeklyReport(
   query: RedmineWeeklyReportQuery,
   repos: readonly WeeklyReportRepo[] = []
 ): Promise<RedmineWeeklyReportResult> {
   const client = requireClient()
   const range = { since: Date.parse(query.since), until: Date.parse(query.until) }
-  const gitScan = collectWeeklyReportCommits(weeklyReportGitRepos(repos), query)
   const viewerId = parseRedmineViewer(
     await redmineGet(client.baseUrl, client.apiKey, '/users/current.json')
   ).id
-  const [issues, git] = await Promise.all([collectIssues(client, query, range, viewerId), gitScan])
-  // Issues only reached through commits are the work Redmine itself does not show.
-  const listed = new Set(issues.map((i) => i.id))
-  const ids = [...listed, ...[...git.byIssue.keys()].filter((id) => !listed.has(id))]
-  const [details, fetchedTrackers, statusNames] = await Promise.all([
-    mapWithConcurrency(ids, DETAIL_CONCURRENCY, (id) => fetchDetail(client, id)),
-    ids.length > 0 ? fetchTrackerNames(client) : Promise.resolve([]),
-    ids.length > 0 ? fetchStatusNames(client) : Promise.resolve(new Map<string, string>())
+  const listedIds = (await collectIssues(client, query, range, viewerId)).map((i) => i.id)
+  const [listedDetails, fetchedTrackers, statusNames] = await Promise.all([
+    fetchDetails(client, listedIds),
+    fetchTrackerNames(client),
+    fetchStatusNames(client)
   ])
+  // Descriptions are parsed here, not on the client: the git scan needs their hash/branch hints
+  // and the raw CKEditor HTML is far larger than the few lines the report keeps.
+  const descriptions = new Map(
+    listedDetails.flatMap((d) => (d ? [[d.id, extractWeeklyReportDescription(d.description)]] : []))
+  )
+  const git = await collectWeeklyReportCommits(weeklyReportGitRepos(repos), query, descriptions)
+  // Issues only reached through commits are the work Redmine itself does not show.
+  const listed = new Set(listedIds)
+  const extraIds = [...git.byIssue.keys()].filter((id) => !listed.has(id))
+  const ids = [...listedIds, ...extraIds]
+  const details = [...listedDetails, ...(await fetchDetails(client, extraIds))]
   // Rendering happens on the client so format edits re-render without refetching.
   return {
     issues: details.flatMap((d) =>
-      d ? [toReportIssue(d, range, statusNames, git.byIssue.get(d.id))] : []
+      d
+        ? [
+            toReportIssue(
+              d,
+              range,
+              statusNames,
+              git.byIssue.get(d.id),
+              descriptions.get(d.id) ?? extractWeeklyReportDescription(d.description)
+            )
+          ]
+        : []
     ),
     baseUrl: client.baseUrl,
     viewerId,
