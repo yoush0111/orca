@@ -47,18 +47,41 @@ function parseLog(stdout: string, repo: string): WeeklyReportGitCommit[] {
   })
 }
 
+/** Issue id → hash prefixes and branch names written in that issue's description. */
+export type WeeklyReportCommitHints = ReadonlyMap<
+  number,
+  { hashes: readonly string[]; branches: readonly string[] }
+>
+
+/** Issues a ref belongs to: the id in its name plus issues whose description names the branch. */
+function refIssueIds(name: string, hints: WeeklyReportCommitHints): number[] {
+  const ids = new Set<number>()
+  const fromName = issueIdFromBranchName(name)
+  if (fromName !== null) {
+    ids.add(fromName)
+  }
+  for (const [id, { branches }] of hints) {
+    // `origin/feature/x` is the remote copy of `feature/x`.
+    if (branches.some((branch) => name === branch || name.endsWith(`/${branch}`))) {
+      ids.add(id)
+    }
+  }
+  return [...ids]
+}
+
 /** Issue id → hashes on matching branches that the default branch does not already have. */
 async function branchCommits(
   repoPath: string,
-  filters: string[]
+  filters: string[],
+  hints: WeeklyReportCommitHints
 ): Promise<Map<number, Set<string>>> {
   const refs = (
     await git(repoPath, ['for-each-ref', '--format=%(refname)', 'refs/heads', 'refs/remotes'])
   )
     .split('\n')
     .flatMap((ref) => {
-      const id = issueIdFromBranchName(ref.trim().replace(/^refs\/(?:heads|remotes)\//, ''))
-      return id === null ? [] : [{ ref: ref.trim(), id }]
+      const ids = refIssueIds(ref.trim().replace(/^refs\/(?:heads|remotes)\//, ''), hints)
+      return ids.length === 0 ? [] : [{ ref: ref.trim(), ids }]
     })
   const out = new Map<number, Set<string>>()
   const defaultRef = refs.length > 0 ? await getDefaultBaseRefAsync(repoPath) : null
@@ -66,22 +89,23 @@ async function branchCommits(
   if (!defaultRef) {
     return out
   }
-  await mapWithConcurrency(refs, BRANCH_CONCURRENCY, async ({ ref, id }) => {
+  await mapWithConcurrency(refs, BRANCH_CONCURRENCY, async ({ ref, ids }) => {
     const stdout = await git(repoPath, ['log', ref, '--not', defaultRef, ...filters, '--format=%H'])
-    const hashes = out.get(id) ?? new Set<string>()
-    for (const hash of stdout.split('\n')) {
-      if (hash.trim()) {
-        hashes.add(hash.trim())
-      }
+    const found = stdout
+      .split('\n')
+      .map((hash) => hash.trim())
+      .filter(Boolean)
+    for (const id of ids) {
+      out.set(id, new Set([...(out.get(id) ?? []), ...found]))
     }
-    out.set(id, hashes)
   })
   return out
 }
 
 async function scanRepo(
   repo: WeeklyReportRepo,
-  range: GitRange
+  range: GitRange,
+  hints: WeeklyReportCommitHints
 ): Promise<{ commits: WeeklyReportGitCommit[]; branches: Map<number, Set<string>> } | null> {
   const email = (await git(repo.path, ['config', '--default', '', '--get', 'user.email'])).trim()
   if (!email) {
@@ -102,20 +126,22 @@ async function scanRepo(
   if (commits.length === 0) {
     return { commits, branches: new Map() }
   }
-  return { commits, branches: await branchCommits(repo.path, filters) }
+  return { commits, branches: await branchCommits(repo.path, filters, hints) }
 }
 
 /**
  * The viewer's commits in range, keyed by the Redmine issue they belong to.
+ * Description hints only widen matching; the author filter still limits it to the viewer.
  * A failing repo is logged and skipped so the report still renders.
  */
 export async function collectWeeklyReportCommits(
   repos: readonly WeeklyReportRepo[],
-  range: GitRange
+  range: GitRange,
+  hints: WeeklyReportCommitHints = new Map()
 ): Promise<{ byIssue: Map<number, WeeklyReportCommit[]>; repoCount: number }> {
   const scans = await mapWithConcurrency(repos, REPO_CONCURRENCY, async (repo) => {
     try {
-      return await scanRepo(repo, range)
+      return await scanRepo(repo, range, hints)
     } catch (error) {
       console.warn('[redmine] weekly report git scan skipped repo', {
         repo: repo.displayName,
@@ -133,7 +159,11 @@ export async function collectWeeklyReportCommits(
     }
   }
   return {
-    byIssue: matchCommitsToIssues(commits, branches),
+    byIssue: matchCommitsToIssues(
+      commits,
+      branches,
+      new Map([...hints].map(([id, hint]) => [id, hint.hashes]))
+    ),
     repoCount: scans.filter(Boolean).length
   }
 }
