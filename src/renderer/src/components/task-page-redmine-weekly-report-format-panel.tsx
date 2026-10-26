@@ -32,6 +32,8 @@ type TemplateKey =
   | 'issueTemplate'
   | 'commentTemplate'
   | 'commitTemplate'
+  | 'commitBodyTemplate'
+  | 'descriptionTemplate'
 type FlagKey =
   | 'stripTrackerTags'
   | 'includeComments'
@@ -39,6 +41,8 @@ type FlagKey =
   | 'includePrivateNotes'
   | 'includeChanges'
   | 'includeCommits'
+  | 'includeCommitBody'
+  | 'includeDescription'
 
 // A single-line input cannot hold a tab keystroke, so tabs are edited as a visible `\t`.
 const toEditable = (template: string): string => template.replace(/\t/g, '\\t')
@@ -168,6 +172,22 @@ export function TaskPageRedmineWeeklyReportFormatPanel({
         'Commit line'
       ),
       placeholders: WEEKLY_REPORT_PLACEHOLDERS.commit
+    },
+    {
+      key: 'commitBodyTemplate',
+      label: translate(
+        'auto.components.task.page.redmine.weekly.report.format.commitBodyTemplate',
+        'Commit body line'
+      ),
+      placeholders: WEEKLY_REPORT_PLACEHOLDERS.line
+    },
+    {
+      key: 'descriptionTemplate',
+      label: translate(
+        'auto.components.task.page.redmine.weekly.report.format.descriptionTemplate',
+        'Description line'
+      ),
+      placeholders: WEEKLY_REPORT_PLACEHOLDERS.line
     }
   ]
   const flags: { key: FlagKey; label: string }[] = [
@@ -211,6 +231,20 @@ export function TaskPageRedmineWeeklyReportFormatPanel({
       label: translate(
         'auto.components.task.page.redmine.weekly.report.format.includeCommits',
         'Include my git commits linked to issues'
+      )
+    },
+    {
+      key: 'includeCommitBody',
+      label: translate(
+        'auto.components.task.page.redmine.weekly.report.format.includeCommitBody',
+        'Include bullet lines from commit messages'
+      )
+    },
+    {
+      key: 'includeDescription',
+      label: translate(
+        'auto.components.task.page.redmine.weekly.report.format.includeDescription',
+        'Include work items and issues from the description'
       )
     }
   ]
