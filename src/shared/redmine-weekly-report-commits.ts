@@ -6,6 +6,8 @@ export type WeeklyReportCommit = {
   /** Committer date, ISO. */
   committedOn: string
   repo: string
+  /** Bullet lines (`- `/`* `) from the message body; optional for hosts that predate it. */
+  body?: string[]
 }
 
 /** One `git log` record before it is tied to issues. */
@@ -26,12 +28,34 @@ export function issueIdFromBranchName(name: string): number | null {
 }
 
 /**
- * Merges message references and branch membership into issue id → commits,
- * listing a commit once per issue however many paths matched it.
+ * Body bullets below the subject, with indented wrap lines joined back on.
+ * Trailers and prose never start with a bullet, so they drop out.
+ */
+export function commitBodyBullets(message: string): string[] {
+  const out: string[] = []
+  let open = false
+  for (const line of message.replace(/\r\n?/g, '\n').split('\n').slice(1)) {
+    const bullet = /^\s*[-*]\s+(.+)$/.exec(line)
+    if (bullet) {
+      out.push(bullet[1].trim())
+    } else if (open && /^\s+\S/.test(line)) {
+      out[out.length - 1] += ` ${line.trim()}`
+      continue
+    }
+    open = Boolean(bullet)
+  }
+  return out
+}
+
+/**
+ * Merges message references, branch membership, and hash prefixes written in an
+ * issue's description into issue id → commits, listing a commit once per issue
+ * however many paths matched it.
  */
 export function matchCommitsToIssues(
   commits: readonly WeeklyReportGitCommit[],
-  branchCommits: ReadonlyMap<number, ReadonlySet<string>>
+  branchCommits: ReadonlyMap<number, ReadonlySet<string>>,
+  hashHints: ReadonlyMap<number, readonly string[]> = new Map()
 ): Map<number, WeeklyReportCommit[]> {
   const byHash = new Map(commits.map((c) => [c.hash, c]))
   const idsByHash = new Map<string, Set<number>>()
@@ -50,9 +74,16 @@ export function matchCommitsToIssues(
       }
     }
   }
+  for (const [id, prefixes] of hashHints) {
+    for (const hash of byHash.keys()) {
+      if (prefixes.some((prefix) => hash.startsWith(prefix))) {
+        add(hash, id)
+      }
+    }
+  }
   const out = new Map<number, WeeklyReportCommit[]>()
-  for (const { hash, subject, committedOn, repo } of byHash.values()) {
-    const commit = { hash, subject, committedOn, repo }
+  for (const { hash, subject, committedOn, repo, message } of byHash.values()) {
+    const commit = { hash, subject, committedOn, repo, body: commitBodyBullets(message) }
     for (const id of idsByHash.get(hash) ?? []) {
       out.set(id, [...(out.get(id) ?? []), commit])
     }
