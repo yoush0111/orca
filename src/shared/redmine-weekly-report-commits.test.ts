@@ -48,6 +48,22 @@ describe('matchCommitsToIssues', () => {
     expect(byIssue.get(5969)?.map((c) => c.hash)).toEqual(['a', 'b'])
     expect([...byIssue.keys()]).toEqual([5969])
   })
+
+  it('ties commits to an issue by hash prefixes from its description and keeps body bullets', () => {
+    const feat = commit(
+      '2ef9b68aa11',
+      'feat: 병원 의뢰서 일괄 출력\n\n- 툴바에 의뢰서 출력 버튼 추가\n본문 설명\n\nCo-Authored-By: X <x@y>'
+    )
+    const byIssue = matchCommitsToIssues(
+      [feat, commit('9999999', 'other')],
+      new Map(),
+      new Map([[6536, ['2ef9b68']]])
+    )
+    expect(byIssue.get(6536)).toEqual([
+      expect.objectContaining({ hash: '2ef9b68aa11', body: ['툴바에 의뢰서 출력 버튼 추가'] })
+    ])
+    expect([...byIssue.keys()]).toEqual([6536])
+  })
 })
 
 describe('cleanCommitSubject', () => {
