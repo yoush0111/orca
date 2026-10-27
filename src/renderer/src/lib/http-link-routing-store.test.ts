@@ -11,6 +11,7 @@ import { openHttpLink } from './http-link-routing'
 import { openAppHttpLink } from './app-http-link-open'
 import { httpLinkActionDestinationsFor, openRoutedHttpLink } from './http-link-destinations'
 import * as workspaceBrowserTabOpen from './workspace-browser-tab-open'
+import { OPEN_FLOATING_TERMINAL_EVENT } from './floating-terminal'
 import type { DocPreviewExternalLink } from '../../../shared/doc-preview-scheme'
 import { subscribeDocPreviewExternalLinkConfirmation } from '@/components/browser-pane/workspace-doc/doc-preview-external-link-confirmation'
 import { canNativeChatOpenOwnedBrowser } from '@/components/native-chat/native-chat-http-link-source-owner'
@@ -339,6 +340,8 @@ it('keeps the main view and workspace selected when revealing a floating HTTP li
     },
     layoutByWorktree: { ...state.layoutByWorktree, [floating]: state.layoutByWorktree[WORKSPACE]! }
   })
+  const dispatchEvent = vi.fn(() => true)
+  vi.stubGlobal('window', { ...window, dispatchEvent })
   const opening = vi.spyOn(workspaceBrowserTabOpen, 'openWorkspaceBrowserTabForLink')
   openHttpLink(URL_TO_OPEN, {
     worktreeId: floating,
@@ -350,6 +353,9 @@ it('keeps the main view and workspace selected when revealing a floating HTTP li
   expect(useAppStore.getState().activeView).toBe('activity')
   expect(useAppStore.getState().activeWorktreeId).toBe(WORKSPACE)
   expect(['a', 'b', 'c']).not.toContain(useAppStore.getState().activeGroupIdByWorktree[floating])
+  expect(dispatchEvent).toHaveBeenCalledWith(
+    expect.objectContaining({ type: OPEN_FLOATING_TERMINAL_EVENT })
+  )
 })
 
 it('reuses an exact page for an HTTP link without source context', async () => {
