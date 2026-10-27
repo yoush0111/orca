@@ -1,4 +1,3 @@
-import type { TaskPageComposerActionsModel } from './use-task-page-composer-actions'
 import type { TaskPageRedmineStateModel } from '../use-task-page-redmine-state'
 import { TaskPageFrame } from './Frame'
 import { TaskPageGitHubIssueDialog } from './github/IssueDialog'
