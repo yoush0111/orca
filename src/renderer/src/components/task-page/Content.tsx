@@ -1,4 +1,3 @@
-import type { TaskPageComposerActionsModel } from './use-task-page-composer-actions'
 import type { TaskPageRedmineStateModel } from '../use-task-page-redmine-state'
 import '../github-item-dialog/load-item-details/work-item-details-cache'
 import PullRequestPage from '@/components/pull-request-page/page/surface'
