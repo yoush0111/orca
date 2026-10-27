@@ -248,7 +248,7 @@ export function openHttpLink(url: string, opts: OpenHttpLinkOptions = {}): void 
         reveal.dispose()
         return
       }
-      if (isHttpLinkBackgroundOpen(state) || isFloatingWorkspaceId(worktreeId)) {
+      if (isFloatingWorkspaceId(worktreeId)) {
         window.dispatchEvent(new Event(OPEN_FLOATING_TERMINAL_EVENT))
       }
       if (workspaceHttpLinkBrowserOpener) {
