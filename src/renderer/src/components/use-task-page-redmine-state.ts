@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import type { TaskPageComposerActionsModel } from './use-task-page-composer-actions'
+import type { TaskPageComposerActionsModel } from './task-page/use-task-page-composer-actions'
 import { buildRedmineTaskSourceContext } from '@/components/redmine-task-source-context'
 import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
