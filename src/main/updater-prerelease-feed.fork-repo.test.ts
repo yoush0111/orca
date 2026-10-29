@@ -15,15 +15,15 @@ vi.mock('electron', () => ({ net: { fetch: netFetchMock, request: netRequestMock
 // Windows probes release assets through net.request; a 302 proves the asset exists.
 function mockRedirectingAssetRequest(): void {
   netRequestMock.mockImplementation(({ url }: { url: string }) => {
-    const handlers = new Map<string, (arg: number) => void>()
+    const handlers = new Map<string, (...args: unknown[]) => void>()
     return {
-      on(event: string, handler: (arg: number) => void) {
+      on(event: string, handler: (...args: unknown[]) => void) {
         handlers.set(event, handler)
         return this
       },
       end() {
         requestedAssetUrls.push(url)
-        queueMicrotask(() => handlers.get('redirect')?.(302))
+        queueMicrotask(() => handlers.get('redirect')?.(302, 'HEAD', `${url}?signed`))
       },
       abort() {}
     }
