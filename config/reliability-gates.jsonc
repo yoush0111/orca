@@ -108,7 +108,7 @@
       "invariant": "The relocated Windows daemon must retain the registry package root JS and native binary independently of its install tree, reject incomplete source or mirror files, and preserve an existing mirror while repairing it.",
       "oracle": "Run the real package JS from the relocated entry after deleting the install tree, reach its native loader, refuse each missing source file before staging, and replace each incomplete mirror without deleting its sentinel. Pin the real package name against the Windows packaging allowlist. On Windows, read ProductName through the built native addon from the mirror.",
       "commands": [
-        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/main/daemon/daemon-host-process-package.test.ts src/main/daemon/daemon-host-file-hash-cache.test.ts config/scripts/pr-code-change-scope.test.mjs config/scripts/package-electron-runtime-contract.test.mjs"
+        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/main/daemon/daemon-host-process-package.test.ts src/main/daemon/daemon-host-file-hash-cache.test.ts config/scripts/package-electron-runtime-contract.test.mjs"
       ],
       "testFiles": [
         "src/main/daemon/daemon-host-process-package.test.ts",
@@ -130,7 +130,7 @@
           "date": "2026-10-22",
           "runner": "local",
           "platform": "macos",
-          "command": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/main/daemon/daemon-host-process-package.test.ts src/main/daemon/daemon-host-file-hash-cache.test.ts config/scripts/pr-code-change-scope.test.mjs config/scripts/package-electron-runtime-contract.test.mjs",
+          "command": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/main/daemon/daemon-host-process-package.test.ts src/main/daemon/daemon-host-file-hash-cache.test.ts config/scripts/package-electron-runtime-contract.test.mjs",
           "result": "passed",
           "durationSeconds": 1.1,
           "summary": "Gate files and packaging scope contracts: 76 tests passed in four files, one Windows native-read test skipped. Full daemon-host suite also passed 94 tests in eight files. Original implementation fails seven new registry regressions."

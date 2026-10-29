@@ -13,7 +13,7 @@ it('records reuse intent for remote and local selections and clears it on Advanc
   const { result } = renderHook(() => {
     const identity = useWorkspaceIdentityState({
       initialBaseBranch: undefined,
-      initialLinearBranchName: undefined,
+      initialLinkedBranchName: undefined,
       initialLinkedWorkItem: null,
       linkedWorkItem: null,
       linkedWorkItemSeedIdentity: null,
