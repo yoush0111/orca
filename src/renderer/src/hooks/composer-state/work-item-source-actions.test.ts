@@ -57,7 +57,7 @@ it('defaults to the existing remote branch while preserving a custom workspace n
     const [name, setName] = useState('Review workspace')
     const identity = useWorkspaceIdentityState({
       initialBaseBranch: undefined,
-      initialLinearBranchName: undefined,
+      initialLinkedBranchName: undefined,
       initialLinkedWorkItem: null,
       linkedWorkItem: null,
       linkedWorkItemSeedIdentity: null,
