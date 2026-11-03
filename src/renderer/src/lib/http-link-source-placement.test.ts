@@ -19,6 +19,7 @@ import {
   type BrowserLinkTestStore
 } from './browser-link-open.test-fixture'
 import type { BrowserOpenOutcome } from './browser-link-destination'
+import { OPEN_FLOATING_TERMINAL_EVENT } from './floating-terminal'
 
 const mocks = vi.hoisted(() => ({ getState: vi.fn() }))
 vi.mock('@/store', () => ({ useAppStore: { getState: () => mocks.getState() } }))
@@ -47,6 +48,7 @@ beforeEach(() => {
 })
 afterEach(() => {
   registerWorkspaceHttpLinkBrowserOpener(null)
+  vi.unstubAllGlobals()
 })
 
 async function settle() {
@@ -192,6 +194,8 @@ it.each([false, true])(
         url: URL_TO_OPEN
       })
     ).toBe(true)
+    const dispatchEvent = vi.fn(() => true)
+    vi.stubGlobal('window', { ...window, dispatchEvent })
     openRoutedHttpLink(URL_TO_OPEN, {
       worktreeId: floating,
       sourceTabId: 'floating-source',
@@ -210,6 +214,9 @@ it.each([false, true])(
         }
       }
     ])
+    expect(dispatchEvent).toHaveBeenCalledWith(
+      expect.objectContaining({ type: OPEN_FLOATING_TERMINAL_EVENT })
+    )
     if (!explicit) {
       expect(outcomes[0]).toMatchObject({ result: { groupId: 'right' } })
       expect(store.getState().groupsByWorktree[floating]).toHaveLength(2)
