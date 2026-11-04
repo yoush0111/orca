@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { translate } from '@/i18n/i18n'
-import type { RedmineAgentSkillStatus } from '../../../../shared/redmine-types'
+import type { RedmineAgentSkillStatus } from '../../../../../shared/redmine-types'
 
 function statusLabel(status: RedmineAgentSkillStatus | null): string {
   if (status === 'installed') {
