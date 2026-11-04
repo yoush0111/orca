@@ -13,8 +13,8 @@ import { translate } from '@/i18n/i18n'
 import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
 import { redmineListProjects } from '@/runtime/runtime-redmine-client'
 import { useAppStore } from '@/store'
-import type { RedmineProject } from '../../../../shared/redmine-types'
-import { SettingsSubsectionHeader } from './SettingsFormControls'
+import type { RedmineProject } from '../../../../../shared/redmine-types'
+import { SettingsSubsectionHeader } from '../../settings/form-controls/SettingsFormControls'
 
 const ADD_PLACEHOLDER = 'add'
 
