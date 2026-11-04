@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { ensureElectronProxyFromEnvironment } from '../network/proxy-settings'
 import { getMainHttpClient } from '../network/http-client'
-import { CredentialDecryptionError } from '../integration-credential-file'
+import { CredentialDecryptionError } from '../credentials/integration-credential-file'
 import type {
   RedmineConnectArgs,
   RedmineConnectResult,
