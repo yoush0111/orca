@@ -25,7 +25,7 @@ import {
 } from '@/runtime/runtime-redmine-client'
 import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
 import { useAppStore } from '@/store'
-import { REDMINE_INTEGRATION_SECTION_ID } from '@/components/settings/task-provider-integration-section-ids'
+import { REDMINE_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
 import type { TaskSourceContext } from '../../../shared/task-source-context'
 import type { RedmineIssue, RedmineNamedRef, RedmineProject } from '../../../shared/redmine-types'
 
