@@ -26,8 +26,7 @@ export function useTaskPageSourceSummary(model: TaskPageSourceAvailabilityPrelud
     hostLabelById,
     taskSourceHostAvailability,
     accountBackedTaskSourceHostId,
-    accountBackedTaskSourceHostAvailability,
-    redmineStatus
+    accountBackedTaskSourceHostAvailability
   } = model
   const taskSourceAvailabilityNoticeByProvider = useMemo<
     Partial<Record<TaskProvider, TaskSourceAvailabilityNotice>>

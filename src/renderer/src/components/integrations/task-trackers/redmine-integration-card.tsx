@@ -9,12 +9,15 @@ import {
   hasRemoteProviderRuntime
 } from '@/lib/provider-runtime-context'
 import { useAppStore } from '@/store'
-import { IntegrationCardDetails, IntegrationCardShell } from './integration-card-shell'
-import { useIntegrationSubordinateRowClass } from './integration-card-presentation'
-import { getProviderAccountScope } from './provider-account-scope'
-import { ProviderHostScopeControl } from './ProviderHostScopeControl'
+import {
+  IntegrationCardDetails,
+  IntegrationCardShell
+} from '../presentation/integration-card-shell'
+import { useIntegrationSubordinateRowClass } from '../presentation/integration-card-presentation'
+import { getProviderAccountScope } from '../../provider-accounts/provider-account-scope'
+import { ProviderHostScopeControl } from '../../provider-accounts/ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
-import { NumberField, SettingsSwitchRow } from './SettingsFormControls'
+import { NumberField, SettingsSwitchRow } from '../../settings/form-controls/SettingsFormControls'
 import { RedmineProjectRepoMapping } from './redmine-project-repo-mapping'
 import { RedmineAgentSkillRow } from './redmine-agent-skill-row'
 import { translate } from '@/i18n/i18n'
