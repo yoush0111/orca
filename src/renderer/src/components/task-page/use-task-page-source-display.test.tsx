@@ -262,6 +262,7 @@ describe('Tasks source display', () => {
         hostLabelById: new Map(),
         selectedLinearWorkspace: null,
         selectedJiraSite: null,
+        redmineStatus: { connected: false, connection: null },
         activeGithubTaskKind: 'issues',
         ...args
       }
