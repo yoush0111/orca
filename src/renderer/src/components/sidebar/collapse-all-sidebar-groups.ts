@@ -1,7 +1,7 @@
 import { getRepoMapFromState } from '@/store/selectors'
 import type { AppState } from '@/store/types'
 import { computeRenderedSidebarRows } from './worktree-list/listing/rendered-sidebar-worktree-order'
-import { computeVisibleWorktrees } from './worktree-list/listing/visible-worktrees'
+import { computeVisibleWorktrees } from './worktree-list/listing/compute-visible-worktrees'
 import { buildVisibleWorktreeOptionsFromState } from './worktree-list/listing/visible-worktree-options-from-state'
 
 // Why headers only: host sections stay open so the collapsed projects remain visible under them.
