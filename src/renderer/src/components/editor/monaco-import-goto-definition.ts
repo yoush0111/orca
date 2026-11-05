@@ -12,7 +12,7 @@ import {
   findExportedSymbolLine,
   findLocalDeclarationLine
 } from './import-goto-definition-symbol-lookup'
-import { deriveMarkdownPreviewSourceRoot } from './markdown-preview-source-routing'
+import { deriveMarkdownPreviewSourceRoot } from './markdown-preview/links/markdown-preview-source-routing'
 
 const IMPORT_GOTO_DEFINITION_SCHEME = 'orca-import-goto'
 
