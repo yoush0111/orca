@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { normalizeWorkspaceLinkedItem } from './workspace-linked-item'
-import { WorktreeCreate } from './rpc-contract/worktree-create-params'
+import { WorktreeCreate } from '../rpc-contract/worktree-create-params'
 
 const redmineItem = {
   provider: 'redmine',
