@@ -1,4 +1,4 @@
-import type { OpenHttpLinkOptions } from '@/lib/http-link-routing'
+import type { OpenHttpLinkOptions } from '@/lib/browser/navigation/http-link-destinations'
 
 export function isRedmineSystemBrowserModifier(
   event: Pick<MouseEvent, 'metaKey' | 'ctrlKey' | 'shiftKey'>,
