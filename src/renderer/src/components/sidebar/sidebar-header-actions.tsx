@@ -14,6 +14,7 @@ function areAllHeadersCollapsed(keys: readonly string[], collapsedGroups: Set<st
 }
 
 function ToggleAllProjectsCollapsedButton(): React.JSX.Element {
+  const t = useTranslate()
   const collapsedGroups = useAppStore((s) => s.collapsedGroups)
   // ponytail: recomputed only on collapse changes, so a project added meanwhile can show a stale icon until the next toggle; the click itself always reads fresh state.
   const allCollapsed = useMemo(
@@ -22,8 +23,8 @@ function ToggleAllProjectsCollapsedButton(): React.JSX.Element {
     [collapsedGroups]
   )
   const label = allCollapsed
-    ? translate('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
-    : translate('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
+    ? t('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
+    : t('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
   const Icon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
 
   const handleClick = useCallback(() => {

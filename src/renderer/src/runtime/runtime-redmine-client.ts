@@ -14,8 +14,8 @@ import type {
 } from '../../../shared/redmine-types'
 import { translate } from '@/i18n/i18n'
 import { defaultScopeHost, rowLessSourceTarget } from '@/lib/default-creation-host'
-import { callRuntimeRpc } from './runtime-rpc-client'
-import { RuntimeRpcCallError } from './runtime-rpc-result'
+import { callRuntimeRpc } from './rpc/calls/runtime-rpc-call'
+import { RuntimeRpcCallError } from './rpc/calls/runtime-rpc-result'
 
 export type RuntimeRedmineSettings =
   | Pick<GlobalSettings, 'activeRuntimeEnvironmentId'>
