@@ -574,6 +574,13 @@ import {
   ProjectUpdate
 } from './project-runtime-params'
 import { RecipeVmWakeParams } from './recipe-vm-wake-params'
+import {
+  RedmineConnect,
+  RedmineIssueId,
+  RedmineIssueNote,
+  RedmineIssueQuery,
+  RedmineWeeklyReportQuery
+} from './redmine-params'
 import { ReferenceFind, ReferenceList } from './reference-params'
 import {
   ProjectGroupCreate,
@@ -1454,6 +1461,16 @@ export const RPC_PARAMS_BY_METHOD = {
   'projectHostSetup.list': null,
   'projectHostSetup.setupExistingFolder': ProjectHostSetupExistingFolder,
   'projectHostSetup.update': ProjectHostSetupUpdate,
+  'redmine.connect': RedmineConnect,
+  'redmine.disconnect': null,
+  'redmine.issueAddNote': RedmineIssueNote,
+  'redmine.issueShow': RedmineIssueId,
+  'redmine.listIssues': RedmineIssueQuery,
+  'redmine.listProjects': null,
+  'redmine.listStatuses': null,
+  'redmine.status': null,
+  'redmine.testConnection': null,
+  'redmine.weeklyReport': RedmineWeeklyReportQuery,
   'reference.find': ReferenceFind,
   'reference.list': ReferenceList,
   'repo.add': RepoPath,

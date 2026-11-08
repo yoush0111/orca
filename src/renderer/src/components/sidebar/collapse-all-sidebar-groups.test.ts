@@ -4,7 +4,10 @@ import type { AppState } from '@/store/types'
 import type { Repo } from '../../../../shared/repo-types'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { getSidebarHeaderCollapseKeys } from './collapse-all-sidebar-groups'
-import { getVisibleWorktreeIds, setVisibleWorktreeIds } from './worktree-list/listing/visible-worktrees'
+import {
+  getVisibleWorktreeIds,
+  setVisibleWorktreeIds
+} from './worktree-list/listing/visible-worktrees'
 
 const initialState = useAppStore.getInitialState()
 
