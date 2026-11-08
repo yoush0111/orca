@@ -11,7 +11,7 @@ vi.mock('@/store', () => ({
   useAppStore: (selector: (state: Record<string, unknown>) => unknown) =>
     selector({ activeWorktreeId: 'wt-1', repos: [], settings: {} })
 }))
-vi.mock('@/lib/http-link-routing', () => ({
+vi.mock('@/lib/browser/navigation/http-link-routing', () => ({
   openHttpLink: (...args: unknown[]) => openHttpLink(...args)
 }))
 
