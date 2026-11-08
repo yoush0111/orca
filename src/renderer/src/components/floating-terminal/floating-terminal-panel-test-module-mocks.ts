@@ -13,6 +13,8 @@ import { storeBox, type FloatingPanelStoreState } from './floating-terminal-pane
 export function createReactHookOverrides() {
   return {
     useCallback: <T>(callback: T) => callback,
+    // Why: the probe renders outside React, so context reads fall back to their defaults.
+    useContext: <T>(context: { _currentValue: T }) => context._currentValue,
     // Why: subscription hooks in the shared model read module stores; the probe only needs the snapshot.
     useSyncExternalStore: <T>(_subscribe: unknown, getSnapshot: () => T) => getSnapshot(),
     useEffect: (effect: EffectCallback) => {
