@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo } from 'react'
-import { ChevronsDownUp, ChevronsUpDown, FolderPlus, Plus } from 'lucide-react'
+import React, { useCallback } from 'react'
+import { FolderPlus, Plus } from 'lucide-react'
 import { useAppStore } from '@/store'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -7,52 +7,6 @@ import { formatOptionalPrimaryShortcutLabel } from '@/hooks/useShortcutLabel'
 import { useTranslate } from '@/i18n/use-translate'
 import { openWorkspaceCreationComposerWithTourHandoff } from '../contextual-tours/workspace-creation-tour-handoff'
 import SidebarWorkspaceOptionsMenu from './worktree-list/controls/SidebarWorkspaceOptionsMenu'
-import { getSidebarHeaderCollapseKeys } from './collapse-all-sidebar-groups'
-
-function areAllHeadersCollapsed(keys: readonly string[], collapsedGroups: Set<string>): boolean {
-  return keys.length > 0 && keys.every((key) => collapsedGroups.has(key))
-}
-
-function ToggleAllProjectsCollapsedButton(): React.JSX.Element {
-  const t = useTranslate()
-  const collapsedGroups = useAppStore((s) => s.collapsedGroups)
-  // ponytail: recomputed only on collapse changes, so a project added meanwhile can show a stale icon until the next toggle; the click itself always reads fresh state.
-  const allCollapsed = useMemo(
-    () =>
-      areAllHeadersCollapsed(getSidebarHeaderCollapseKeys(useAppStore.getState()), collapsedGroups),
-    [collapsedGroups]
-  )
-  const label = allCollapsed
-    ? t('auto.components.sidebar.SidebarHeader.expandAll', 'Expand all projects')
-    : t('auto.components.sidebar.SidebarHeader.collapseAll', 'Collapse all projects')
-  const Icon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
-
-  const handleClick = useCallback(() => {
-    const state = useAppStore.getState()
-    const keys = getSidebarHeaderCollapseKeys(state)
-    state.setGroupsCollapsed(keys, !areAllHeadersCollapsed(keys, state.collapsedGroups))
-  }, [])
-
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon-xs"
-          type="button"
-          className="text-muted-foreground"
-          aria-label={label}
-          onClick={handleClick}
-        >
-          <Icon className="size-3.5" strokeWidth={2.25} />
-        </Button>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" sideOffset={6}>
-        {label}
-      </TooltipContent>
-    </Tooltip>
-  )
-}
 
 function AddProjectButton({
   preserveWorkspaceBoardOpen
@@ -143,7 +97,6 @@ export function SidebarHeaderActions({
           />
         )}
       </div>
-      {agentsViewActive ? null : <ToggleAllProjectsCollapsedButton />}
       <AddProjectButton preserveWorkspaceBoardOpen />
       <NewWorkspaceButton preserveWorkspaceBoardOpen />
     </div>
