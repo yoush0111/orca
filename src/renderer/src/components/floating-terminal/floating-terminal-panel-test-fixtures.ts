@@ -3,7 +3,7 @@ import type { KeybindingOverrides, TerminalShortcutPolicy } from '../../../../sh
 import type { BrowserTab } from '../../../../shared/browser-workspace-types'
 import type { Tab, TabGroup, TabGroupLayoutNode } from '../../../../shared/tab-types'
 import type { TerminalTab } from '../../../../shared/workspace-layout/terminal-tab-types'
-import type { OpenFile } from '@/store/slices/editor'
+import type { OpenFile } from '@/store/slices/editor/types/open-file'
 
 export type FloatingPanelStoreState = {
   tabsByWorktree: Record<string, TerminalTab[]>
