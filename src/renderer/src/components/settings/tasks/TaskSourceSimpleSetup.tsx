@@ -130,6 +130,7 @@ export function JiraSetupSteps(
 export function RedmineSetupSteps(
   props: ConnectStepProps & { onConnected: () => void; onOpenIntegrations: () => void }
 ): React.JSX.Element {
+  const t = useTranslate()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
@@ -138,11 +139,8 @@ export function RedmineSetupSteps(
         <TaskSourceStepRow
           index={1}
           state={getConnectStepState(props)}
-          title={translate(
-            'auto.components.settings.TasksPane.connectRedmineTitle',
-            'Connect Redmine'
-          )}
-          description={translate(
+          title={t('auto.components.settings.TasksPane.connectRedmineTitle', 'Connect Redmine')}
+          description={t(
             'auto.components.settings.TasksPane.connectRedmineDescription',
             'Add a Redmine instance with its REST API key.'
           )}
@@ -154,14 +152,14 @@ export function RedmineSetupSteps(
               onClick={props.connected ? props.onOpenIntegrations : () => setDialogOpen(true)}
             >
               {props.connected
-                ? translate('auto.components.settings.TasksPane.manageRedmine', 'Manage key')
-                : translate('auto.components.settings.TasksPane.addRedmine', 'Add Redmine access')}
+                ? t('auto.components.settings.TasksPane.manageRedmine', 'Manage key')
+                : t('auto.components.settings.TasksPane.addRedmine', 'Add Redmine access')}
             </Button>
           }
         />
         <TaskSourceShowInTasksStep
           index={2}
-          providerLabel={translate('auto.components.settings.TasksPane.redmineLabel', 'Redmine')}
+          providerLabel={t('auto.components.settings.TasksPane.redmineLabel', 'Redmine')}
           visible={props.visible}
           canHide={props.canHide}
           onToggleVisible={props.onToggleVisible}

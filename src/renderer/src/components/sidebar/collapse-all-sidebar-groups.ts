@@ -1,4 +1,3 @@
-import { getRepoMapFromState } from '@/store/selectors'
 import type { AppState } from '@/store/types'
 import { computeRenderedSidebarRows } from './worktree-list/listing/rendered-sidebar-worktree-order'
 import { computeVisibleWorktrees } from './worktree-list/listing/compute-visible-worktrees'
@@ -10,7 +9,7 @@ export function getSidebarHeaderCollapseKeys(state: AppState): string[] {
   const visibleWorktrees = computeVisibleWorktrees(
     state.worktreesByRepo,
     [],
-    buildVisibleWorktreeOptionsFromState(state, getRepoMapFromState(state))
+    buildVisibleWorktreeOptionsFromState(state, new Map(state.repos.map((repo) => [repo.id, repo])))
   )
   return computeRenderedSidebarRows(
     { ...state, collapsedGroups: new Set() },
