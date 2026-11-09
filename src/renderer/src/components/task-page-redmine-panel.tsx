@@ -23,10 +23,10 @@ import {
   redmineListProjects,
   redmineListStatuses
 } from '@/runtime/runtime-redmine-client'
-import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
+import { getProviderRuntimeContextKey } from '@/runtime/hosts/observations/provider-runtime-context'
 import { useAppStore } from '@/store'
 import { REDMINE_INTEGRATION_SECTION_ID } from '@/components/integrations/task-trackers/task-provider-integration-section-ids'
-import type { TaskSourceContext } from '../../../shared/task-source-context'
+import type { TaskSourceContext } from '../../../shared/work-items/task-source-context'
 import type { RedmineIssue, RedmineNamedRef, RedmineProject } from '../../../shared/redmine-types'
 
 const ALL_PROJECTS = 'all'
