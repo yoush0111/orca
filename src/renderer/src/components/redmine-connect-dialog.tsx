@@ -14,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
-import { hasRemoteProviderRuntime } from '@/lib/provider-runtime-context'
+import { hasRemoteProviderRuntime } from '@/runtime/hosts/observations/provider-runtime-context'
 import { translate } from '@/i18n/i18n'
 
 type RedmineConnectDialogProps = {

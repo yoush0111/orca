@@ -1,7 +1,7 @@
 import {
   normalizeTaskSourceContext,
   type TaskSourceContext
-} from '../../../shared/task-source-context'
+} from '../../../shared/work-items/task-source-context'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 
 /** Redmine has no repo of its own, so it falls back to the account-scoped project id. */
