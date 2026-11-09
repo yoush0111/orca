@@ -18,10 +18,7 @@ export function RedmineSetupSteps(
         <TaskSourceStepRow
           index={1}
           state={getConnectStepState(props)}
-          title={t(
-            'auto.components.settings.TasksPane.connectRedmineTitle',
-            'Connect Redmine'
-          )}
+          title={t('auto.components.settings.TasksPane.connectRedmineTitle', 'Connect Redmine')}
           description={t(
             'auto.components.settings.TasksPane.connectRedmineDescription',
             'Add a Redmine instance with its REST API key.'
