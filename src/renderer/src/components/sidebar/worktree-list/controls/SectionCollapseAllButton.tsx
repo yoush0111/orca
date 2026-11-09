@@ -14,6 +14,7 @@ export function SectionCollapseAllButton({
   expandLabel,
   shortcut,
   announcing = false,
+  alwaysVisible = false,
   toggleAttributes
 }: {
   allCollapsed: boolean
@@ -24,6 +25,8 @@ export function SectionCollapseAllButton({
   shortcut?: ShortcutKeyComboDetails
   /** A tour points at it, so it stays shown without hover. */
   announcing?: boolean
+  /** Sits among the header actions, so it is shown without hover. */
+  alwaysVisible?: boolean
   /** Marks the wrapper for tours and tests, e.g. `{ 'data-projects-collapse-toggle': '' }`. */
   toggleAttributes?: Record<`data-${string}`, string>
 }): React.JSX.Element {
@@ -38,10 +41,12 @@ export function SectionCollapseAllButton({
           {...toggleAttributes}
           className={cn(
             'flex shrink-0 overflow-hidden text-muted-foreground',
-            'can-hover:w-0 can-hover:opacity-0',
-            'can-hover:group-hover/sidebar-header:w-6 can-hover:group-hover/sidebar-header:opacity-100',
-            'can-hover:focus-within:w-6 can-hover:focus-within:opacity-100',
-            announcing && 'can-hover:w-6 can-hover:opacity-100'
+            !alwaysVisible && [
+              'can-hover:w-0 can-hover:opacity-0',
+              'can-hover:group-hover/sidebar-header:w-6 can-hover:group-hover/sidebar-header:opacity-100',
+              'can-hover:focus-within:w-6 can-hover:focus-within:opacity-100',
+              announcing && 'can-hover:w-6 can-hover:opacity-100'
+            ]
           )}
         >
           <TooltipTrigger asChild>
@@ -52,11 +57,14 @@ export function SectionCollapseAllButton({
               aria-label={label}
               onClick={onToggle}
             >
-              <Icon />
+              <Icon
+                className={alwaysVisible ? 'size-3.5' : undefined}
+                strokeWidth={alwaysVisible ? 2.25 : undefined}
+              />
             </Button>
           </TooltipTrigger>
         </span>
-        <TooltipContent side="top" sideOffset={4}>
+        <TooltipContent side={alwaysVisible ? 'bottom' : 'top'} sideOffset={alwaysVisible ? 6 : 4}>
           <span className="flex items-center gap-2">
             {label}
             {shortcut ? <ShortcutKeyCombo {...shortcut} /> : null}

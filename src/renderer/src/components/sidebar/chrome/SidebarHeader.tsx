@@ -78,15 +78,6 @@ const SidebarHeader = React.memo(function SidebarHeader({
       sectionId={groupBy === 'repo' ? 'projects' : 'workspaces'}
       reorderable={collapsible}
       fold={fold}
-      tourTarget={groupBy === 'repo' ? 'projects-collapse-all' : undefined}
-      // WorktreeList portals the collapse-all toggle here; it owns the rendered project rows.
-      titleAccessory={
-        <div
-          ref={projectsCollapseTarget}
-          className="relative flex shrink-0 items-center empty:hidden"
-        />
-      }
-
       actions={
         <>
           <Popover
@@ -169,6 +160,8 @@ const SidebarHeader = React.memo(function SidebarHeader({
             onWorkspaceBoardMenuOpenChange={onWorkspaceBoardMenuOpenChange}
             agentsViewActive={agentsViewActive}
             activityOptionsTarget={activityOptionsTarget}
+            projectsCollapseTarget={projectsCollapseTarget}
+            projectsCollapseTourTarget={groupBy === 'repo'}
           />
         </>
       }
