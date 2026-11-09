@@ -12,7 +12,7 @@ import {
   redmineStatus,
   redmineTestConnection
 } from '@/runtime/runtime-redmine-client'
-import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
+import { getProviderRuntimeContextKey } from '@/runtime/hosts/observations/provider-runtime-context'
 
 // Why: a status read that lands after the runtime switched belongs to the old
 // host, so every write re-checks the generation and the context key.
