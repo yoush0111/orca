@@ -6,7 +6,7 @@ import {
   buildRedmineTaskSourceContext
 } from '@/components/redmine-task-source-context'
 import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
-import { getProviderRuntimeContextKey } from '@/lib/provider-runtime-context'
+import { getProviderRuntimeContextKey } from '@/runtime/hosts/observations/provider-runtime-context'
 import { useAppStore } from '@/store'
 import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host'
 import { buildRedmineWorkspaceSource } from '../../../../shared/new-workspace/workspace-source'
