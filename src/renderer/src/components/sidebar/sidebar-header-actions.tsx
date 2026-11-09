@@ -81,11 +81,15 @@ function NewWorkspaceButton({
 export function SidebarHeaderActions({
   onWorkspaceBoardMenuOpenChange,
   agentsViewActive = false,
-  activityOptionsTarget
+  activityOptionsTarget,
+  projectsCollapseTarget,
+  projectsCollapseTourTarget = false
 }: {
   onWorkspaceBoardMenuOpenChange: (open: boolean) => void
   agentsViewActive?: boolean
   activityOptionsTarget?: React.Ref<HTMLDivElement>
+  projectsCollapseTarget?: React.Ref<HTMLDivElement>
+  projectsCollapseTourTarget?: boolean
 }): React.JSX.Element {
   return (
     <div className="flex shrink-0 items-center gap-1" data-sidebar-header-actions="">
@@ -97,6 +101,14 @@ export function SidebarHeaderActions({
           />
         )}
       </div>
+      {/* WorktreeList portals the collapse-all toggle here; it owns the rendered project rows. */}
+      <div
+        ref={projectsCollapseTarget}
+        className="flex shrink-0 items-center empty:hidden"
+        data-contextual-tour-target={
+          projectsCollapseTourTarget ? 'projects-collapse-all' : undefined
+        }
+      />
       <AddProjectButton preserveWorkspaceBoardOpen />
       <NewWorkspaceButton preserveWorkspaceBoardOpen />
     </div>

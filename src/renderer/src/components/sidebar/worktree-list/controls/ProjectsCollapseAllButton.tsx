@@ -5,8 +5,6 @@ import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
 import { useShortcutKeyDetails } from '@/hooks/useShortcutLabel'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { useTranslate } from '@/i18n/use-translate'
-import { cn } from '@/lib/class-names'
-import { useAppStore } from '@/store/index'
 
 export function ProjectsCollapseAllButton({
   allCollapsed,
@@ -21,22 +19,12 @@ export function ProjectsCollapseAllButton({
     ? t('auto.components.sidebar.SidebarHeader.expandAllProjects', 'Expand all projects')
     : t('auto.components.sidebar.SidebarHeader.collapseAllProjects', 'Collapse all projects')
   const Icon = allCollapsed ? ChevronsUpDown : ChevronsDownUp
-  const announcing = useAppStore((s) => s.activeContextualTourId === 'projects-collapse-all')
 
   // Own provider so a tooltip open on a neighbor can't skip this delay; clicks are the common case.
   return (
     <TooltipProvider delayDuration={1000} skipDelayDuration={0}>
       <Tooltip>
-        <span
-          data-projects-collapse-toggle=""
-          className={cn(
-            'flex shrink-0 overflow-hidden text-muted-foreground',
-            'can-hover:w-0 can-hover:opacity-0',
-            'can-hover:group-hover/sidebar-header:w-6 can-hover:group-hover/sidebar-header:opacity-100',
-            'can-hover:focus-within:w-6 can-hover:focus-within:opacity-100',
-            announcing && 'can-hover:w-6 can-hover:opacity-100'
-          )}
-        >
+        <span data-projects-collapse-toggle="" className="flex shrink-0 text-muted-foreground">
           <TooltipTrigger asChild>
             <Button
               variant="ghost"
@@ -45,11 +33,11 @@ export function ProjectsCollapseAllButton({
               aria-label={label}
               onClick={onToggle}
             >
-              <Icon />
+              <Icon className="size-3.5" strokeWidth={2.25} />
             </Button>
           </TooltipTrigger>
         </span>
-        <TooltipContent side="top" sideOffset={4}>
+        <TooltipContent side="bottom" sideOffset={6}>
           <span className="flex items-center gap-2">
             {label}
             <ShortcutKeyCombo {...shortcut} />
