@@ -1,7 +1,6 @@
 import React from 'react'
 import { useShortcutKeyDetails } from '@/lib/keyboard/useShortcutLabel'
 import { useTranslate } from '@/i18n/use-translate'
-import { useAppStore } from '@/store/index'
 import { SectionCollapseAllButton } from './SectionCollapseAllButton'
 
 const PROJECTS_TOGGLE_ATTRIBUTES = {
@@ -17,7 +16,6 @@ export function ProjectsCollapseAllButton({
 }): React.JSX.Element {
   const t = useTranslate()
   const shortcut = useShortcutKeyDetails('sidebar.projects.toggleCollapse')
-  const announcing = useAppStore((s) => s.activeContextualTourId === 'projects-collapse-all')
   return (
     <SectionCollapseAllButton
       allCollapsed={allCollapsed}
@@ -31,7 +29,7 @@ export function ProjectsCollapseAllButton({
         'Expand all projects'
       )}
       shortcut={shortcut}
-      announcing={announcing}
+      alwaysVisible
       toggleAttributes={PROJECTS_TOGGLE_ATTRIBUTES}
     />
   )
