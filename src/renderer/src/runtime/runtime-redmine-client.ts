@@ -13,7 +13,10 @@ import type {
   RedmineWeeklyReportResult
 } from '../../../shared/redmine-types'
 import { translate } from '@/i18n/i18n'
-import { defaultScopeHost, rowLessSourceTarget } from '@/lib/default-creation-host'
+import {
+  defaultScopeHost,
+  rowLessSourceTarget
+} from '@/runtime/hosts/selection/default-creation-host'
 import { callRuntimeRpc } from './rpc/calls/runtime-rpc-call'
 import { RuntimeRpcCallError } from './rpc/calls/runtime-rpc-result'
 
