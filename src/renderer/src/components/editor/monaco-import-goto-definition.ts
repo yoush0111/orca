@@ -1,7 +1,7 @@
 import type { editor, IDisposable, IRange, languages, Position } from 'monaco-editor'
 import * as monaco from 'monaco-editor'
 import { useAppStore } from '@/store'
-import { detectLanguage } from '@/lib/language-detect'
+import { detectLanguage } from '../../../../shared/editor-language/editor-language-detect'
 import {
   findImportSpecifierRanges,
   findImportSymbolRanges,
