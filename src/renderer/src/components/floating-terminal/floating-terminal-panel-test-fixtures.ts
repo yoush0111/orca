@@ -1,13 +1,13 @@
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../../shared/constants'
 import type { KeybindingOverrides, TerminalShortcutPolicy } from '../../../../shared/keybindings'
-import type { BrowserTab } from '../../../../shared/browser-workspace-types'
+import type { BrowserWorkspace } from '../../../../shared/browser-workspace-types'
 import type { Tab, TabGroup, TabGroupLayoutNode } from '../../../../shared/tab-types'
 import type { TerminalTab } from '../../../../shared/workspace-layout/terminal-tab-types'
 import type { OpenFile } from '@/store/slices/editor/types/open-file'
 
 export type FloatingPanelStoreState = {
   tabsByWorktree: Record<string, TerminalTab[]>
-  browserTabsByWorktree: Record<string, BrowserTab[]>
+  browserTabsByWorktree: Record<string, BrowserWorkspace[]>
   browserPagesByWorkspace: Record<string, unknown[]>
   groupsByWorktree: Record<string, TabGroup[]>
   unifiedTabsByWorktree: Record<string, Tab[]>
@@ -49,7 +49,7 @@ export type FloatingPanelStoreState = {
       title?: string
       targetGroupId?: string
     }
-  ) => BrowserTab
+  ) => BrowserWorkspace
   closeTab: (tabId: string) => void
   closeBrowserTab: (tabId: string) => void
   closeFile: (fileId: string) => void
