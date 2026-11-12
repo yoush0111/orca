@@ -1,4 +1,4 @@
-import type { GitPushTarget, Worktree } from './types'
+import type { GitPushTarget, WorkspaceAttachment, Worktree } from './types'
 import {
   CLEARED_HOSTED_REVIEW_LINK_UPDATES,
   CLEARED_HOSTED_REVIEW_SELECTION_UPDATES,
@@ -39,7 +39,8 @@ function hostedReviewSelectionSignature(
         item.type === type &&
         context[slot] === item.number
     )
-      ? getWorkspaceReferenceIdentity(item)
+      ? // oxlint-disable-next-line typescript/consistent-type-assertions -- SAFETY: the slot match above proves a forge provider, never Redmine.
+        getWorkspaceReferenceIdentity(item as WorkspaceAttachment)
       : null
   return {
     links: JSON.stringify(HOSTED_REVIEW_LINK_KEYS.map((key) => context[key] ?? null)),

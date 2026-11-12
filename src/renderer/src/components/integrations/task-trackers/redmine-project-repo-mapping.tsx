@@ -10,7 +10,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { translate } from '@/i18n/i18n'
-import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../../../shared/new-workspace-dialog-repo'
 import { redmineListProjects } from '@/runtime/runtime-redmine-client'
 import { useAppStore } from '@/store'
 import type { RedmineProject } from '../../../../../shared/redmine-types'
@@ -61,7 +61,7 @@ export function RedmineProjectRepoMapping(): React.JSX.Element {
     }
   }, [runtimeEnvironmentId])
 
-  const eligibleRepos = useMemo(() => getComposerEligibleRepos(repos), [repos])
+  const eligibleRepos = useMemo(() => getNewWorkspaceDialogEligibleRepos(repos), [repos])
   const projectsById = useMemo(
     () => new Map(projects.map((project) => [project.id, project])),
     [projects]

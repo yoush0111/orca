@@ -1,5 +1,5 @@
-import type { LinkedWorkItemSummary } from '@/lib/new-workspace'
-import { getLinearLinkedWorkItemBranchName } from '@/lib/linear-linked-work-item'
+import type { LinkedWorkItemSummary } from '@/lib/workspace/creation/new-workspace'
+import { getLinearLinkedWorkItemBranchName } from '@/lib/work-items/linear/linear-linked-work-item'
 
 /**
  * The canonical git ref a linked work item brings with it, bypassing the
