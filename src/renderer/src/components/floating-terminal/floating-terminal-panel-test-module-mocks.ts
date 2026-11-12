@@ -212,14 +212,14 @@ export function createFocusTerminalTabSurfaceModule(): Pick<
 export function createOrchestrationSetupStateModule(): {
   ORCHESTRATION_SETUP_DISMISSED_STORAGE_KEY: string
   ORCHESTRATION_SETUP_STATE_EVENT: string
-  hasOrchestrationSetupMarker: Mock<() => boolean>
+  isOrchestrationSetupEnabled: Mock<() => boolean>
   isOrchestrationSetupDismissed: Mock<() => boolean>
   notifyOrchestrationSetupStateChanged: Mock<() => void>
 } {
   return {
     ORCHESTRATION_SETUP_DISMISSED_STORAGE_KEY: 'floating-terminal-test-dismissed',
     ORCHESTRATION_SETUP_STATE_EVENT: 'floating-terminal-test-setup-state',
-    hasOrchestrationSetupMarker: vi.fn(() => true),
+    isOrchestrationSetupEnabled: vi.fn(() => true),
     isOrchestrationSetupDismissed: vi.fn(() => false),
     notifyOrchestrationSetupStateChanged: vi.fn()
   }
