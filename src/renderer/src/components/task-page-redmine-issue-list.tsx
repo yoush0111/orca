@@ -5,8 +5,8 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { translate } from '@/i18n/i18n'
 import { openHttpLink } from '@/lib/browser/navigation/http-link-routing'
-import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
-import { cn } from '@/lib/utils'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace-dialog-repo'
+import { cn } from '@/lib/class-names'
 import { useAppStore } from '@/store'
 import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
 import { clampDoneRatio, TaskPageRedmineIssueSheet } from './task-page-redmine-issue-sheet'
@@ -218,7 +218,7 @@ export function TaskPageRedmineIssueList({
   const repos = useAppStore((s) => s.repos)
   const projectRepoMap = useAppStore((s) => s.settings?.redmineProjectRepoMap)
   const repoNameByProjectId = useMemo(() => {
-    const eligibleRepos = getComposerEligibleRepos(repos)
+    const eligibleRepos = getNewWorkspaceDialogEligibleRepos(repos)
     const eligibleRepoIds = eligibleRepos.map((repo) => repo.id)
     const labels = new Map<number, string>()
     for (const issue of issues) {
