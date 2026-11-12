@@ -33,17 +33,20 @@ vi.mock('@/components/terminal-pane/TerminalPane', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createTerminalPaneModule()
 })
 
-vi.mock('@/components/terminal-pane/use-terminal-tab-cold-parking', async () => {
+vi.mock('@/components/terminal-pane/parking/lifecycle/use-terminal-tab-cold-parking', async () => {
   return (await import('./floating-terminal-panel-test-module-mocks')).createColdParkingModule()
 })
 
-vi.mock('@/components/terminal-pane/terminal-parked-tab-watchers', async () => {
-  return (
-    await import('./floating-terminal-panel-test-module-mocks')
-  ).createParkedTabWatchersModule()
-})
+vi.mock(
+  '@/components/terminal-pane/parking/output-watchers/terminal-parked-tab-watchers',
+  async () => {
+    return (
+      await import('./floating-terminal-panel-test-module-mocks')
+    ).createParkedTabWatchersModule()
+  }
+)
 
-vi.mock('@/components/terminal-pane/terminal-ime-input-context-refresh', async () => {
+vi.mock('@/components/terminal-pane/input/ime/terminal-ime-input-context-refresh', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createImeInputContextRefreshModule()
@@ -55,7 +58,7 @@ vi.mock('@/components/terminal/terminal-tab-actions', async () => {
   ).createTerminalTabActionsModule()
 })
 
-vi.mock('@/store/pinned-tab-close-guard', async () => {
+vi.mock('@/store/slices/tabs/closing/pinned-tab-close-guard', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createPinnedTabCloseGuardModule()
@@ -91,31 +94,31 @@ vi.mock('@/components/terminal/useTerminalSaveDialog', async () => {
   ).createTerminalSaveDialogModule()
 })
 
-vi.mock('@/runtime/web-runtime-session-tab-lifecycle', async () => {
+vi.mock('@/runtime/web-session-tabs-sync/actions/web-runtime-session-tab-lifecycle', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createWebRuntimeTabLifecycleModule()
 })
 
-vi.mock('@/runtime/web-runtime-browser-creation', async () => {
+vi.mock('@/runtime/browser/creation/web-runtime-browser-creation', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createWebRuntimeBrowserCreationModule()
 })
 
-vi.mock('@/runtime/web-runtime-terminal-creation', async () => {
+vi.mock('@/runtime/hosted-terminals/creation/web-runtime-terminal-creation', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createWebRuntimeTerminalCreationModule()
 })
 
-vi.mock('@/runtime/web-runtime-session-environment', async () => {
+vi.mock('@/runtime/web-session-tabs-sync/identity/web-runtime-session-environment', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createWebRuntimeSessionEnvironmentModule()
 })
 
-vi.mock('@/lib/workspace-browser-tab-close', () => ({
+vi.mock('@/lib/browser/workspace/workspace-browser-tab-close', () => ({
   closeWorkspaceBrowserTab: vi.fn(() => ({ closesLocally: true, localCloseReason: 'user' }))
 }))
 
@@ -137,7 +140,7 @@ vi.mock('@/components/WorkspacePaneOverlayLayers', async () => {
   ).createWorkspacePaneOverlayLayersModule()
 })
 
-vi.mock('@/lib/connection-context', async () => {
+vi.mock('@/lib/workspace/ownership/connection-context', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createConnectionContextModule()
@@ -145,11 +148,11 @@ vi.mock('@/lib/connection-context', async () => {
 
 // Why inline and sync: this module is imported by the test file itself, so an async factory
 // resolves too late and the panel ends up calling a second copy of the mock.
-vi.mock('@/lib/create-untitled-markdown', () => ({
+vi.mock('@/lib/editor/file-operations/create-untitled-markdown', () => ({
   createUntitledMarkdownFileWithTemplateSelection: vi.fn()
 }))
 
-vi.mock('@/lib/ipc-error', async () => {
+vi.mock('@/runtime/errors/ipc-error', async () => {
   return (await import('./floating-terminal-panel-test-module-mocks')).createIpcErrorModule()
 })
 
@@ -157,13 +160,13 @@ vi.mock('sonner', async () => {
   return (await import('./floating-terminal-panel-test-module-mocks')).createSonnerModule()
 })
 
-vi.mock('@/lib/focus-terminal-tab-surface', async () => {
+vi.mock('@/components/terminal-pane/input/focus/focus-terminal-tab-surface', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createFocusTerminalTabSurfaceModule()
 })
 
-vi.mock('@/lib/orchestration-setup-state', async () => {
+vi.mock('@/components/orchestration/setup/orchestration-setup-state', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createOrchestrationSetupStateModule()
