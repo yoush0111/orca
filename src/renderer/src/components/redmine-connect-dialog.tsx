@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { cn } from '@/lib/utils'
+import { cn } from '@/lib/class-names'
 import { hasRemoteProviderRuntime } from '@/runtime/hosts/observations/provider-runtime-context'
 import { translate } from '@/i18n/i18n'
 

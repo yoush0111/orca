@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { TaskPageComposerActionsModel } from './task-page/use-task-page-composer-actions'
 import { buildRedmineTaskSourceContext } from '@/components/redmine-task-source-context'
-import { getComposerEligibleRepos } from '@/lib/new-workspace-composer-repo'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace-dialog-repo'
 import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
 import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
 import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
@@ -43,7 +43,7 @@ export function useTaskPageRedmineState(model: TaskPageComposerActionsModel) {
         map: settings?.redmineProjectRepoMap,
         projectId: issue.project?.id ?? null,
         projects: redmineProjects,
-        eligibleRepoIds: getComposerEligibleRepos(repos).map((repo) => repo.id)
+        eligibleRepoIds: getNewWorkspaceDialogEligibleRepos(repos).map((repo) => repo.id)
       })
       openModal('new-workspace-composer', {
         linkedWorkItem: buildRedmineWorkspaceSource(issue),
