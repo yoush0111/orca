@@ -164,16 +164,16 @@
     {
       "name": "orca-redmine",
       "sourcePath": "skills/orca-redmine",
-      "packageDigest": "cdeeaf83894621492d27849287e4229968e03e6e7feb19197e67f79904e08c65",
+      "packageDigest": "13e220b40f5aaf1d733a14e97f0493e48e2884d4330d092d21ef4e15d351d378",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2078,
+          "size": 2589,
           "executable": false,
           "classification": "text",
-          "exactSha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c",
-          "textNormalizedSha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c",
-          "identitySha256": "60097c560ef483ee415df54c748b286c314978acf31aa1dd40861c839756431c"
+          "exactSha256": "b0b7dcf507cad61c091f371085160072c1cdef1f13ab89f6cd219bb24a518508",
+          "textNormalizedSha256": "b0b7dcf507cad61c091f371085160072c1cdef1f13ab89f6cd219bb24a518508",
+          "identitySha256": "b0b7dcf507cad61c091f371085160072c1cdef1f13ab89f6cd219bb24a518508"
         }
       ]
     },

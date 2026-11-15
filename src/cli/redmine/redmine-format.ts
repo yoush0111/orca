@@ -1,4 +1,4 @@
-import type { RedmineIssueDetail } from '../shared/redmine-types'
+import type { RedmineIssueDetail } from '../../shared/redmine-types'
 
 export function formatRedmineIssue(issue: RedmineIssueDetail): string {
   const tracker = issue.tracker ? ` [${issue.tracker.name}]` : ''
