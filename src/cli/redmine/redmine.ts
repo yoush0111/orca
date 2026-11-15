@@ -1,10 +1,10 @@
 import type { RedmineIssueDetail } from '../../shared/redmine-types'
-import type { CommandHandler } from '../dispatch'
-import { getOptionalPositiveIntegerFlag } from '../flags'
-import { printResult } from '../format'
-import { readLinearBody } from '../linear-request-builders'
-import { formatRedmineIssue, formatRedmineNoteAdded } from '../redmine-format'
-import { RuntimeClientError } from '../runtime-client'
+import type { CommandHandler } from '../dispatch/dispatch'
+import { getOptionalPositiveIntegerFlag } from '../arguments/flags'
+import { printResult } from '../output/command-result-output'
+import { readLinearBody } from '../linear/linear-request-builders'
+import { formatRedmineIssue, formatRedmineNoteAdded } from './redmine-format'
+import { RuntimeClientError } from '../runtime/types'
 
 function getRequiredIssueId(flags: Map<string, string | boolean>): number {
   const id = getOptionalPositiveIntegerFlag(flags, 'id')
