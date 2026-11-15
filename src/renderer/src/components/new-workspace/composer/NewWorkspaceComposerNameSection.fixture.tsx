@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { defineFixture } from '../../../component-fixtures/component-fixture'
 import { NewWorkspaceComposerNameSection } from './NewWorkspaceComposerNameSection'
 import { buildWorkspaceSourceSelection } from '../../../../../shared/new-workspace/workspace-source'
+import type { SmartWorkspaceNameSelection } from '../name-field/smart-workspace-name-field-model'
 
 function BranchReusePreview({
   busy = false,
@@ -34,7 +35,12 @@ function BranchReusePreview({
         onSmartGitLabItemSelect={() => {}}
         onSmartBranchSelect={() => {}}
         onSmartLinearIssueSelect={() => {}}
-        smartNameSelection={buildWorkspaceSourceSelection({ linkedWorkItem: null, baseBranch })}
+        smartNameSelection={
+          buildWorkspaceSourceSelection({
+            linkedWorkItem: null,
+            baseBranch
+          }) as SmartWorkspaceNameSelection | null
+        }
         onClearSmartNameSelection={() => {}}
         selectedRepoRequiresConnection={false}
         selectedRepoIsGit
