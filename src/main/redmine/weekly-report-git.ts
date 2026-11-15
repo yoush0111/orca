@@ -8,8 +8,11 @@ import {
 } from '../../shared/redmine-weekly-report-commits'
 import { isGitRepoKind } from '../../shared/repo-kind'
 import type { Repo } from '../../shared/repo-types'
-import { getDefaultBaseRefAsync, gitExecOptions } from '../git/repo-default-base-ref'
-import { gitExecFileAsync } from '../git/runner'
+import {
+  getDefaultBaseRefAsync,
+  gitExecOptions
+} from '../git/refs/resolution/repo-default-base-ref'
+import { gitExecFileAsync } from '../git/command-runner/git-exec-file'
 
 export type WeeklyReportRepo = Pick<
   Repo,
