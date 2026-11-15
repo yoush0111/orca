@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const callMock = vi.fn()
 
-vi.mock('../runtime-client', async () => {
+vi.mock('../runtime/client', async () => {
   class RuntimeClient {
     readonly isRemote = false
     call = callMock
@@ -15,7 +15,7 @@ vi.mock('../runtime-client', async () => {
 })
 
 import { main } from '../index'
-import { okFixture, queueFixtures } from '../test-fixtures'
+import { okFixture, queueFixtures } from '../runtime/fixtures/runtime-rpc-fixtures'
 
 const detail = {
   id: 42,
