@@ -2,7 +2,7 @@ import type {
   RedmineWeeklyReportQuery,
   RedmineWeeklyReportResult
 } from '../../shared/redmine-types'
-import { mapWithConcurrency } from '../../shared/map-with-concurrency'
+import { mapWithConcurrency } from '../../shared/concurrency/map-with-concurrency'
 import {
   DEFAULT_REDMINE_TRACKER_NAMES,
   type WeeklyReportChange,
