@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { getWorktreeGitHubIssueRepository } from './github-issue-repository'
 import type { WorkspaceLinkedItem } from './types'
 
-const item: WorkspaceLinkedItem = {
+const item = {
   provider: 'github',
   type: 'issue',
   number: 247,
   title: 'Fork issue',
   url: 'https://github.com/fork/repo/issues/247'
-}
+} satisfies WorkspaceLinkedItem
 
 describe('getWorktreeGitHubIssueRepository', () => {
   it('uses the linked URL rather than the project or current selector', () => {

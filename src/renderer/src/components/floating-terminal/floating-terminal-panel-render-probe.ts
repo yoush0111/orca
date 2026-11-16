@@ -1,6 +1,6 @@
 import { vi } from 'vitest'
 import { hookRuntime } from './floating-terminal-panel-test-harness'
-import type { FloatingTerminalPanelBounds } from './floating-terminal-panel-bounds'
+import type { FloatingTerminalPanelBounds } from './geometry/floating-terminal-panel-bounds'
 
 export type ReactElementLike = {
   type: unknown

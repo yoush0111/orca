@@ -4,7 +4,7 @@ import { getOptionalPositiveIntegerFlag } from '../arguments/flags'
 import { printResult } from '../output/command-result-output'
 import { readLinearBody } from '../linear/linear-request-builders'
 import { formatRedmineIssue, formatRedmineNoteAdded } from './redmine-format'
-import { RuntimeClientError } from '../runtime/types'
+import { RuntimeClientError } from '../runtime/connection/types'
 
 function getRequiredIssueId(flags: Map<string, string | boolean>): number {
   const id = getOptionalPositiveIntegerFlag(flags, 'id')
