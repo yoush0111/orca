@@ -8,7 +8,7 @@ import {
   renderPanel,
   runEffects
 } from './floating-terminal-panel-render-probe'
-import { FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY } from './floating-terminal-panel-view-state'
+import { FLOATING_TERMINAL_PANEL_VIEW_STATE_STORAGE_KEY } from './state/floating-terminal-panel-view-state'
 
 vi.mock('zustand/react/shallow', () => ({
   // Why: zustand resolves the real react (unmocked in node_modules); the memo wrapper is inert here.

@@ -1,13 +1,13 @@
 import { getRepoExecutionHostId, LOCAL_EXECUTION_HOST_ID } from '../../shared/execution-host'
-import { mapWithConcurrency } from '../../shared/map-with-concurrency'
+import { mapWithConcurrency } from '../../shared/concurrency/map-with-concurrency'
 import {
   issueIdFromBranchName,
   matchCommitsToIssues,
   type WeeklyReportCommit,
   type WeeklyReportGitCommit
 } from '../../shared/redmine-weekly-report-commits'
-import { isGitRepoKind } from '../../shared/repo-kind'
-import type { Repo } from '../../shared/repo-types'
+import { isGitRepoKind } from '../../shared/repository/repo-kind'
+import type { Repo } from '../../shared/repository/repo-types'
 import {
   getDefaultBaseRefAsync,
   gitExecOptions
