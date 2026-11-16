@@ -10,7 +10,8 @@ vi.mock('../runtime/client', async () => {
     openOrca = vi.fn()
   }
   // Why: format.ts narrows with `instanceof` against the real error classes.
-  const { RuntimeClientError, RuntimeRpcFailureError } = await import('../runtime/types.js')
+  const { RuntimeClientError, RuntimeRpcFailureError } =
+    await import('../runtime/connection/types.js')
   return { RuntimeClient, RuntimeClientError, RuntimeRpcFailureError }
 })
 

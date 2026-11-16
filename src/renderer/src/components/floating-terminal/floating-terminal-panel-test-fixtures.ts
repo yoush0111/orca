@@ -1,6 +1,9 @@
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../../shared/constants'
-import type { KeybindingOverrides, TerminalShortcutPolicy } from '../../../../shared/keybindings'
-import type { BrowserWorkspace } from '../../../../shared/browser-workspace-types'
+import type {
+  KeybindingOverrides,
+  TerminalShortcutPolicy
+} from '../../../../shared/keybindings/types'
+import type { BrowserWorkspace } from '../../../../shared/browser/workspaces/browser-workspace-types'
 import type { Tab, TabGroup, TabGroupLayoutNode } from '../../../../shared/tab-types'
 import type { TerminalTab } from '../../../../shared/workspace-layout/terminal-tab-types'
 import type { OpenFile } from '@/store/slices/editor/types/open-file'
