@@ -2,8 +2,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   persistFloatingTerminalPanelTasksView,
   readPersistedFloatingTerminalPanelViewState
-} from './floating-terminal-panel-view-state'
-import type { useFloatingWorkspaceChromeModel } from './use-floating-workspace-chrome-model'
+} from './state/floating-terminal-panel-view-state'
+import type { useFloatingWorkspaceChromeModel } from './workspace/use-floating-workspace-chrome-model'
 
 export function useFloatingTerminalPanelTasksView({
   activeTab

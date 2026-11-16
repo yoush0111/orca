@@ -1,4 +1,4 @@
-import { slugifyForWorkspaceName } from './workspace-name'
+import { slugifyForWorkspaceName } from './workspace/naming/workspace-name'
 
 export const REDMINE_BRANCH_PREFIX = 'feature'
 
