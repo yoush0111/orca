@@ -8,7 +8,7 @@ import {
 import { TaskPageRedminePanel } from '@/components/task-page-redmine-panel'
 import { getProviderRuntimeContextKey } from '@/runtime/hosts/observations/provider-runtime-context'
 import { useAppStore } from '@/store'
-import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host'
+import { getSettingsFocusedExecutionHostId } from '../../../../shared/execution-host/execution-host'
 import { buildRedmineWorkspaceSource } from '../../../../shared/new-workspace/workspace-source'
 import { redmineWorkspaceSeedName } from '../../../../shared/redmine-workspace-name'
 import type { RedmineIssue } from '../../../../shared/redmine-types'
