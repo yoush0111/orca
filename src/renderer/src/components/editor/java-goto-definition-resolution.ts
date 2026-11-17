@@ -1,4 +1,4 @@
-import { resolveRuntimePath } from '../../../../shared/cross-platform-path'
+import { resolveRuntimePath } from '../../../../shared/file-access/cross-platform-path'
 import {
   dirnameOfFilePath,
   findFirstExistingTarget,
