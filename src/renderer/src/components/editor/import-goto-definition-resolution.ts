@@ -1,4 +1,7 @@
-import { relativePathInsideRoot, resolveRuntimePath } from '../../../../shared/cross-platform-path'
+import {
+  relativePathInsideRoot,
+  resolveRuntimePath
+} from '../../../../shared/file-access/cross-platform-path'
 
 const RESOLVABLE_SUFFIXES = [
   '',
