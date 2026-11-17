@@ -2,7 +2,7 @@ import {
   normalizeTaskSourceContext,
   type TaskSourceContext
 } from '../../../shared/work-items/task-source-context'
-import type { ExecutionHostId } from '../../../shared/execution-host'
+import type { ExecutionHostId } from '../../../shared/execution-host/execution-host'
 
 /** Redmine has no repo of its own, so it falls back to the account-scoped project id. */
 export const ACCOUNT_BACKED_TASK_SOURCE_PROJECT_ID = 'account-backed-task-source'
