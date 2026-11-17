@@ -10,7 +10,7 @@ import {
   SelectValue
 } from '@/components/ui/select'
 import { translate } from '@/i18n/i18n'
-import { getNewWorkspaceDialogEligibleRepos } from '../../../../../shared/new-workspace-dialog-repo'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../../../shared/new-workspace/new-workspace-dialog-repo'
 import { redmineListProjects } from '@/runtime/runtime-redmine-client'
 import { useAppStore } from '@/store'
 import type { RedmineProject } from '../../../../../shared/redmine-types'

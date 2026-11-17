@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { translate } from '@/i18n/i18n'
 import { openHttpLink } from '@/lib/browser/navigation/http-link-routing'
-import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace-dialog-repo'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace/new-workspace-dialog-repo'
 import { cn } from '@/lib/class-names'
 import { useAppStore } from '@/store'
 import { resolveRedmineIssueOpenOptions } from './task-page-redmine-link-routing'
 import { clampDoneRatio, TaskPageRedmineIssueSheet } from './task-page-redmine-issue-sheet'
 import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
 import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
-import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
+import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/workspace/identity/floating-workspace-id'
 
 type TaskPageRedmineIssueListProps = {
   issues: readonly RedmineIssue[]

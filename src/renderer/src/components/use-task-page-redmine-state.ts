@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { TaskPageComposerActionsModel } from './task-page/use-task-page-composer-actions'
 import { buildRedmineTaskSourceContext } from '@/components/redmine-task-source-context'
-import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace-dialog-repo'
+import { getNewWorkspaceDialogEligibleRepos } from '../../../shared/new-workspace/new-workspace-dialog-repo'
 import { buildRedmineWorkspaceSource } from '../../../shared/new-workspace/workspace-source'
 import { resolveRedmineRepoId } from '../../../shared/redmine-project-repo-map'
 import type { RedmineIssue, RedmineProject } from '../../../shared/redmine-types'
