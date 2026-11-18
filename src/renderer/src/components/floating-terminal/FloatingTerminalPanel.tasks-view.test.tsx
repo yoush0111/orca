@@ -52,7 +52,7 @@ vi.mock('@/components/terminal-pane/input/ime/terminal-ime-input-context-refresh
   ).createImeInputContextRefreshModule()
 })
 
-vi.mock('@/components/terminal/terminal-tab-actions', async () => {
+vi.mock('@/components/terminal/tab-lifecycle/terminal-tab-actions', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createTerminalTabActionsModule()
@@ -88,7 +88,7 @@ vi.mock('@/components/ui/dialog', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createDialogModule()
 })
 
-vi.mock('@/components/terminal/useTerminalSaveDialog', async () => {
+vi.mock('@/components/terminal/workspace-files/useTerminalSaveDialog', async () => {
   return (
     await import('./floating-terminal-panel-test-module-mocks')
   ).createTerminalSaveDialogModule()
@@ -134,7 +134,7 @@ vi.mock('@/components/tab-group/TabGroupSplitNodeTree', async () => {
   ).createTabGroupSplitNodeTreeModule()
 })
 
-vi.mock('@/components/WorkspacePaneOverlayLayers', async () => {
+vi.mock('@/components/terminal/workbench/WorkspacePaneOverlayLayers', async () => {
   return (
     await import('./floating-terminal-panel-component-stubs')
   ).createWorkspacePaneOverlayLayersModule()
@@ -172,29 +172,29 @@ vi.mock('@/components/orchestration/setup/orchestration-setup-state', async () =
   ).createOrchestrationSetupStateModule()
 })
 
-vi.mock('./FloatingTerminalOrchestrationDialog', async () => {
+vi.mock('./orchestration/FloatingTerminalOrchestrationDialog', async () => {
   return (
     await import('./floating-terminal-panel-component-stubs')
   ).createOrchestrationDialogModule()
 })
 
-vi.mock('./FloatingTerminalResizeHandles', async () => {
+vi.mock('./geometry/FloatingTerminalResizeHandles', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createResizeHandlesModule()
 })
 
-vi.mock('./FloatingTerminalToggleButton', async () => {
+vi.mock('./trigger/FloatingTerminalToggleButton', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createToggleButtonModule()
 })
 
 // Why: the panel runs as a plain function here, so the real confirmation dialog's useContext has no dispatcher.
-vi.mock('@/components/use-bulk-tab-close-confirmation', () => ({
+vi.mock('@/components/terminal/tab-lifecycle/use-bulk-tab-close-confirmation', () => ({
   useBulkTabCloseConfirmation: () => () => {}
 }))
 vi.mock('./FloatingTerminalWindowControls', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createWindowControlsModule()
 })
 
-vi.mock('@/components/ShortcutKeyCombo', async () => {
+vi.mock('@/components/ui/ShortcutKeyCombo', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createShortcutKeyComboModule()
 })
 
