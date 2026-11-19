@@ -53,8 +53,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      # 빌드가 git describe로 upstream 릴리즈 태그를 찾는데 포크에는 v1.4.* 태그가 없다.
-      - run: git fetch --no-tags https://github.com/stablyai/orca.git 'refs/tags/v1.4.*:refs/tags/v1.4.*'
+      # 빌드의 git describe는 포크에 올려 둔 upstream 기준 태그(v1.4.*)를 쓴다 — upstream 저장소가 404라 직접 가져올 수 없다.
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
@@ -99,7 +98,6 @@ jobs:
       - uses: actions/checkout@v5
         with:
           fetch-depth: 0
-      - run: git fetch --no-tags https://github.com/stablyai/orca.git 'refs/tags/v1.4.*:refs/tags/v1.4.*'
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v5
         with:
