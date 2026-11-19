@@ -184,6 +184,8 @@ export type PersistedUIState = {
   dismissedUpdateNudgeId?: string | null
   /** Whether Orca already tried triggering the macOS notification permission dialog; prevents re-firing every launch. */
   notificationPermissionRequested?: boolean
+  /** Parent of the folder last chosen in the project folder pickers; reopened next time. */
+  lastProjectPickerParent?: string
   /** Once the "your sessions won't be interrupted" reassurance card is seen, never show it again. */
   updateReassuranceSeen?: boolean
   /** macOS major whose update-requirement notice was seen; a later requirement shows it again. */
