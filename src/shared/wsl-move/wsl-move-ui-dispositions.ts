@@ -143,6 +143,7 @@ export const UI_STATE_GLOBAL_FIELDS = [
   'pendingUpdateNudgeId',
   'dismissedUpdateNudgeId',
   'notificationPermissionRequested',
+  'lastProjectPickerParent',
   'updateReassuranceSeen',
   'seenMacosUpdateRequirement',
   'setupGuideSidebarDismissed',
