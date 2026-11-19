@@ -26,6 +26,8 @@ type MainOwnedUIState =
   // The moved-to-WSL list exists only on the desktop that moved the projects.
   | 'wslMovedSectionCollapsed'
   | 'hiddenWslMovedProjectKeys'
+  // Native folder pickers run only in the desktop main process.
+  | 'lastProjectPickerParent'
 const _uiUpdateParity: AssertNoMissingKeys<
   Omit<PersistedUIState, MainOwnedUIState>,
   z.infer<UiUpdateFieldsSchema>
