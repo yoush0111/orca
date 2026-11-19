@@ -3,6 +3,7 @@ import { ipcMain } from 'electron'
 import { dirname } from 'node:path'
 import type { Store } from '../../persistence/loading-store/store'
 import type { Repo } from '../../../shared/repository/repo-types'
+import type { PersistedUIState } from '../../../shared/orca-profiles/persisted-ui-state-types'
 import {
   getRepoExecutionHostId,
   LOCAL_EXECUTION_HOST_ID
@@ -26,11 +27,22 @@ function newestLocalProjectParent(store: Pick<Store, 'getRepos'>): string | unde
 
 export function registerRepoFolderPickerHandlers(
   mainWindow: BrowserWindow,
-  store: Pick<Store, 'getRepos'>
+  store: Pick<Store, 'getRepos'> & {
+    getUI: () => Pick<PersistedUIState, 'lastProjectPickerParent'>
+    updateUI: (updates: Pick<PersistedUIState, 'lastProjectPickerParent'>) => void
+  }
 ): void {
   const projectPickerOptions = (
     properties: OpenDialogOptions['properties']
-  ): OpenDialogOptions => ({ defaultPath: newestLocalProjectParent(store), properties })
+  ): OpenDialogOptions => ({
+    defaultPath: store.getUI().lastProjectPickerParent ?? newestLocalProjectParent(store),
+    properties
+  })
+  const rememberPick = (filePaths: string[]): void => {
+    if (filePaths[0]) {
+      store.updateUI({ lastProjectPickerParent: dirname(filePaths[0]) })
+    }
+  }
 
   ipcMain.handle('repos:pickFolder', async () => {
     const result = await showSingleFlightOpenDialog(
@@ -40,6 +52,7 @@ export function registerRepoFolderPickerHandlers(
     if (result.canceled || result.filePaths.length === 0) {
       return null
     }
+    rememberPick(result.filePaths)
     return result.filePaths[0]
   })
 
@@ -51,6 +64,7 @@ export function registerRepoFolderPickerHandlers(
     if (result.canceled || result.filePaths.length === 0) {
       return []
     }
+    rememberPick(result.filePaths)
     return result.filePaths
   })
 
@@ -64,6 +78,7 @@ export function registerRepoFolderPickerHandlers(
     if (result.canceled || result.filePaths.length === 0) {
       return null
     }
+    rememberPick(result.filePaths)
     return result.filePaths[0]
   })
 }
