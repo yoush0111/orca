@@ -5,7 +5,12 @@ import { registerRepoFolderPickerHandlers } from './repo-folder-picker-handlers'
 
 const { handlers, showDialog } = vi.hoisted(() => ({
   handlers: new Map<string, () => Promise<unknown>>(),
-  showDialog: vi.fn(async (_options: unknown) => ({ canceled: true, filePaths: [] }))
+  showDialog: vi.fn(
+    async (_options: unknown): Promise<{ canceled: boolean; filePaths: string[] }> => ({
+      canceled: true,
+      filePaths: []
+    })
+  )
 }))
 vi.mock('electron', () => ({
   BrowserWindow: class {},
@@ -26,12 +31,33 @@ describe('repo folder pickers', () => {
       repo('/Users/me/code/beta', 2),
       repo('/home/me/remote/gamma', 3, 'ssh-box')
     ]
-    registerRepoFolderPickerHandlers(new BrowserWindow(), { getRepos: () => repos })
+    registerRepoFolderPickerHandlers(new BrowserWindow(), {
+      getRepos: () => repos,
+      getUI: () => ({}),
+      updateUI: () => {}
+    })
 
     for (const channel of ['repos:pickFolder', 'repos:pickFolders', 'repos:pickDirectory']) {
       showDialog.mockClear()
       await handlers.get(channel)!()
       expect(showDialog.mock.calls[0]?.[0]).toMatchObject({ defaultPath: '/Users/me/code' })
     }
+  })
+
+  it('reopen beside the last picked folder', async () => {
+    let ui: { lastProjectPickerParent?: string } = {}
+    registerRepoFolderPickerHandlers(new BrowserWindow(), {
+      getRepos: () => [repo('/Users/me/code/beta', 2)],
+      getUI: () => ui,
+      updateUI: (patch: { lastProjectPickerParent?: string }) => {
+        ui = { ...ui, ...patch }
+      }
+    })
+
+    showDialog.mockResolvedValueOnce({ canceled: false, filePaths: ['/Users/me/picked/alpha'] })
+    await handlers.get('repos:pickFolder')!()
+    showDialog.mockClear()
+    await handlers.get('repos:pickFolders')!()
+    expect(showDialog.mock.calls[0]?.[0]).toMatchObject({ defaultPath: '/Users/me/picked' })
   })
 })
