@@ -3886,6 +3886,7 @@
             "e518f544b1": "No se detectaron agentes",
             "8dea9b5cdf": "No hay agentes habilitados",
             "chatNotInstalled": "No instalado",
+            "chatInstallRequired": "Requiere instalación",
             "startChat": "Iniciar un chat con {{value0}}",
             "chatNotInSubfolder": "Chat no disponible en subcarpetas",
             "chatNotOverSsh": "Chat no disponible por SSH",
@@ -3897,8 +3898,7 @@
             "agentsLoading": "Cargando agentes",
             "terminalListNeedsServerUpdate": "Actualiza Orca en este servidor para ver los agentes de terminal",
             "terminalListFailed": "No se pudieron listar los agentes de terminal de este espacio de trabajo",
-            "chatNotOnWindows": "Chat aún no disponible en Windows",
-            "chatInstallRequired": "Requiere instalación"
+            "chatNotOnWindows": "Chat aún no disponible en Windows"
           },
           "RecentTabSwitcher": {
             "329638ff6f": "Cambiar pestaña",
@@ -5834,12 +5834,12 @@
           "removeDescriptionSsh": "Esto solo elimina {{name}} de Orca. Sus archivos permanecen en {{host}}; vuelve a añadir ese host SSH para recuperarlo.",
           "removeDescriptionLocal": "Esto solo elimina {{name}} de Orca. Sigue estando en tu disco.",
           "removeDescriptionVmRecipe": "Esto elimina {{name}} de Orca. Su receta de VM determina si el entorno y sus archivos se eliminan permanentemente.",
-          "openTerminalWarning_one": "Se cerrará {{count}} terminal abierto en este proyecto.",
-          "openTerminalWarning_other": "Se cerrarán {{count}} terminales abiertos en este proyecto.",
-          "openTerminalWarning_many": "Se cerrarán {{count}} terminales abiertos en este proyecto.",
           "linkedWorkspaceWarning_one": "También se eliminará de Orca {{count}} espacio de trabajo de este proyecto.",
           "linkedWorkspaceWarning_other": "También se eliminarán de Orca {{count}} espacios de trabajo de este proyecto.",
-          "linkedWorkspaceWarning_many": "También se eliminarán de Orca {{count}} espacios de trabajo de este proyecto."
+          "linkedWorkspaceWarning_many": "También se eliminarán de Orca {{count}} espacios de trabajo de este proyecto.",
+          "openTerminalWarning_one": "Se cerrará {{count}} terminal abierto en este proyecto.",
+          "openTerminalWarning_other": "Se cerrarán {{count}} terminales abiertos en este proyecto.",
+          "openTerminalWarning_many": "Se cerrarán {{count}} terminales abiertos en este proyecto."
         },
         "SetupGuideSidebarEntry": {
           "b0a7bfc34c": "Ocultar de la barra lateral",
@@ -18513,16 +18513,6 @@
         "activityMonitorCount_other": "Supervisando {{count}} tareas en segundo plano",
         "activityMonitorCount_many": "Supervisando {{count}} tareas en segundo plano"
       },
-      "NativeChatResumeFailureGuidance": {
-        "fallbackShort": "No se pudo reanudar.",
-        "unconfirmedShort": "No se confirmó que continuara.",
-        "supersededShort": "Llegó trabajo nuevo tras el reinicio.",
-        "conflictShort": "Abierto en otra ventana o terminal.",
-        "ownershipUnknownShort": "Aún no está listo para reanudar.",
-        "notAttachedShort": "No se reconectó.",
-        "dispatchRejectedShort": "El agente se negó a continuar.",
-        "unsupportedShort": "Orca no puede reanudar este chat."
-      },
       "web": {
         "preloadApi": {
           "cursorAccounts": {
@@ -18861,6 +18851,16 @@
         "stateNeedsYou": "Te necesita",
         "stateResuming": "Reanudando",
         "stateStopped": "Detenido"
+      },
+      "NativeChatResumeFailureGuidance": {
+        "fallbackShort": "No se pudo reanudar.",
+        "unconfirmedShort": "No se confirmó que continuara.",
+        "supersededShort": "Llegó trabajo nuevo tras el reinicio.",
+        "conflictShort": "Abierto en otra ventana o terminal.",
+        "ownershipUnknownShort": "Aún no está listo para reanudar.",
+        "notAttachedShort": "No se reconectó.",
+        "dispatchRejectedShort": "El agente se negó a continuar.",
+        "unsupportedShort": "Orca no puede reanudar este chat."
       }
     },
     "i18n": {
@@ -19037,6 +19037,7 @@
         "claudeAccountFolderMissing": "Falta la carpeta de la cuenta de Claude seleccionada. Vuelva a iniciar sesión en ella o elija otra cuenta.",
         "claudeAccountSetupFailed": "No se pudo configurar la cuenta de Claude seleccionada. Vuelva a intentarlo o elija otra cuenta.",
         "agentCommandNotRunnable": "El Comando de {{agent}} en Ajustes → Agentes debe empezar con un programa que Orca pueda encontrar. No se admiten variables, tuberías ni otra sintaxis de shell; usa el ajuste Entorno para las variables. Cámbialo o restablécelo.",
+        "agentCommandFailed": "El Comando de {{agent}} en Ajustes → Agentes no inició {{agent}}: {{detail}}. Cámbialo o restablécelo.",
         "runtimeNotInstalled": "{{agent}} no está instalado en el equipo que ejecuta este chat. Instálelo desde el chat en una versión actual de Orca.",
         "fullAccessAsRoot": "{{agent}} no usará Acceso total mientras se ejecute como root. Elija otro permiso para {{agent}} en Configuración → Agentes para el equipo que ejecuta este chat y luego inicie un chat nuevo.",
         "launchPreparationFailed": "Orca no pudo preparar el inicio de {{agent}} en el equipo que ejecuta este chat.",
@@ -19051,6 +19052,7 @@
         "providerUnavailable": "{{agent}} no pudo responder porque el servicio está ocupado. Elige otro modelo o espera un poco y vuelve a enviar el mensaje.",
         "providerSafetyStopped": "{{agent}} detuvo esta respuesta tras una comprobación de seguridad. Revisa tu solicitud y vuelve a enviarla.",
         "providerResponseFailed": "{{agent}} no pudo terminar esta respuesta. Abre los detalles para obtener más información.",
+        "providerResponseFailedQuoted": "{{agent}} no pudo terminar esta respuesta: {{detail}}.",
         "modelUnavailable": "{{agent}} no pudo usar {{detail}}. Elige otro modelo y vuelve a enviar el mensaje.",
         "selectedModel": "el modelo seleccionado",
         "providerRejected": "{{agent}} no aceptó este mensaje.",
@@ -19122,9 +19124,7 @@
         "commandAfterAnswer": "Responda a la pregunta o aprobación del agente y luego ejecute /{{command}}.",
         "pluginInputRequired": "{{agent}} se detuvo porque el complemento «{{plugin}}» espera una entrada en un panel de terminal. Desactiva el complemento para las sesiones de chat o ejecuta la tarea en un terminal de {{agent}}.",
         "modelUnavailableUpdate": "{{agent}} no pudo usar {{detail}}. Actualiza {{agent}} a {{minimumVersion}} o posterior para conservarlo tras un reinicio, o elige otro modelo y vuelve a enviar.",
-        "modelNotSelected": "{{agent}} no tiene ningún modelo seleccionado. Comprueba la selección del modelo y el inicio de sesión de {{agent}}, y vuelve a enviar.",
-        "agentCommandFailed": "El Comando de {{agent}} en Ajustes → Agentes no inició {{agent}}: {{detail}}. Cámbialo o restablécelo.",
-        "providerResponseFailedQuoted": "{{agent}} no pudo terminar esta respuesta: {{detail}}."
+        "modelNotSelected": "{{agent}} no tiene ningún modelo seleccionado. Comprueba la selección del modelo y el inicio de sesión de {{agent}}, y vuelve a enviar."
       },
       "writeNotice": {
         "notDoneReadHistory": "No se pudo cargar el historial de este chat.",
@@ -19267,6 +19267,7 @@
         "optionUpdateFailed": "No se pudo actualizar la opción",
         "optionValue": {
           "none": "Ninguno",
+          "off": "Desactivado",
           "fast": "Rápido",
           "minimal": "Mínimo",
           "low": "Bajo",
@@ -19275,8 +19276,7 @@
           "xhigh": "Muy alto",
           "max": "Máximo",
           "ultra": "Supremo",
-          "standard": "Estándar",
-          "off": "Desactivado"
+          "standard": "Estándar"
         },
         "noCommandsOrSkills": "No hay comandos o habilidades coincidentes",
         "commands": "Comandos",
@@ -19313,6 +19313,10 @@
         "permissionAuto": "Aprobar por mí",
         "permissionAutoDescription": "Revisa las solicitudes de aprobación por ti",
         "permissionFullAccess": "Acceso total",
+        "permissionAgentSettings": "Configuración de {{agent}}",
+        "permissionAgentSettingsUsedHint": "Usa tu configuración de permisos de {{agent}}.",
+        "permissionAgentSettingsUnnamedHint": "Usa tu configuración de permisos de {{agent}}. Orca no puede mostrar este modo.",
+        "permissionFromAgentSettings": "{{mode}}, según la configuración de {{agent}}",
         "permissionFullAccessDescription": "Nunca pregunta antes de ediciones o comandos",
         "permissionFullAccessCodexDescription": "Nunca pregunta; puede editar cualquier archivo y usar la red",
         "permissionFullAccessSharedDescription": "Nunca pregunta antes de ediciones o comandos",
@@ -19328,10 +19332,6 @@
         "sessionAttachmentsStarting": "El chat de {{agent}} aún se está abriendo. Espera a que se abra y vuelve a adjuntar los archivos.",
         "moreControls": "Más controles de chat",
         "exitPlanMode": "Salir del modo de planificación",
-        "permissionAgentSettings": "Configuración de {{agent}}",
-        "permissionAgentSettingsUsedHint": "Usa tu configuración de permisos de {{agent}}.",
-        "permissionAgentSettingsUnnamedHint": "Usa tu configuración de permisos de {{agent}}. Orca no puede mostrar este modo.",
-        "permissionFromAgentSettings": "{{mode}}, según la configuración de {{agent}}",
         "permissionAppliesNextMessage": "{{saved}} se aplica a tu próximo mensaje; actualmente se usa {{active}}",
         "botFor": "Para: {{detail}}",
         "bots": "Bots"
@@ -21890,6 +21890,16 @@
       "confirm": "Ajustar y mostrar",
       "cancel": "Mantener filtros"
     },
+    "revealCurrent": {
+      "label": "Mostrar actual",
+      "noWorkspace": "No hay nada abierto",
+      "fullPageView": "Esta página no tiene fila en la barra lateral",
+      "archived": "Los espacios de trabajo archivados no aparecen en la barra lateral",
+      "botsOff": "Los bots están desactivados, así que este bot no aparece",
+      "botHidden": "Este bot está en pausa y oculto por las opciones de bots",
+      "renameBotPage": "La página de un bot o grupo no es un worktree. Para renombrarlo, usa Renombrar en el menú de su fila.",
+      "renameUnlisted": "Este espacio de trabajo no aparece ahora en la barra lateral, así que no se puede renombrar allí."
+    },
     "wslMoved": {
       "movedToHost": "Movido al host de {{distro}}",
       "sectionTitle": "Movidos a hosts de WSL ({{count}})",
@@ -22069,16 +22079,6 @@
       "existingTitle": "Añadir en el host {{distro}} (recomendado)",
       "existingWhy": "{{distro}} ya se ejecuta como host, así que Git, los archivos y las terminales se ejecutan de forma nativa en Linux en lugar de a través del recurso compartido de Windows.",
       "existingAccept": "Añadir en el host"
-    },
-    "revealCurrent": {
-      "label": "Mostrar actual",
-      "noWorkspace": "No hay nada abierto",
-      "fullPageView": "Esta página no tiene fila en la barra lateral",
-      "archived": "Los espacios de trabajo archivados no aparecen en la barra lateral",
-      "botsOff": "Los bots están desactivados, así que este bot no aparece",
-      "botHidden": "Este bot está en pausa y oculto por las opciones de bots",
-      "renameBotPage": "La página de un bot o grupo no es un worktree. Para renombrarlo, usa Renombrar en el menú de su fila.",
-      "renameUnlisted": "Este espacio de trabajo no aparece ahora en la barra lateral, así que no se puede renombrar allí."
     },
     "cardSlot": {
       "needYouCount": "{{count}} te necesitan",
@@ -23615,10 +23615,10 @@
     }
   },
   "nativeChat": {
+    "linkedMessageMissing": "No se pudo encontrar ese mensaje.",
     "math": {
       "scrollDisplayEquation": "Desplazar ecuación en bloque"
     },
-    "linkedMessageMissing": "No se pudo encontrar ese mensaje.",
     "messageTime": {
       "yesterday": "Ayer {{time}}"
     }
@@ -24488,47 +24488,6 @@
     "invalidBranchName": "Este nombre de rama no es válido. Elige otro nombre.",
     "createBranchFailed": "Orca no pudo crear la rama. Revisa este repositorio en una terminal e inténtalo de nuevo."
   },
-  "speechModelUpdate": {
-    "update": "Actualizar",
-    "cancel": "Cancelar",
-    "pill": {
-      "updateNotice": "El dictado más rápido está listo para instalarse",
-      "retiredNotice": "El dictado ahora usa un modelo de voz más rápido",
-      "install": "Instalar",
-      "installTooltip": "Descarga única · {{size}} MB",
-      "downloading": "Configurando el dictado",
-      "downloadingTooltip": "{{done}} de {{size}} MB",
-      "ready": "El dictado está listo. Pulsa <kbd></kbd>",
-      "readyNoShortcut": "El dictado está listo.",
-      "failed": "La descarga se detuvo. Revisa tu conexión.",
-      "tryAgain": "Reintentar",
-      "deleteOld": "Eliminar modelo anterior",
-      "deleteFailed": "No se pudo eliminar {{model}}.",
-      "dismiss": "Descartar",
-      "cancelDownload": "Cancelar descarga"
-    }
-  },
-  "usage": {
-    "failure": {
-      "unavailable": "El uso no está disponible. Pulsa Actualizar para reconectar.",
-      "setting": "No se pudo confirmar el cambio de seguimiento. Intenta cambiarlo de nuevo.",
-      "refresh": "No se pudo completar la actualización anterior. Pulsa Actualizar de nuevo.",
-      "read": "No se pudo cargar el uso. Pulsa Actualizar de nuevo.",
-      "retry": "Actualizar"
-    }
-  },
-  "crashReport": {
-    "freeze": {
-      "includeRedacted": "Incluir el informe de bloqueo guardado y los registros recientes (anonimizados)",
-      "uncheckAttachments": "Uncheck \"Include the saved freeze report and recent logs (redacted)\" and try again, or copy the details."
-    },
-    "includeRecentLogsRedacted": "Incluir registros recientes (anonimizados)",
-    "details": "Detalles",
-    "copyDetails": "Copiar detalles",
-    "dontSend": "No enviar",
-    "sending": "Enviando…",
-    "sendReport": "Enviar informe"
-  },
   "bots": {
     "deepLink": {
       "missing": "Esa conversación no está abierta en este equipo."
@@ -24901,6 +24860,47 @@
       "shareAction": "Compartir",
       "sharingOn": "Activado"
     }
+  },
+  "speechModelUpdate": {
+    "update": "Actualizar",
+    "cancel": "Cancelar",
+    "pill": {
+      "updateNotice": "El dictado más rápido está listo para instalarse",
+      "retiredNotice": "El dictado ahora usa un modelo de voz más rápido",
+      "install": "Instalar",
+      "installTooltip": "Descarga única · {{size}} MB",
+      "downloading": "Configurando el dictado",
+      "downloadingTooltip": "{{done}} de {{size}} MB",
+      "ready": "El dictado está listo. Pulsa <kbd></kbd>",
+      "readyNoShortcut": "El dictado está listo.",
+      "failed": "La descarga se detuvo. Revisa tu conexión.",
+      "tryAgain": "Reintentar",
+      "deleteOld": "Eliminar modelo anterior",
+      "deleteFailed": "No se pudo eliminar {{model}}.",
+      "dismiss": "Descartar",
+      "cancelDownload": "Cancelar descarga"
+    }
+  },
+  "usage": {
+    "failure": {
+      "unavailable": "El uso no está disponible. Pulsa Actualizar para reconectar.",
+      "setting": "No se pudo confirmar el cambio de seguimiento. Intenta cambiarlo de nuevo.",
+      "refresh": "No se pudo completar la actualización anterior. Pulsa Actualizar de nuevo.",
+      "read": "No se pudo cargar el uso. Pulsa Actualizar de nuevo.",
+      "retry": "Actualizar"
+    }
+  },
+  "crashReport": {
+    "freeze": {
+      "includeRedacted": "Incluir el informe de bloqueo guardado y los registros recientes (anonimizados)",
+      "uncheckAttachments": "Uncheck \"Include the saved freeze report and recent logs (redacted)\" and try again, or copy the details."
+    },
+    "includeRecentLogsRedacted": "Incluir registros recientes (anonimizados)",
+    "details": "Detalles",
+    "copyDetails": "Copiar detalles",
+    "dontSend": "No enviar",
+    "sending": "Enviando…",
+    "sendReport": "Enviar informe"
   },
   "agentCliUpdate": {
     "thisComputer": "Este equipo"

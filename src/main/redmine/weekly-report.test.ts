@@ -22,9 +22,9 @@ vi.mock('./credential-store', () => ({
     email: null
   }),
   readApiKey: () => 'secret',
-  hasStoredApiKey: () => true,
+  hasStoredApiKey: async () => true,
   getCredentialError: () => null,
-  saveConnection: vi.fn(),
+  saveConnection: vi.fn(async () => {}),
   clearConnection: vi.fn()
 }))
 
