@@ -1,3 +1,4 @@
+/* eslint-disable max-lines -- Why: the fork release-feed branch sits inside upstream's feed pinning; extracting it would conflict on every upstream rebase. */
 import { app } from 'electron'
 import {
   fetchLatestStableReleaseTag,
@@ -239,7 +240,7 @@ export abstract class UpdaterReleaseFeed extends UpdaterInstallExecution {
       // Why: fork releases are `-personal` prereleases on their own repo, so upstream's stable-tag pin never matches.
       const url = `https://github.com/${releaseRepo}/releases/latest/download`
       console.info(`[updater] fork release feed fallback: current=${currentVersion} → ${url}`)
-      autoUpdater.setFeedURL({ provider: 'generic', url })
+      this.getAutoUpdater().setFeedURL({ provider: 'generic', url })
       return 'ready'
     }
     const stableTag = await fetchLatestStableReleaseTag()
