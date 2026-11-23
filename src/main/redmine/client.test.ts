@@ -27,9 +27,9 @@ const credentialState: { record: typeof record | null; apiKey: string | null } =
 vi.mock('./credential-store', () => ({
   readConnectionRecord: () => credentialState.record,
   readApiKey: () => credentialState.apiKey,
-  hasStoredApiKey: () => credentialState.apiKey !== null,
+  hasStoredApiKey: async () => credentialState.apiKey !== null,
   getCredentialError: () => null,
-  saveConnection: vi.fn(),
+  saveConnection: vi.fn(async () => {}),
   clearConnection: vi.fn()
 }))
 

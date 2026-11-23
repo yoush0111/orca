@@ -47,8 +47,8 @@ export function getCredentialError(): string | null {
   return credentialError
 }
 
-export function hasStoredApiKey(): boolean {
-  return cachedApiKey !== null || credentialFileHasContent(keyPath())
+export async function hasStoredApiKey(): Promise<boolean> {
+  return cachedApiKey !== null || (await credentialFileHasContent(keyPath()))
 }
 
 function normalizeRecord(input: unknown): RedmineConnectionRecord | null {
@@ -92,9 +92,12 @@ export function readConnectionRecord(): RedmineConnectionRecord | null {
   return cachedRecord
 }
 
-export function saveConnection(record: RedmineConnectionRecord, apiKey: string): void {
+export async function saveConnection(
+  record: RedmineConnectionRecord,
+  apiKey: string
+): Promise<void> {
   ensureOrcaDir()
-  writeEncryptedCredential('Redmine', keyPath(), apiKey)
+  await writeEncryptedCredential('Redmine', keyPath(), apiKey)
   writeFileSync(recordPath(), JSON.stringify(record, null, 2), {
     encoding: 'utf-8',
     mode: 0o600
