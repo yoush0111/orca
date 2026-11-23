@@ -128,9 +128,9 @@ function getClient(): ActiveClient | null {
   return apiKey ? { baseUrl: record.baseUrl, apiKey } : null
 }
 
-export function getStatus(): RedmineConnectionStatus {
+export async function getStatus(): Promise<RedmineConnectionStatus> {
   const record = readConnectionRecord()
-  const connected = record !== null && hasStoredApiKey()
+  const connected = record !== null && (await hasStoredApiKey())
   const credentialError = getCredentialError()
   return {
     connected,
@@ -163,7 +163,7 @@ export async function connect(args: RedmineConnectArgs): Promise<RedmineConnectR
   }
   try {
     const viewer = parseRedmineViewer(await redmineGet(baseUrl, apiKey, '/users/current.json'))
-    saveConnection(
+    await saveConnection(
       {
         version: 1,
         baseUrl,
