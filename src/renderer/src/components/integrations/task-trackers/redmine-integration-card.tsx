@@ -8,13 +8,14 @@ import {
   getProviderRuntimeContextKey,
   hasRemoteProviderRuntime
 } from '@/runtime/hosts/observations/provider-runtime-context'
+import { defaultScopeHost } from '@/runtime/hosts/selection/default-creation-host'
 import { useAppStore } from '@/store'
 import {
   IntegrationCardDetails,
   IntegrationCardShell
 } from '../presentation/integration-card-shell'
 import { useIntegrationSubordinateRowClass } from '../presentation/integration-card-presentation'
-import { getProviderAccountScope } from '../../provider-accounts/provider-account-scope'
+import { useProviderAccountScope } from '../../provider-accounts/use-provider-host-scope'
 import { ProviderHostScopeControl } from '../../provider-accounts/ProviderHostScopeControl'
 import { REDMINE_INTEGRATION_SECTION_ID } from './task-provider-integration-section-ids'
 import { NumberField, SettingsSwitchRow } from '../../settings/form-controls/SettingsFormControls'
@@ -44,7 +45,7 @@ export function RedmineIntegrationCard(): React.JSX.Element {
   const checking = !contextMatches || !redmineStatusChecked
   const connected = contextMatches && redmineStatus.connected
   const connection = redmineStatus.connection
-  const accountScope = getProviderAccountScope(settings)
+  const accountScope = useProviderAccountScope(defaultScopeHost(settings))
   const credentialCopy = hasRemoteProviderRuntime(settings)
     ? translate(
         'auto.components.settings.redmine.integration.card.credentialRemote',
